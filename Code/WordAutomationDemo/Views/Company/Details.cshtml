@@ -1,0 +1,136 @@
+﻿@model WordAutomationDemo.Models.CompanyModel
+@using Kendo.Mvc.UI
+@{
+    ViewBag.Title = "Company Details";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+<div class="row">
+    <div class="col-sm-12">
+        <div class="main-heading title-row mbp15">
+            <div class="row">
+                <div class="col-xs-12">
+                    <h1 class="heading01">Company Details</h1>
+                </div>
+
+            </div>
+        </div>
+    </div>
+    @if (Model != null)
+    {
+        <div class="col-sm-12 mtp10">
+            <div class="form-details">
+                <div class="row">
+                    <div class="col-sm-3">
+                        <div class="form-group">
+                            <label>Company Name</label>
+                            <p class="form-control-static">@Html.DisplayFor(model => model.Name)</p>
+                        </div>
+                    </div>
+                    <div class="col-sm-3">
+                        <div class="form-group">
+                            <label>Address</label>
+                            <p class="form-control-static">
+                                @{
+                                    var str = (!string.IsNullOrEmpty(Model.Address)) ? Model.Address.Replace("\n", "<br/>") : Model.Address;
+                                    @Html.Raw(str);
+                                }
+                            </p>
+                        </div>
+                    </div>
+                    <div class="col-sm-3">
+                        <div class="form-group">
+                            <label>Country</label>
+                            <p class="form-control-static">@Html.DisplayFor(model => model.Country)</p>
+                        </div>
+                    </div>
+                    <div class="col-sm-3">
+                        <div class="form-group">
+                            <label>State/Province/Other</label>
+                            <p class="form-control-static">@Html.DisplayFor(model => model.State)</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-sm-3">
+                        <div class="form-group">
+                            <label>City</label>
+                            <p class="form-control-static">@Html.DisplayFor(model => model.City)</p>
+                        </div>
+                    </div>
+                    <div class="col-sm-3">
+                        <div class="form-group">
+                            <label>Zip/Postal</label>
+                            <p class="form-control-static">@Html.DisplayFor(model => model.Zip)</p>
+                        </div>
+                    </div>
+                    <div class="col-sm-3">
+                        <div class="form-group">
+                            <label>Status</label>
+                            <p class="form-control-static">@Html.DisplayFor(model => model.strStatus)</p>
+                        </div>
+                    </div>
+                    <div class="col-sm-3">
+                        <div class="form-group">
+                            <label>Website URL</label>
+                            <p class="form-control-static">@Html.DisplayFor(model => model.WebsiteURL)</p>
+                        </div>
+                    </div>
+                    <div class="col-sm-3 divCompanyLogoImage">
+                        <div class="form-group">
+                            <label>Company Logo</label>
+                            <div class="clearfix">
+                                <div class="thumbimg">
+                                    <img src="~/ApplicationDocuments/CompanyLogos/@Model.CompanyLogo" id="imgCLogo" class="img-thumbnail img-responsive" />
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-sm-3">
+                        <div class="form-group">
+                            <label>Exchange Server</label>
+                            @if (Model.IsAppointmentEnable == true)
+                            {
+                                <p class="form-control-static">Enable</p>
+                            }
+                            else
+                            {
+                                <p class="form-control-static">Disable</p>
+                            }
+                        </div>
+                    </div>
+                    <div class="col-sm-3">
+                        <div class="form-group">
+                            <label>Exchange Server URL</label>
+                            <p class="form-control-static">@Html.DisplayFor(model => model.ExchangeServerURL)</p>
+                        </div>
+                    </div>
+                    <div class="col-sm-3">
+                        <div class="form-group">
+                            <label>Exchange Server User Name</label>
+                            <p class="form-control-static">@Html.DisplayFor(model => model.ExchangeServerUserName)</p>
+                        </div>
+                    </div>
+                    <div class="col-sm-3">
+                        <div class="form-group">
+                            <label>Date Format</label>
+                            <p class="form-control-static">@Html.DisplayFor(model => model.DateFormat )</p>
+                        </div>
+                    </div>
+                </div>
+                    <div class="row">
+                        <div class="col-sm-12">
+                            <button class="darkblue-btn btnspace" type="button" onclick="location.href='@Url.Action("Index", "Company")';return false;"><i class="fa fa-angle-left" aria-hidden="true"></i> Back</button>
+                        </div>
+                    </div>
+                </div>
+        </div>
+                                    }
+</div>
+<script>
+    $('#imgCLogo').load(function () { }).error(function () {
+        $("#imgCLogo, #btnRemoveImage, .divCompanyLogoImage").hide();
+    });
+</script>
+

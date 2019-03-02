@@ -1,0 +1,76 @@
+﻿@using DevExpress.Web.Mvc;
+@using DevExpress.Web.Mvc.UI;
+@using Kendo.Mvc.UI
+
+@model WordAutomationDemo.Models.AssignmentModel
+
+<div class="col-sm-6">
+    <div id="grid"></div>
+    <p class="errormessage" style="display:none;" id="reqAssignTo">
+        <span class="field-validation-error" data-valmsg-for="AssignTo" data-valmsg-replace="true"><span for="AssignTo" class="">Assign To is required.</span></span>
+    </p>
+</div>
+<hr />
+<div class="row">
+    <div class="col-sm-6">
+        <div class="form-group input-height row">
+            <label for="" class="col-md-6 col-sm-3">Choose a project file</label>
+            <div id="divProjectTaskID" class="col-md-6 col-sm-9 input-group">
+                @(Html.Kendo().DropDownList()
+                                                .Name("ProjectTaskID")
+                                                .HtmlAttributes(new { style = "width: 100%", @class = "form-control" })
+                                                .DataTextField("ProjectName")
+                                                .DataValueField("ProjectID")
+                                                .OptionLabel(" - Select Project Document - ")
+                                                .DataSource(source => source
+                                                .Custom()
+                                                .Transport(transport => transport
+                                                .Read(read =>
+                                                {
+                                                    read.Action("GetProjectDocumentList", "Home").Data("filterDocuments"); ;
+                                                })))
+                                                .Events(e =>
+                                                {
+                                                    e.Change("changeProjectDoc");
+                                                }).Template("<span class=\"k-state-default\" ><b style='font-size:14px;'>#: ProjectName #</b><p style='font-size:10px;'>#: DocName #</p></span>")
+                                                .ValueTemplate("<span class=\"selected-value\" ></span>" + "<span>#:DocName#</span>")
+                )
+            </div>
+            <p class="errormessage col-sm-6 offset-sm-6" style="display:none;" id="reqProjectDocuments">
+                <span class="field-validation-error" data-valmsg-for="ProjectDocuments" data-valmsg-replace="true"><span for="ProjectDocuments" class="">Project Document is required.</span></span>
+            </p>
+        </div>
+    </div>
+    <div class="col-sm-6" id="divDocFile">
+        <div class="form-group multiselectbox">
+            @using (Html.BeginForm("UploadDoc", "Home", FormMethod.Post, new { enctype = "multipart/form-data", id = "CreateUpload" }))
+            {
+                <input type="hidden" name="hdnDocTaskType" value="" id="hdnDocTaskType" />
+                <input type="hidden" name="hdnDocProjectID" value="" id="hdnDocProjectID" />
+                <input type="hidden" name="hdnDocTaskName" value="" id="hdnDocTaskName" />
+                <input type="hidden" name="hdnDocDueDate" value="" id="hdnDocDueDate" />
+                <input type="hidden" name="hdnDocAssignTo" value="" id="hdnDocAssignTo" />
+                <input type="hidden" name="hdnDocComments" value="" id="hdnDocComments" />
+                <input type="hidden" name="hdnDocName" value="" id="hdnDocName" />
+                <input type="hidden" name="hdnDocumentID" value="" id="hdnDocumentID" />
+                <input type="hidden" name="hdnFileName" id="hdnFileName" />
+
+                <label for="UploadNewFile" class="col-md-6 col-sm-3">Or upload a new file</label>
+                <div class="col-md-6 col-sm-9 input-group" style="padding-right:15px;">
+
+                    <input type="text" class="form-control" readonly="">
+                    <label class="input-group-btn">
+                        <span class="btn btn-primary">
+                            Browse… <input type="file" style="display:none;" multiple="multiple" name="docFile" onchange="ValidateType(this)" class="form-control" id="docFile" accept=".docx,.doc,.ppt,.pptx,.xls,.xlsx" />
+                        </span>
+                        @*<div class="col-lg-6">
+                                <input type="file" multiple="multiple" name="docFile" onchange="ValidateType(this)" value="" class="form-control col-md-5" id="docFile" accept=".docx,.doc,.ppt,.pptx" />
+                            </div>*@
+                        <button class="btn-primary btn ml5" type="submit" name="Upload" onclick="return SetDocData()" title="Upload Document"><i class="fa fa-upload" aria-hidden="true"></i></button>
+                    </label>
+                </div>
+            }
+        </div>
+    </div>
+</div>
+

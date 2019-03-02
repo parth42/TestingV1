@@ -1,0 +1,622 @@
+﻿@using DevExpress.Web.Mvc;
+@using DevExpress.Web.Mvc.UI;
+@model WordAutomationDemo.Models.ExcelModel
+@{
+    ViewBag.Title = "Edit Content";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+
+    var canPublish = WordAutomationDemo.Common.Global.AssignmentMemberCanPublish(Model.AssignedTaskID, WordAutomationDemo.Helpers.CurrentUserSession.User.UserID);
+    var canSendForApproval = WordAutomationDemo.Common.Global.AssignmentMemberCanSendForApproval(Model.AssignedTaskID, WordAutomationDemo.Helpers.CurrentUserSession.User.UserID);
+}
+
+<div class="row">
+    @{
+        string ExcelPath = @Url.Content("~/ApplicationDocuments/Excels/");
+    }
+    <div class="col-sm-12">
+        <div class="main-heading title-row mbp15">
+            <div class="row">
+                <div class="col-xs-11">
+                    <h1 class="heading01">Edit Content</h1>
+                </div>
+                <div class="col-xs-1">
+                    <button href="#" class="darkblue-btn btnspace" data-toggle="tooltip" data-placement="bottom" title="" data-original-title="Refresh" onclick="RefreshPage()">Refresh</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-sm-12 mtp10">
+
+        @using (Html.BeginForm("EditExcel", "Home", FormMethod.Post, new { enctype = "multipart/form-data", id = "frmEdit" }))
+        {
+            @Html.HiddenFor(x => x.OriginalFile);
+            @Html.HiddenFor(x => x.AssignedTaskID);
+            @Html.HiddenFor(x => x.ListSheets);
+            @Html.HiddenFor(x => x.strSheetComments);
+
+            if (Request.QueryString["Msg"] != null && Request.QueryString["Msg"].ToString() == "Error")
+            {
+                <div class="alert alert-danger" id="Error">
+                    @Html.Encode(String.Format(WordAutomationDemo.Common.Messages.ExcelNotUploaded))
+                </div>
+                <script>
+                    $("#Error").show().focus();
+                    setTimeout(function () {
+                        $("#Error").hide();
+                    },
+                        5000);
+                </script>
+            }
+
+            else if (Request.QueryString["Msg"] != null && Request.QueryString["Msg"].ToString() == "Completed")
+            {
+                <div class="alert alert-success" id="Completed">
+                    @Html.Encode(String.Format(WordAutomationDemo.Common.Messages.SuccessChanged, "Content"))
+                </div>
+                <script>
+                    $("#Completed").show().focus();
+                    setTimeout(function () {
+                        $("#Completed").hide();
+                    }, 5000);
+                </script>
+            }
+
+            
+            <div class="row">
+                <div class="col-sm-3">
+                    <div class="form-group">
+                        <label for="UserName">Project Name </label>
+                        <p class="form-control-static">@Model.ProjectName</p>
+                    </div>
+                </div>
+
+                <div class="col-sm-3">
+                    <div class="form-group">
+                        <label for="FullName">Task Name</label>
+                        <p class="form-control-static">@Model.TaskName</p>
+                    </div>
+                </div>
+
+            </div>
+
+            <div class="row">
+                <div class="col-sm-12">
+
+                    <div class="table-responsive bluetheme">
+
+                        <table class="table table-bordered">
+                            <tr>
+                                <th>Download</th>
+                                <th>
+                                    Upload File
+                                    (optional)
+                                </th>
+                                <th>Content</th>
+                                @*<th>Changed</th>*@
+                                <th>Remarks</th>
+                                <th>Action</th>
+
+                            </tr>
+                            @{
+                                int imgCnt = 0;
+                                int cntThImg = 0;
+                                foreach (var item in Model.ListSheets)
+                                {
+                                    @Html.HiddenFor(x => x.SheetName);
+                                    <tr>
+                                        @*<td style="vertical-align:middle;"> <a class="names " data-id="@item.ThumbnailLink" href="@item.SlideLink" title="Click to download" target="_blank"><span class="glyphicon glyphicon-download-alt"> &nbsp;</span>@item.SlideName</a></td>*@
+                                        <td><a data-id="@item.SheetLink" href="@item.SheetLink" title="Click to download" target="_blank"><i class="fa fa-download mr5" aria-hidden="true"></i> @item.SheetName</a></td>
+                                        @if (item.IsSheetApproved == true)
+                                        {
+                                            <td>
+                                                @*<label class="tableicon bluebg cursor">
+                                                        <input type="file" name="" value=" " id="newfiles265" data-id="sp265" accept=".ppt,.pptx" style="display:none;">
+                                                        <i class="fa fa-plus" aria-hidden="true"></i>
+                                                    </label>*@
+
+                                            </td>
+                                        }
+                                        else
+                                        {
+                                            <td>
+                                                <div class="tableicon bluebg cursor" onclick="FileWarning(@item.AssignedExcelSheetID)"><i class="fa fa-plus" aria-hidden="true"></i></div>
+                                                <label class="tableicon bluebg cursor" style="display:none">
+                                                    <input type="file" name="newfiles" value="" onchange="ValidateType(this,@item.AssignedExcelSheetID)" id="@(String.Format("{0}", "newfiles" + item.AssignedExcelSheetID))" data-id="@(String.Format("{0}", "sp" + item.AssignedExcelSheetID))" accept=".xls,.xlsx" style="display: none;">
+                                                    <i class="fa fa-plus" aria-hidden="true"></i>
+                                                </label>
+                                                <span style="margin-left: 5px;" id="@(String.Format("{0}", "sp" + item.AssignedExcelSheetID))"></span>
+                                            </td>
+                                        }
+
+                                        @if (item.IsSheetApproved == true || item.IsSheetModified == true)
+                                        {
+                                            <td class="popover-hide-xs">
+                                                <a style="cursor:pointer;" title="View" class="onlyicon greencolor" data-toggle="modal" onclick="OpenAssignedExcel(this,@item.AssignedTaskID,@item.AssignedExcelSheetID,'@WordAutomationDemo.Common.Global.Encryption.Encrypt(item.AssignedTaskID.ToString())')" id='@item.SheetName' name='@item.OriginalFile'><i class="fa fa-file-excel-o" aria-hidden="true"></i></a>
+                                            </td>
+
+                                        }
+                                        else
+                                        {
+                                            <td class="popover-hide-xs">
+                                                <a style="cursor:pointer;" title="View" class="onlyicon greencolor" data-toggle="modal" onclick="OpenExcel(this,@item.AssignedTaskID,@item.AssignedExcelSheetID,'@WordAutomationDemo.Common.Global.Encryption.Encrypt(item.AssignedTaskID.ToString())')" id='@item.SheetName' name='@item.OriginalFile'><i class="fa fa-file-excel-o" aria-hidden="true"></i></a>
+                                                @*<a href="javascript:;" data-toggle="popover" data-trigger="hover" data-placement="bottom" id="@("pptA"+imgCnt)" class="gridthumb">
+                                                        <img src="@item.AssignedThumbnail" alt="" class="img-responsive img-thumbnail">
+                                                    </a>
+                                                    <div id="popover-content-@("pptA"+imgCnt)" class="hide">
+                                                        <img src="@item.AssignedThumbnail" alt="" class="img-responsive">
+                                                    </div>*@
+                                            </td>
+                                        }
+
+                                        @*<td>
+                                            <div>
+                                                @if (item.lstModifiedSheet.Count > 0)
+                                                {
+                                                    <div>@Html.Raw(@item.SlideLinks)</div>
+                                                    //foreach (string link in item.lstModifiedSheet)
+                                                    //{
+                                                    //    <span>@HttpUtility.HtmlDecode(@link)</span>
+                                                    //}
+                                                }
+                                                else
+                                                {
+                                                    <span>No changes found.</span>
+                                                }
+                                            </div>
+                                        </td>*@
+                                        @if (item.IsSheetApproved == true)
+                                        {
+                                            <td>@item.SheetRemarks</td>
+                                            <td id="@(String.Format("{0}", "td" + item.AssignedExcelSheetID))">Approved</td>
+                                        }
+                                        else if (item.IsGrayedOut.HasValue && item.IsGrayedOut.Value == true)
+                                        {
+                                            <td>@item.SheetRemarks</td>
+                                            <td id="@(String.Format("{0}", "td" + item.AssignedExcelSheetID))">
+                                                @*<button disabled type="button" class="btn btn-primary pull-right">Complete</button>*@
+                                                <button disabled href="#" class="tableicon bluebg" data-toggle="tooltip" data-placement="bottom" title="" data-original-title="Complete"><i class="fa fa-check" aria-hidden="true"></i></button>
+                                            </td>
+                                        }
+                                        else
+                                        {
+                                            <td>
+                                                @Html.TextArea(String.Format("{0}", "txtSheetRemarks" + item.AssignedExcelSheetID), item.SheetRemarks, new { @class = "form-control", @txtRemarksExcel = "" })
+                                            </td>
+
+                                            <td id="Actions">
+                                                @if (canPublish)
+                                                {
+                                                <button type="button" onclick="PublishExcel(@item.AssignedTaskID, '@item.OriginalFile');" class="tableicon bluebg" data-toggle="tooltip" data-placement="bottom" title="" data-original-title="Complete">Publish</button>
+                                                }
+
+                                                @if (canSendForApproval)
+                                                {
+                                                <button type="button" onclick="SendToReview(@item.AssignedTaskID);" class="tableicon bluebg" data-toggle="tooltip" data-placement="botton" title="" data-original-title="Request Review">Request Review</button>
+                                                }
+                                            </td>
+                                        }
+                                    </tr>
+                                    imgCnt += 1;
+                                }
+                            }
+                        </table>
+
+
+                    </div>
+                </div>
+            </div>
+            <div class="popup" style="border:1px solid gray;z-index:99999;display:none;">Popup</div>
+
+                                }
+
+    </div>
+</div>
+<div class="modal fade bs-example-modal-lg" id="ExcelModal" tabindex="1000" role="dialog" aria-labelledby="myLargeModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg" style="overflow:auto;">
+        <div class="modal-content">
+            <div class="modal-header">
+                <div class="pull-right">
+                    <a id="AssignedExcelDownloadLink" href="#"><i class="glyphicon glyphicon-download-alt " title="Click to Download "></i></a>
+                    &nbsp;&nbsp;
+                    <button type="button" title="Close" class="close" data-dismiss="modal" aria-hidden="true" onclick="CloseAssignedExcel()">&times;</button>
+                </div>
+                <h4 class="modal-title" id="myModalLabel">  <span id="contentType">View Document </span></h4>
+            </div>
+            <div class="modal-body" id="ExcelPartialContent" style="line-height:25px;">
+                <div>
+
+                </div>
+            </div>
+
+        </div>
+    </div>
+</div>
+
+<div class="modal fade bs-example-modal-lg" id="AssignExcelModal" tabindex="1000" role="dialog" aria-labelledby="myLargeModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg" style="overflow:auto;">
+        <div class="modal-content">
+            <div class="modal-header">
+                <div class="pull-right">
+                    <a id="AssignExcelDownloadLink" href="#"><i class="glyphicon glyphicon-download-alt " title="Click to Download "></i></a>
+                    &nbsp;&nbsp;
+                    <button type="button" title="Close" class="close" data-dismiss="modal" aria-hidden="true" onclick="CloseAssignExcel()">&times;</button>
+                </div>
+                <h4 class="modal-title" id="myModalLabel">  <span id="contentType">View Document </span></h4>
+            </div>
+            <div class="modal-body" id="AssignExcelPartialContent" style="line-height:25px;">
+                <div>
+
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade bs-example-modal-lg" id="ChangedExcelModal" tabindex="1000" role="dialog" aria-labelledby="myLargeModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg" style="overflow:auto;">
+        <div class="modal-content">
+            <div class="modal-header">
+                <div class="pull-right">
+                    <a id="ChangedExcelDownloadLink" href="#"><i class="glyphicon glyphicon-download-alt " title="Click to Download "></i></a>
+                    &nbsp;&nbsp;
+                    <button type="button" title="Close" class="close" data-dismiss="modal" aria-hidden="true" onclick="CloseChangedExcel()">&times;</button>
+                </div>
+                <h4 class="modal-title" id="myModalLabel">  <span id="contentType">View Document </span></h4>
+            </div>
+            <div class="modal-body" id="ChangedExcelPartialContent" style="line-height:25px;">
+                <div>
+
+                </div>
+            </div>
+            @*<div class="modal-footer">
+                    <button type="button" class="btn btn-primary" data-dismiss="modal">Close</button>
+                </div>*@
+        </div>
+    </div>
+</div>
+<div class="popup" data-backdrop="static" style="z-index:11000;display:none;">Popup</div>
+<div id="spinner" style="display:none;">
+    <img src=@Url.Content("~/CSS/images/bx_loader.gif") class="ajax-loader loading-spinner">
+</div>
+
+<div id="modalConfirmYesNo" class="modal fade">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                <h4 id="lblTitleConfirmYesNo" class="modal-title">Confirmation</h4>
+            </div>
+            <div class="modal-body">
+                <p id="lblMsgConfirmYesNo"></p>
+            </div>
+            <div class="modal-footer">
+                <button id="btnYesConfirmYesNo" type="button" class="btn btn-primary">Yes</button>
+                <button id="btnNoConfirmYesNo" type="button" class="btn btn-default">No</button>
+            </div>
+        </div>
+    </div>
+</div>
+<script>
+
+    _spreadsheet = null;
+    function spreadsheet_DocumentChanged(s, e) {
+        _spreadsheet = s;
+        console.log(_spreadsheet);
+        //_selection = [-1, -1, s.sheetIndex];
+        //s.getStateController().setSelection(new ASPxClientSpreadsheet.Selection(new ASPxClientSpreadsheet.Range(-1, -1, -1, -1), 0, 0));
+    }
+
+    function FileWarning(AssignedSheetID) {
+        var fileInput = $("#newfiles" + AssignedSheetID);
+        var $confirm = $("#modalConfirmYesNo");
+        $confirm.modal('show');
+        $("#lblTitleConfirmYesNo").html("Triyosoft");
+        $("#lblMsgConfirmYesNo").html("Uploading a new file will overwrite any changes. Do you wish to proceed?");
+        $("#btnYesConfirmYesNo").off('click').click(function () {
+
+            $('.ApproveButton').attr('disabled', 'disabled');
+
+            //Continue with file upload
+            $(fileInput).trigger("click");
+
+            $confirm.modal("hide");
+        });
+        $("#btnNoConfirmYesNo").off('click').click(function () {
+
+            $confirm.modal("hide");
+        });
+    }
+
+    function ValidateType(e, AssignedSheetID) {
+        if ($(e).val() != "") {
+            var ext = $(e).val().split('.').pop().toLowerCase();
+            if ($.inArray(ext, ['xls', 'xlsx']) == -1) {
+                alert("Only excel files can be uploaded!");
+                $(e).val('');
+            }
+            else {
+                $("#" + e.attributes["data-id"].value).text($(e).val().replace('C:\\fakepath\\', ""));
+
+                var fileUpload = $('#newfiles'+AssignedSheetID).get(0);
+                var files = fileUpload.files;
+
+                if (files.length > 0) {
+
+                    // Create FormData object
+                    var fileData = new FormData();
+                    for (var i = 0; i < files.length; i++) {
+                        fileData.append(files[i].name, files[i]);
+                    }
+                    fileData.append('assignmentID', '@Model.AssignedTaskID');
+                    fileData.append('originalFile', '@Model.OriginalFile');
+
+                    $.ajax({
+                        url: SiteUrl + 'Home/ValidateUploadedExcel',
+                        type: "POST",
+                        contentType: false, // Not to set any content header
+                        processData: false, // Not to process data
+                        //dataType: "JSON",
+                        //async: false,
+                        data: fileData,
+                        error: function () {
+                            alert("Server access failure!");
+                            $(".glyphicon-refresh").removeClass("glyphicon-spin");
+                        },
+                        success: function (result) {
+                            if (result !== "False") {
+                                window.location.href = SiteUrl +
+                                    'Home/EditExcel/' +
+                                    '@Model.AssignedTaskID' +
+                                    "?Msg=Completed";
+                            } else {
+                                window.location.href = SiteUrl +
+                                    'Home/EditExcel/' +
+                                    '@Model.AssignedTaskID' +
+                                    "?Msg=Error";
+                            }
+
+                        }
+                    });
+                }
+
+                $("#" + e.attributes["data-id"].value).text($(e).val().replace('C:\\fakepath\\', ""));
+            }
+        }
+
+    }
+
+    $(document).ajaxStart(function () {
+        if ($(".k-loading-image:visible").length > 0) {
+            $("#loading").hide();
+        }
+        else {
+            $("#loading").show();
+        }
+        //$(".k-loading-image").hide();
+    });
+    $(document).ajaxStop(function () {
+        $("#loading").hide();
+    });
+
+    $("#frmEdit").submit(function (event) {
+        var data = $(".table-bordered").find("[txtremarksexcel='']");
+        var strRemarks = '';
+        for (var i = 0; i < data.length; i++) {
+            if (data[i].value != '') {
+                strRemarks += data[i].id.replace('txtSheetRemarks','') + '`' + data[i].value + "~"
+            }
+        }
+        $('#strSheetComments').val(strRemarks);
+        $("#btnSubmit").attr('disabled', 'disabled');
+        Snippet.core.commandManager.commands["3"]; //Save Document before form submit;
+    });
+
+    $(document).ready(function () {
+        $(".aniimated-thumbnials").lightGallery({
+            thumbnail: true,
+            animateThumb: false,
+            loop: false,
+            enableSwipe: true
+
+        });
+
+        $(window).keydown(function (event) {
+            //if (event.keyCode == 13) {
+            //    event.preventDefault();
+            //    return false;
+            //}
+        });
+        $('.names').on('mouseenter', function (evt) {
+            $('.popup').html('<img style="border:1px solid"  src="' + $(this).data('id') + '">');
+            $('.popup').css({ left: 325, top: 0 }).show();
+            //$('.popup').show();
+            $(this).on('mouseleave', function () {
+                $('.popup').hide();
+            });
+        });
+    });
+
+
+    function ShowImg(obj) {
+        $('.popup').hide();
+        $('.popup').html('<img style="border:1px solid" src="' + $(obj).data('id') + '" />');
+        var offset = $(obj).offset();
+
+        $('.popup').css('left', 300);
+        if (offset.top < 200) {
+            $('.popup').css('top', (offset.top - 50));
+        }
+        else {
+            $('.popup').css('top', 50);
+        }
+        $('.popup').show();
+    }
+
+    function HideImg(obj) {
+        $('.popup').hide();
+    }
+
+    function PublishExcel(assignmentID, originalFile) {
+        var remarks = $(".table-bordered").find("[txtremarksexcel='']").val();
+        console.log(assignmentID, originalFile);
+        $.ajax({
+            url: SiteUrl + '/Home/PublishExcel',
+            type: "POST",
+            data: { 'assignmentID': assignmentID, 'originalFile': originalFile, 'remarks': remarks },
+            error: function () {
+                alert("Server access failure!");
+                $(".glyphicon-refresh").removeClass("glyphicon-spin");
+            },
+            success: function (result) {
+                window.location.href = SiteUrl + 'Home/Approval?Msg=Completed';
+            }
+        })
+    }
+
+    function SendToReview(assignmentID) {
+        var remarks = $(".table-bordered").find("[txtremarksexcel='']").val();
+        $.ajax({
+            url: SiteUrl + '/Home/SendToReview',
+            type: "POST",
+            data: { 'assignmentID': assignmentID, 'remarks': remarks},
+            error: function () {
+                alert("Server error when sending to review.");
+                $(".glyphicon-refresh").removeClass("glyphicon-spin");
+            },
+            success: function (result) {
+                window.location.href = SiteUrl + 'Home/Approval?Msg=Completed';
+            }
+        })
+    }
+
+    var isExcelChanged = false;
+
+    function DocumentChanged(s, e) {
+        isExcelChanged = true;
+    }
+
+    function OnSpreadSheetEndCallback(s, e) {
+        isExcelChanged = false;
+    }
+
+    $("[data-toggle=popover]").each(function (i, obj) {
+        $(this).popover({
+            html: true,
+            content: function () {
+                var id = $(this).attr('id')
+                return $('#popover-content-' + id).html();
+            }
+        });
+
+    });
+    $(".aniimated-thumbnials").lightGallery({
+        thumbnail: true,
+        animateThumb: false,
+        loop: false,
+        enableSwipe: true
+
+    });
+    $(window).off("resize").on("resize", function () {
+        $(".popover").each(function () {
+            var popover = $(this);
+            if (popover.is(":visible")) {
+                var ctrl = $(popover.context);
+                ctrl.popover('show');
+            }
+        });
+    });
+
+    function OpenExcel(e, assignmentID, AssignedExcelSheetID, EcryptedAssignmentID) {
+        var name = e.name;
+        console.log(e);
+        var originalDocumentName = e.name;
+        var userId = '@(WordAutomationDemo.Helpers.CurrentUserSession.User.UserID.ToString())';
+        console.log(userId);
+        $("#AssignedExcelDownloadLink").attr("href", '/Home/GetAssignedChangedExcel?FileName=' + name + '&userId=' + userId + '&AssignmentId=' + assignmentID, '_blank');
+        $("#ExcelPartialContent").html('<p class="center"><i class="glyphicon glyphicon-repeat glyphicon-spin"> </i>&nbsp;&nbsp;Loading...</p>');
+        $('#SheetsLinksModal').modal('hide');
+        //$('#btnInlineSave').attr("onclick", 'SaveInlineSheet('+ assignmentID +','+JsonConvert.SerializeObject(Model) + ')');
+        $('#ExcelModal').modal('show');
+        setTimeout(function() {
+            $.get('@Url.Action("LoadAssignedChangedExcel", "Home")', { originalDocumentName: originalDocumentName, name: originalDocumentName, userid: @WordAutomationDemo.Helpers.CurrentUserSession.User.UserID, IsReadOnly: false, assignmentId: assignmentID }, function (partialView) {
+                $("#ExcelPartialContent").html(partialView);
+                $('.dxr-minBtn').click();
+                $('#Snippet_R_TC_TPTCL_MinBtn').click();
+            });
+        }, 1000);
+    }
+
+    function spreadsheet_SelectionChanged(s, e) {
+    }
+
+    function OpenAssignedExcel(e, assignmentID, AssignedExcelSheetID, EcryptedAssignmentID) {
+        var name = e.id;
+        var originalDocumentName = e.name;
+        $("#AssignExcelDownloadLink").attr("href", '@ExcelPath' + "Sheets_" + originalDocumentName + '/' + name)
+        $("#AssignExcelPartialContent").html('<p class="center"><i class="glyphicon glyphicon-repeat glyphicon-spin"> </i>&nbsp;&nbsp;Loading...</p>');
+        $('#SheetsLinksModal').modal('hide');
+        $('#AssignExcelModal').modal('show');
+        setTimeout(function () {
+            $.get('@Url.Action("LoadAssignedChangedExcel", "Home")', { OriginalDocumentName: originalDocumentName, name: originalDocumentName, userid: 1, IsReadOnly: false, AssignmentID: assignmentID }, function (partialView) {
+                $("#AssignExcelPartialContent").html(partialView);
+                $('.dxr-minBtn').click();
+                $('#Snippet_R_TC_TPTCL_MinBtn').click();
+            });
+        }, 1000);
+    }
+
+    function OpenChangedExcel(e) {
+        var originalDocumentName = e.id;
+        var name = e.name;
+        $("#ChangedExcelDownloadLink").attr("href", '@ExcelPath' + "Sheets_" + originalDocumentName + '/AssignedDoc/' + name)
+        $("#ChangedExcelPartialContent").html('<p class="center"><i class="glyphicon glyphicon-repeat glyphicon-spin"> </i>&nbsp;&nbsp;Loading...</p>');
+        $('#SheetsLinksModal').modal('hide');
+        $('#ChangedExcelModal').modal('show');
+        setTimeout(function () {
+            $.get('@Url.Action("LoadChangedExcel", "Home")', { OriginalDocumentName: originalDocumentName, name: name, userid: 1, IsReadOnly: true }, function (partialView) {
+                $("#ChangedExcelPartialContent").html(partialView);
+                $('.dxr-minBtn').click();
+                $('#Snippet_R_TC_TPTCL_MinBtn').click();
+            });
+        }, 1000);
+    }
+
+    function CloseAssignedExcel() {
+        $('#ExcelModal').modal('hide');
+    }
+
+    function CloseAssignExcel() {
+        $('#AssignExcelModal').modal('hide');
+    }
+
+    function CloseChangedExcel() {
+        $('#CloseChangedExcel').modal('hide');
+    }
+
+    function RefreshPage() {
+        window.location.href = window.location.href;
+    }
+
+</script>
+<style>
+    #spreadsheet_SSFB {
+        display: none !important;
+    }
+
+    #spreadsheetChanged_SSFB {
+        display: none !important;
+    }
+
+    #spreadsheetOriginal_SSFB {
+        display: none !important;
+    }
+
+    #spreadsheetInline_SSFB {
+        display: none !important;
+    }
+
+    #spreadsheetInlineAssigned_SSFB {
+        display: none !important;
+    }
+</style>

@@ -1,0 +1,127 @@
+﻿@using DevExpress.Web.Mvc;
+@using DevExpress.Web.Mvc.UI;
+@using WordAutomationDemo.Helpers
+@model  WordAutomationDemo.Models.AssignmentLogModel
+
+<table class="table" id="CommentHistoryTable">
+    <thead>
+        <tr>
+            <th>User</th>
+            <th>Action</th>
+            <th>Comments</th>
+            <th>Date</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var objAssignmentLogModel in Model.lstAssignmentLogModel)
+        {
+
+            <tr>
+                <td>
+                    <span>@objAssignmentLogModel.UserName</span>
+                </td>
+                <td>
+                    <span>@objAssignmentLogModel.ActionString</span>
+                </td>
+                <td>
+                    <span>@objAssignmentLogModel.Description</span>
+                </td>
+                <td>
+                    <span>@objAssignmentLogModel.CreatedDateString</span>
+                </td>
+            </tr>
+        }
+    </tbody>
+
+</table>
+<br />
+
+<div class="col-lg-10"><textarea name="comments" id="newComment"></textarea></div>
+<div class="col-lg-2"><div class="btn btn-primary" id="addNewComment" onclick="addNewComment(@Model.AssignmentID)">Add comment</div></div>
+<div class="col-lg-12"><p id="error-comment" style="display:none">Comment cannot be empty.</p></div>
+
+
+
+<style>
+    #newComment {
+        width: 100%;
+    }
+
+    .invalid-comment {
+        border-color: red;
+    }
+
+    #error-comment {
+        color: red;
+        font-size: 11px;
+    }
+</style>
+
+<script>
+
+    function validateNewComment(content) {
+        if (content.length > 0) {
+            $("#newComment").removeClass("invalid-comment");
+            $("#error-comment").hide();
+            return true;
+        } else {
+            $("#newComment").removeClass("invalid-comment").addClass("invalid-comment");
+            $("#error-comment").show();
+            return false;
+        }
+    }
+
+    function addNewComment(assignmentID) {
+        var content = $("#newComment").val();
+
+        if (validateNewComment(content)) {
+            $.post('@Url.Action("AddComment", "Home")',
+                {
+                userID: '@CurrentUserSession.User.UserID',
+                assignmentID: assignmentID,
+                comment: content
+            }, function (data) {
+                var newRow = "<tr>" +
+                    "<td>" + data.UserName + "</td>" +
+                    "<td>" + data.ActionString + "</td>" +
+                    "<td>" + data.Description + "</td>" +
+                    "<td>" + data.CreatedDateString + "</td>" +
+                        "<tr>";
+                $(newRow).prependTo("#CommentHistoryTable > tbody");
+                $("#newComment").val("");
+                //$('#CommentHistoryTable > tbody:last-child').append(newRow);
+            });
+        }
+    }
+
+</script>
+@*@if (Model.lstSlideLogModel != null && Model.lstSlideLogModel.Count > 0)
+    {
+        <p><strong>Slide Comments:</strong></p>
+        <table class="table" id="CommentHistoryTable">
+            <thead>
+            <tr>
+                <th>Slide Number</th>
+                <th>Comment</th>
+            </tr>
+            </thead>
+            <tbody>
+            <tbody>
+            @foreach (var slideLogModel in Model.lstSlideLogModel)
+            {
+
+                <tr>
+                    <td>
+                        <span>@slideLogModel.SlideNumber.ToString()</span>
+                    </td>
+                    <td>
+                        <span>@slideLogModel.Comment</span>
+                    </td>
+                </tr>
+            }
+            </tbody>
+
+        </table>
+
+
+    }*@

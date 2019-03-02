@@ -1,0 +1,125 @@
+﻿@if (Request.QueryString["Msg"] != null && Request.QueryString["Msg"].ToString() == "Uploaded")
+{
+    <div class="col-sm-12">
+        <div class="alert alert-success" id="upload">
+            @Html.Encode(String.Format(WordAutomationDemo.Common.Messages.Uploaded))
+        </div>
+    </div>
+
+    <script>
+            $("#upload").show().focus();
+            setTimeout(function () {
+                $("#upload").hide();
+            }, 5000);
+    </script>
+}
+
+
+@if (TempData.ContainsKey("ProjectCreated"))
+{
+    <div class="col-sm-12">
+        <div class="alert alert-success" id="upload">
+            @Html.Encode(String.Format(WordAutomationDemo.Common.Messages.ProjectCreated))
+        </div>
+    </div>
+
+    <script>
+            $("#upload").show().focus();
+            setTimeout(function () {
+                $("#upload").hide();
+            }, 5000);
+    </script>
+    TempData.Remove("ProjectCreated");
+}
+
+@if (Request.QueryString["Msg"] != null && Request.QueryString["Msg"].ToString() == "ProjectCreated")
+{
+    <div class="col-sm-12">
+        <div class="alert alert-success" id="upload">
+            @Html.Encode(String.Format(WordAutomationDemo.Common.Messages.ProjectCreated))
+        </div>
+    </div>
+
+    <script>
+            $("#upload").show().focus();
+            setTimeout(function () {
+                $("#upload").hide();
+            }, 5000);
+    </script>
+
+}
+
+@if (Request.QueryString["Msg"] != null && Request.QueryString["Msg"].ToString() == "DocCreated")
+{
+    <div class="col-sm-12">
+        <div class="alert alert-success" id="upload">
+            @Html.Encode(String.Format(WordAutomationDemo.Common.Messages.DocCreated))
+        </div>
+    </div>
+
+    <script>
+            $("#upload").show().focus();
+            setTimeout(function () {
+                $("#upload").hide();
+            }, 5000);
+    </script>
+
+}
+@if (Request.QueryString["Msg"] != null && Request.QueryString["Msg"].ToString() == "Error")
+{
+    <div class="col-sm-12">
+        <div class="alert alert-danger" id="upload">
+            @Html.Encode(String.Format(WordAutomationDemo.Common.Messages.Error))
+        </div>
+    </div>
+
+    <script>
+            $("#upload").show().focus();
+            setTimeout(function () {
+                $("#upload").hide();
+            }, 5000);
+    </script>
+
+}
+
+@if (Request.QueryString["Msg"] != null && Request.QueryString["Msg"].ToString() == "corruptedFile")
+{
+    <div class="col-sm-12">
+        <div class="alert alert-danger" id="upload">
+            @Html.Encode(String.Format(WordAutomationDemo.Common.Messages.corruptedFile))
+        </div>
+    </div>
+
+    <script>
+            $("#upload").show().focus();
+            setTimeout(function () {
+                $("#upload").hide();
+            }, 5000);
+    </script>
+}
+
+
+@if (ViewData.ContainsKey("Success"))
+{
+    <div class="col-sm-12">
+        <div class="alert alert-success" id="create">
+            @Html.Encode(ViewData["Success"])
+        </div>
+    </div>
+
+    <script>
+            $("#create").show().focus();
+            setTimeout(function () {
+                $("#create").hide();
+            }, 5000);
+    </script>
+}
+else if (ViewData.ContainsKey("Failure"))
+{
+    <div class="col-sm-12">
+        <div class="alert alert-danger" id="Failure">
+            @Html.Encode(ViewData["Failure"])
+        </div>
+    </div>
+}
+

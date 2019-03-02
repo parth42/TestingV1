@@ -1,0 +1,49 @@
+﻿@using DevExpress.Web.Mvc;
+@using DevExpress.Web.Mvc.UI;
+@model  WordAutomationDemo.Models.AssignmentModel
+
+@{
+    var path = "";
+    if (Model.IsReadOnly)
+    {
+        path = Path.Combine(WordAutomationDemo.Models.DirectoryManagmentUtils.InitialDemoFilesPathWords, "Pages_" + Model.OriginalDocumentName, "assignedDocs", Model.DocumentName);
+    }
+    else
+    {
+        path = Path.Combine(WordAutomationDemo.Models.DirectoryManagmentUtils.InitialDemoFilesPathWords, "Pages_" + Model.OriginalDocumentName, "changedDocs", Model.DocumentName);
+    }
+}
+
+@Html.DevExpress().RichEdit(settings =>
+{
+    settings.Name = "Snippet";
+    settings.CallbackRouteValues = new { Controller = "Home", Action = "LoadPageSnippet" };
+    settings.WorkDirectory = WordAutomationDemo.Models.DirectoryManagmentUtils.DocumentBrowsingFolderPath;
+    settings.Width = System.Web.UI.WebControls.Unit.Percentage(100);
+    settings.Height = System.Web.UI.WebControls.Unit.Pixel(700);
+    //settings.ReadOnly = Model.IsReadOnly;
+    //settings.Settings.HorizontalRuler.Visibility = DevExpress.XtraRichEdit.RichEditRulerVisibility.Visible;
+    settings.ShowConfirmOnLosingChanges = false;
+    settings.ActiveTabIndex = 0;
+    settings.EnableClientSideAPI = true;
+    //settings.Settings.Behavior.Cut = DevExpress.XtraRichEdit.DocumentCapability.Hidden;
+    //settings.Settings.Behavior.Copy = DevExpress.XtraRichEdit.DocumentCapability.Hidden;
+    //settings.Settings.Behavior.Paste = DevExpress.XtraRichEdit.DocumentCapability.Hidden;
+    settings.ReadOnly = Model.IsReadOnly;
+    //settings.ClientSideEvents.SelectionChanged = "function(s, e) { SectionChanged(s,e)}";
+    if (!Model.IsReadOnly)
+    {
+        settings.AutoSaveMode = DevExpress.Web.Office.Internal.AutoSaveMode.On;
+        settings.RibbonMode = DevExpress.Web.ASPxRichEdit.RichEditRibbonMode.Auto;
+        settings.ClientSideEvents.DocumentChanged = "function(s, e){DocumentChanged(s,e)}";
+        settings.ClientSideEvents.Init = "function(s, e){DocumentInit(s,e)}";
+        settings.PreRender = (s, e) =>
+        {
+            MVCxRichEdit rEdits = (MVCxRichEdit)s;
+            rEdits.ForeColor = System.Drawing.Color.Blue;
+            rEdits.Focus();
+
+        };
+    }
+    
+}).Open(path, (Model.DocumentName.Split('.').Last() == "doc") ? DevExpress.XtraRichEdit.DocumentFormat.Doc : DevExpress.XtraRichEdit.DocumentFormat.OpenXml).GetHtml()

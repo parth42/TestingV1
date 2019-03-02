@@ -1,0 +1,217 @@
+﻿@model WordAutomationDemo.Models.ProjectModel
+@using WordAutomationDemo.Common
+@{
+    ViewBag.Title = "Create Project";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+<script src="~/Scripts/Common/bootstrap-multiselect.js"></script>
+<link href="~/CSS/Common/bootstrap-multiselect.css" rel="stylesheet" />
+<link href="~/CSS/Common/bootstrap-datetimepicker.css" rel="stylesheet" />
+
+<link href="~/CSS/Custom/CreateTask.css" rel="stylesheet" />
+
+@*<script src="~/Scripts/Common/bootstrap-datetimepicker.js"></script>*@
+
+
+<script src="~/Scripts/Custom/Projects.js"></script>
+<div class="row">
+    <div class="col-sm-12">
+        <div class="main-heading title-row mbp15">
+            <div class="row">
+                <div class="col-xs-12">
+                    <h1 class="heading01">Create Project</h1>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-sm-12 mtp10">
+        @using (Html.BeginForm("Create", "Projects", FormMethod.Post, new { enctype = "multipart/form-data", id = "CreateUpload", @class = "createTaskForm" }))
+        {
+            @Html.AntiForgeryToken()
+            <div class="row">
+                <div class="col-sm-12">
+                    <div class="form-group">
+                        <label for="name">Project Name<span class="mandatory">*</span></label>
+                        @Html.TextBoxFor(model => model.Name, new { @class = "form-control" })
+                        <p class="errormessage">
+                            @Html.ValidationMessageFor(model => model.Name)
+                            <span id='spanConfirm'></span>
+                        </p>
+                    </div>
+                </div>
+                <div class="col-sm-6">
+                    <div class="form-group multiselectbox">
+                        <label for="projectDocuments">Project Documents</label>
+                        @Html.DropDownListFor(model => model.DocumentID, new MultiSelectList(Model.WordList, "Value", "Text"), new { @class = "form-control", @id = "projectDocuments", @multiple = "multiple" })
+                    </div>
+                </div>
+                
+                @if (Model.MemberList != null && Model.MemberList.Count > 0)
+                {
+                    <div class="col-sm-6">
+                        <div class="form-group multiselectbox">
+                            <label for="selectMembers">Select Members</label>
+                            @Html.DropDownListFor(model => model.MemberIDList, Model.Members, new { @class = "form-control", @id = "selectMembers", @multiple = "multiple" })
+                        </div>
+                    </div>
+                }
+
+            </div>
+            <div class="row">
+                <div class="col-sm-12">
+                    <div class="form-group">
+                        <label for="name">Description</label>
+                        @Html.TextAreaFor(model => model.Description, new { @class = "form-control", @rows = 5 })
+                    </div>
+                </div>
+                <div class="col-sm-12">
+                    <div class="row">
+                        <div class="col-sm-6">
+                            <div class="form-group">
+                                <label>Start Date</label>
+                                <div class="input-group data" id="datetimepickerStrDate">
+                                    @Html.TextBoxFor(model => model.strStartDate, new { @class = "form-control" })
+                                    <span class="input-group-addon btn-primary"> <i class="fa fa-calendar" aria-hidden="true"></i> </span>
+                                </div>
+
+                            </div>
+                        </div>
+                        <div class="col-sm-6">
+                            <div class="form-group">
+                                <label>End Date</label>
+                                <div class="input-group data" id="datetimepickerEndDate">
+                                    @Html.TextBoxFor(model => model.strEndDate, new { @class = "form-control" })
+                                    <span class="input-group-addon btn-primary"> <i class="fa fa-calendar" aria-hidden="true"></i> </span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-sm-12">
+                    <div class="row">
+                        <div class="col-sm-6">
+                            <div class="form-group">
+                                <label for="name">Status</label>
+                                <div class="clearfix">
+                                    <label class="radio-inline">
+                                        @Html.RadioButtonFor(model => model.Status, (int)Global.ProjectStatus.Active, new { id = (int)Global.ProjectStatus.Active })
+                                        <label for=@Global.ProjectStatus.Active>@Global.ProjectStatus.Active</label>
+                                    </label>
+                                    <label class="radio-inline">
+                                        @Html.RadioButtonFor(model => model.Status, (int)Global.ProjectStatus.InActive, new { id = (int)Global.ProjectStatus.InActive })
+                                        <label for=@Global.ProjectStatus.InActive>@Global.ProjectStatus.InActive</label>
+                                    </label>
+                                    <label class="radio-inline">
+                                        @Html.RadioButtonFor(model => model.Status, (int)Global.ProjectStatus.Completed, new { id = (int)Global.ProjectStatus.Completed })
+                                        <label for=@Global.ProjectStatus.Completed>@Global.ProjectStatus.Completed</label>
+                                    </label>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-sm-12">
+                    <button class="lightblue-btn btnspace btnSubmitForm" type="submit"><i class="fa fa-pencil" aria-hidden="true"></i> Save</button>
+                    <button class="darkblue-btn btnspace" type="button" onclick="location.href='@Url.Action("Index", "Projects")';return false;"><i class="fa fa-angle-left" aria-hidden="true"></i> Back</button>
+                </div>
+            </div>
+        }
+    </div>
+</div>
+
+<script>
+
+    var DateFormatDy = '@WordAutomationDemo.Helpers.CurrentUserSession.User.DTformat';
+    $(function () {
+        $('#datetimepickerStrDate').datetimepicker({
+            format: '@WordAutomationDemo.Helpers.CurrentUserSession.User.DTformat',
+            viewMode: 'days',
+            keepOpen: false,
+            useCurrent: false,
+            defaultDate: moment(),
+            //minDate: moment().add("days", -1),
+            allowInputToggle: true
+
+        });
+
+        $('#datetimepickerEndDate').datetimepicker({
+            format: '@WordAutomationDemo.Helpers.CurrentUserSession.User.DTformat',
+            viewMode: 'days',
+            useCurrent: false,
+            keepOpen: false,
+            defaultDate: moment().add("days", 1),
+            minDate: moment().add("days", -1),
+            allowInputToggle: true
+
+        });
+
+    });
+
+    function IsProjectExists() {
+        var name = $("#Name").val().trim();
+        $(".validation-summary-errors").html('').hide();
+        if (name.length > 0) {
+            var n = SiteUrl + "/Projects/CheckDuplication", t = { Name: name, ProjectId: 0 };
+            $.post(n, t, function (n) { n == "1" ? ($("#duplicateRecord").show(), $("#btnSubmit").prop("disabled", !0)) : ($("#duplicateRecord").hide(), $("#btnSubmit").prop("disabled", !1)) }, "json")
+        }
+    }
+    $(function () {
+        $("#Name").focus();
+        $("#Name").change(function () { IsProjectExists() })
+        $("#DocumentID").multiselect({ noneSelectedText: '- Select Documents -' });
+    })
+
+    $(document).ready(function () {
+        //$("#strStartDate").datetimepicker({
+        //    format: 'MM/DD/YYYY',
+        //    viewMode: 'days',
+        //    keepOpen: true,
+        //    useCurrent: false,
+        //    defaultDate: moment(),
+        //    minDate: moment().add("days", -1),
+        //    allowInputToggle: true
+        //});
+
+        //$("#strEndDate").datetimepicker({
+        //    format: 'MM/DD/YYYY',
+        //    viewMode: 'days',
+        //    useCurrent: false,
+        //    keepOpen: true,
+        //    defaultDate: moment().add("days", 1),
+        //    minDate: moment().add("days", -1),
+        //    allowInputToggle: true
+        //})
+        //$("#strStartDate").on("keydown", function () {
+        //    return false;
+        //});
+        //$("#strEndDate").on("keydown", function () {
+        //    return false;
+        //});
+        $("#strStartDate").on("dp.change", function (e) {
+            $(this).blur();
+            $('#strEndDate').data("DateTimePicker").setMinDate(moment(e.date).add(1, 'days'));
+            if ($('#strEndDate').data("DateTimePicker").getDate() <= e.date) {
+                $('#strEndDate').data("DateTimePicker").setDate(moment(e.date).add(1, 'days'));
+            }
+        });
+
+
+        $("#strEndDate").on("dp.change", function (e) {
+            $(this).blur();
+            $('#strStartDate').data("DateTimePicker").setMaxDate(moment(e.date).add(-1, 'days'));
+        });
+    });
+
+    function ValidateType(e) {
+        if ($(e).val() != "") {
+            var ext = $(e).val().split('.').pop().toLowerCase();
+            if ($.inArray(ext, ['docx', 'doc', 'ppt', 'pptx', 'xls', 'xlsx']) == -1) {
+                alert("Only documents files can be uploaded!")
+                $(e).val('');
+            }
+        }
+    }
+
+</script>

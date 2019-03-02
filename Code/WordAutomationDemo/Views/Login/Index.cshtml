@@ -1,0 +1,201 @@
+﻿@using WordAutomationDemo.Common
+@{
+    Layout = null;
+}
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="description" content="">
+    <meta name="author" content="">
+
+    <title>TRIYO</title>
+    <link href="@Url.Content("~/CSS/fonts/fonts.css")" rel="stylesheet" />
+    <link href="@Url.Content("~/CSS/fonts/font-awesome.css")" rel="stylesheet">
+
+    <!-- Bootstrap core CSS -->
+    <link href="@Url.Content("~/CSS/Common/bootstrap.css")" rel="stylesheet">
+    <link href="@Url.Content("~/CSS/Common/bootstrap-multiselect.css")" rel="stylesheet">
+    <link href="@Url.Content("~/CSS/Common/bootstrap-datetimepicker.css")" rel="stylesheet">
+    <link href="@Url.Content("~/CSS/Common/bootstrap-theme.css")" rel="stylesheet">
+
+    <!-- Custom -->
+    <link href="@Url.Content("~/CSS/Common/jquery.smartmenus.bootstrap.css")" rel="stylesheet">
+    <link href="@Url.Content("~/CSS/Custom/style.css")" rel="stylesheet">
+    <link href="@Url.Content("~/CSS/Common/bootstrap-toggle.css")" rel="stylesheet">
+    
+
+    <!-- HTML5 Shim and Respond.js IE8 support of HTML5 elements and media queries -->
+    <!--[if lt IE 9]>
+    <script src="@Url.Content("js/html5shiv.js")"></script>
+    <script src="@Url.Content("js/respond.min.js")"></script>
+    <![endif]-->
+
+
+</head>
+
+<body onload="javascript:document.getElementById('UserName').focus();">
+@using (Html.BeginForm("Index", "Login", "POST"))
+{
+    <div id="wrapper" class="clearfix">
+        <div class="loginbox">
+            <div class="loginlogo"><img src="~/CSS/images/logo.png" alt="" class="img-responsive center-block"></div>
+            @if (Request.QueryString["Msg"] != null && Request.QueryString["Msg"].ToString() == "Unauthorize")
+            {
+                <div class="alert alert-danger" id="authorisemsg">
+                    @Html.Encode(String.Format(Messages.NotAuthorized))
+                </div>
+            }
+            @if (Request.QueryString["Msg"] != null && Request.QueryString["Msg"].ToString() == "Logout" && Request.Form["btnSumit"] == null)
+{
+    <div class="alert alert-success" id="logoutmsg">
+        @Html.Encode(String.Format(Messages.SuccessLogOut))
+    </div>
+}
+@if (Request.QueryString["Msg"] != null && Request.QueryString["Msg"].ToString() == "Forgot")
+{
+     <div class="alert alert-success" id="logoutmsg">
+        @Html.Encode(String.Format(Messages.ResetPasswordMail))
+    </div>
+}
+
+            @if (Request.QueryString["Msg"] != null && Request.QueryString["Msg"].ToString() == "Reset")
+{
+    <div class="alert alert-success" id="msgUnAuthorized">
+        @Html.Encode(String.Format(Messages.SuccessResetPassword))
+    </div>
+}
+            @if (Request.QueryString["Msg"] != null && Request.QueryString["Msg"].ToString().ToLower() == "changed")
+{
+    <div class="alert alert-success" id="msgUnAuthorized">
+        @Html.Encode(String.Format(Messages.SuccessChanged, "Password"))
+    </div>
+}
+            <div class="alert alert-danger" id="messageLogin" style="display: none;">
+            </div>
+            @*<div class="alert alert-danger">
+                <strong>Danger!</strong> Indicates a dangerous or potentially negative action.
+            </div>*@
+            @if (Request.QueryString["Msg"] != null && Request.QueryString["Msg"].ToString() == "Wrong")
+            {
+                <div class="alert alert-danger" id="msgUnAuthorized">
+                    @Html.Encode(String.Format(Messages.WrongCredentials))
+                </div>
+            }
+            @if (Request.QueryString["Msg"] != null && Request.QueryString["Msg"].ToString() == "NotExist")
+            {
+                <div class="alert alert-danger" id="msgUnAuthorized">
+                    @Html.Encode(String.Format(Messages.NotExistsUser))
+                </div>
+            }
+            @if (Request.QueryString["Msg"] != null && Request.QueryString["Msg"].ToString() == "InActiveUser")
+            {
+                <div class="alert alert-danger" id="msgUnAuthorized">
+                    @Html.Encode(String.Format("You are inactive"))
+                </div>
+            }
+            @if (Request.QueryString["Msg"] != null && Request.QueryString["Msg"].ToString() == "InActiveCompany")
+            {
+                <div class="alert alert-danger" id="msgUnAuthorized">
+                    @Html.Encode(String.Format(Messages.InActive, "Your company"))
+                </div>
+            }
+            @if (Request.QueryString["Msg"] != null && Request.QueryString["Msg"].ToString() == "InActiveRole")
+            {
+                <div class="alert alert-danger" id="msgUnAuthorized">
+                    @Html.Encode(String.Format(Messages.InActive, "Your role"))
+                </div>
+            }
+            @if (Request.QueryString["Msg"] != null && Request.QueryString["Msg"].ToString() == "ADNotFound")
+            {
+                <div class="alert alert-danger" id="msgUnAuthorized">
+                    @Html.Encode(String.Format(Request.QueryString["Ex"].ToString()))
+                </div>
+            }
+            <div class="loginform">
+                <div class="form-group">
+                    <input name="UserName" type="text" id="UserName" placeholder="User Name" class="form-control" value=@ViewBag.UserName />
+                </div>
+                <div class="form-group">
+                    <div class="divShowPassword">
+                        <input name="UserPassword" type="password" id="UserPassword" placeholder="Password" class="form-control" value=@ViewBag.UserPassword />
+                        <a id="showPass" class="cursor" title="Show Password"><i class="fa fa-eye" aria-hidden="true"></i></a>
+                    </div>
+                </div>
+                <div class="clearfix text-center mtp15">
+                    <button type="submit" name="btnSumit" id="btnSumit" onclick="javascript: return validateLogin();" class="lightblue-btn btnspace btn-block">Login</button>
+                </div>
+                <div class="row text-left mtp10 mbp10">
+                    <div class="col-xs-7 col-sm-5 mtp5">
+                        <a href="@Url.Content("~/ForgotPassword/Index")" class="bluecolor float-left" style="text-transform:none;">Forgot Password?</a>
+                    </div>
+                    <div class="col-xs-5 col-sm-7 onoffbtn">
+                        <label class="name">Remember Me</label>
+                        <input id="chkRemember" name="chkRemember" type="checkbox" class="singleCheckBox" onclick="return initializeAllCheckBox();" checked data-toggle="toggle" data-style="ios">
+                    </div>
+                </div>
+                
+
+            </div>
+            <div class="clearfix login-footer">
+                Powered By <span>Triyosoft</span>
+            </div>
+        </div>
+    </div>
+}
+    <script src="@Url.Content("~/Scripts/Common/jquery-1.11.1.min.js")"></script>
+    <script src="@Url.Content("~/Scripts/Common/bootstrap.min.js")"></script>
+    <script src="@Url.Content("~/Scripts/Common/bootstrap-multiselect.js")"></script>
+
+    <script src="@Url.Content("~/Scripts/Common/jquery.smartmenus.js")"></script>
+    <script src="@Url.Content("~/Scripts/Common/jquery.smartmenus.bootstrap.js")"></script>
+    <script type="text/javascript">
+		$(document).ready(function () {
+			$('#ProjectDocuments').multiselect({
+				includeSelectAllOption: true,
+				enableFiltering: true
+			});
+
+			$('#SelectMembers').multiselect({
+				includeSelectAllOption: true,
+				enableFiltering: true
+
+			});
+
+		});
+		
+    </script>
+    <script src="@Url.Content("~/Scripts/Common/moment.min.js")"></script>
+    <script src="@Url.Content("~/Scripts/Common/bootstrap-datetimepicker.js")"></script>
+    <script src="@Url.Content("~/Scripts/Common/bootstrap-toggle.js")"></script>
+    <script type="text/javascript">
+		$(function () {
+			$('#datetimepicker1, #datetimepicker2').datetimepicker({
+				format: 'L'
+			});
+
+			$("#showPass").click(function (e) {
+			    var type = $("#UserPassword").attr("type");
+			    if (type == 'password')
+			    {
+			        $("#UserPassword").attr("type", "text");
+			        $("#showPass").attr("title", "Hide Password");
+			    }
+			    else if (type == 'text') {
+			        $("#UserPassword").attr("type", "password");
+			        $("#showPass").attr("title", "Show Password");
+			    }
+			});
+		});
+    </script>
+    <script src="@Url.Content("~/Scripts/Custom/AdminLogin.js")"></script>
+
+
+
+</body>
+
+</html>
+

@@ -1,0 +1,16 @@
+﻿@model System.Web.Mvc.HandleErrorInfo
+
+@{
+    ViewBag.Title = "Error";
+}
+
+<h1 class="text-danger">Error.</h1>
+<h2 class="text-danger">An error occurred while processing your request.</h2>
+
+@if (Model.Exception != null)
+{
+    <button class="btn" data-toggle="collapse" data-target="#details" style="margin-top:25px;">Details</button>
+    <div id="details" class="collapse" style="background-color:white;padding-top:25px;">
+        @Html.Raw(Model.Exception.ToString().Replace("\r\n","<br />"))
+    </div>
+}

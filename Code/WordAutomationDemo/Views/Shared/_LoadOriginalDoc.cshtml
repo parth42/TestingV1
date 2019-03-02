@@ -1,0 +1,32 @@
+﻿@using DevExpress.Web.Mvc;
+@using DevExpress.Web.Mvc.UI;
+@model  WordAutomationDemo.Models.AssignmentModel
+ 
+@Html.DevExpress().RichEdit(settings =>
+{
+    settings.Name = "OrignalDoc";
+    settings.CallbackRouteValues = new { Controller = "Home", Action = "LoadOrginalDoc" };
+    settings.WorkDirectory = WordAutomationDemo.Models.DirectoryManagmentUtils.DocumentBrowsingFolderPath;
+    settings.Width = System.Web.UI.WebControls.Unit.Percentage(100);
+    settings.Height = System.Web.UI.WebControls.Unit.Pixel(700);
+    //settings.RibbonMode = DevExpress.Web.ASPxRichEdit.RichEditRibbonMode.Auto;
+    settings.ReadOnly = Model.IsReadOnly;
+
+    //settings.Settings.HorizontalRuler.Visibility = DevExpress.XtraRichEdit.RichEditRulerVisibility.Visible;
+    settings.ShowConfirmOnLosingChanges = false;
+    settings.ActiveTabIndex = 0;
+    //settings.AutoSaveMode = DevExpress.Web.Office.Internal.AutoSaveMode.On;
+    settings.EnableClientSideAPI = true;
+    //settings.Settings.Behavior.Cut = DevExpress.XtraRichEdit.DocumentCapability.Hidden;
+    //settings.Settings.Behavior.Copy = DevExpress.XtraRichEdit.DocumentCapability.Hidden;
+    //settings.Settings.Behavior.Paste = DevExpress.XtraRichEdit.DocumentCapability.Hidden;
+    settings.Settings.Behavior.FullScreen = DevExpress.XtraRichEdit.DocumentCapability.Hidden;
+
+    //settings.ClientSideEvents.Init = "function(s, e){ $('#Snippet_R_TC_TPTCL_MinBtn').click(); }";
+    //settings.ClientSideEvents.SelectionChanged = "function(s, e) { console.log(s.document._native.selection.intervals[0].length); console.log(s.document._native.selection.intervals[0].start);  PerformCallback({ start: s.document._native.selection.intervals[0].length ,length:s.document._native.selection.intervals[0].start}); }";
+    settings.PreRender = (s, e) =>
+    {
+        MVCxRichEdit rEdits = (MVCxRichEdit)s;
+        rEdits.Focus();
+    };
+}).Open(Path.Combine(WordAutomationDemo.Models.DirectoryManagmentUtils.InitialDemoFilesPathDemo, Model.DocumentName)).GetHtml()

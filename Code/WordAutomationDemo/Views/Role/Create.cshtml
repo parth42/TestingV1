@@ -1,0 +1,88 @@
+﻿@model WordAutomationDemo.Models.RoleModel
+@using WordAutomationDemo.Common;
+@{
+    ViewBag.Title = "Create Role";
+}
+<script src="@Url.Content("~/Scripts/Custom/Role.js")" type="text/javascript"></script>
+<link href="~/CSS/Common/bootstrap-multiselect.css" rel="stylesheet" />
+<script src="~/Scripts/Common/bootstrap-multiselect.js"></script>
+@{Html.EnableClientValidation();}
+
+<div class="row">
+    <div class="col-sm-12">
+        <div class="main-heading title-row mbp15">
+            <div class="row">
+                <div class="col-xs-12">
+                    <h1 class="heading01">Create Role</h1>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-sm-12 mtp10">
+        @using (Html.BeginForm("Create", "Role", FormMethod.Post))
+        {
+            <div class="row">
+                <div class="col-sm-4">
+                    <div class="form-group multiselectbox">
+                        <label for="dropdownCompany">Company<span class="mandatory">*</span></label>
+                        @Html.DropDownListFor(model => model.Company_ID, Model.SelectCompany, "- Select Company -", new { @class = "form-control", @id = "dropdownCompany" })
+                        <p class="errormessage">
+                            @Html.ValidationMessageFor(model => model.Company_ID)
+                        </p>
+                    </div>
+                </div>
+                <div class="col-sm-4">
+                    <div class="form-group">
+                        <label for="dropdownCompany">Role<span class="mandatory">*</span></label>
+                        @Html.TextBoxFor(model => model.Role, new { @class = "form-control", @maxlength = 50 })
+                        <p class="errormessage">
+                            @Html.ValidationMessageFor(model => model.Role)
+                        </p>
+                    </div>
+                </div>
+                <div class="col-sm-4">
+                    <div class="form-group">
+                        @Html.LabelFor(model => model.Description)
+                        @Html.TextAreaFor(model => model.Description, new { @class = "form-control", @maxlength = 255 })
+                    </div>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-sm-4">
+                    <div class="form-group">
+                        <label for="name">Status <span class="mandatory">*</span></label>
+                        <div class="clearfix">
+                            <label class="radio-inline">
+                                @Html.RadioButtonFor(model => model.IsActive, true, new { id = "active", value = "Doc", @checked = "checked" }) Active
+                            </label>
+                            <label class="radio-inline">
+                                @Html.RadioButtonFor(model => model.IsActive, false, new { id = "inActive" }) InActive
+                            </label>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-sm-4">
+                    <div class="form-group">
+                        <label for="name">Is Admin Role <span class="mandatory">*</span></label>
+                        <div class="clearfix">
+                            <label class="radio-inline">
+                                @Html.RadioButtonFor(model => model.IsAdminRole, true, new { Checked = "checked" }) Yes
+
+                            </label>
+                            <label class="radio-inline">
+                                @Html.RadioButtonFor(model => model.IsAdminRole, false) No
+                            </label>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-sm-12">
+                    <button class="lightblue-btn btnspace btnSubmitForm" type="submit"><i class="fa fa-pencil" aria-hidden="true"></i> Save</button>
+                    <button class="darkblue-btn btnspace" type="button" onclick="location.href='@Url.Action("Index", "Role")';return false;"><i class="fa fa-angle-left" aria-hidden="true"></i> Back</button>
+                </div>
+            </div>
+
+        }
+    </div>
+</div>

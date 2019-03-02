@@ -1,0 +1,113 @@
+﻿@using DevExpress.Web.Mvc;
+@using DevExpress.Web;
+@using DevExpress.Web.Mvc.UI;
+@model  WordAutomationDemo.Models.AssignmentModel
+
+@using (Ajax.BeginForm("SaveInlineExcel", "Home", new AjaxOptions() { UpdateTargetId = "saveSpreadsheet", HttpMethod = "Post", InsertionMode = InsertionMode.Replace }))
+{
+
+    @Html.DevExpress().Spreadsheet(
+    settings =>
+    {
+        settings.Name = "spreadsheet";
+        settings.CallbackRouteValues = new { Controller = "Home", Action = "LoadExcel" };
+        settings.WorkDirectory = WordAutomationDemo.Models.DirectoryManagmentUtils.InitialDemoFilesPathExcels + "\\tmp\\";
+        settings.Width = System.Web.UI.WebControls.Unit.Percentage(100);
+        settings.Height = System.Web.UI.WebControls.Unit.Pixel(550);
+
+        settings.ShowFormulaBar = false;
+        settings.ShowSheetTabs = true;
+
+        settings.RibbonMode = DevExpress.Web.ASPxSpreadsheet.SpreadsheetRibbonMode.OneLineRibbon;
+
+        var viewTab = new RibbonTab() { Name="View"};
+        var viewsGroup = new RibbonGroup();
+        viewsGroup.Items.Add(new DevExpress.Web.ASPxSpreadsheet.SRFullScreenCommand());
+        viewTab.Groups.Add(viewsGroup);
+
+        settings.RibbonTabs.Add(viewTab);
+
+        settings.EnableClientSideAPI = true;
+        settings.ClientSideEvents.SelectionChanged = "spreadsheet_SelectionChanged";
+        settings.ShowConfirmOnLosingChanges = false;
+        
+        //No assignment has been made, so must be creating a new one
+        if (String.IsNullOrEmpty(Model.AssignmentID) && Model.AssignID == 0)
+        {
+            settings.PreRender = (s, e) =>
+            {
+                MVCxSpreadsheet spreadsheet = (MVCxSpreadsheet)s;
+                WordAutomationDemo.Common.CellStyleHelper.PrepareWorksheet(spreadsheet.Document.Worksheets.ToList(), Model.DocumentName);
+            };
+        }
+
+    }).Open(Server.MapPath(Model.Path)).GetHtml()
+
+    <div class="modal-footer">
+        <div class="row">
+            <div class="col-sm-12">
+                @*@Html.DevExpress().Button(
+                         settings =>
+                         {
+                             settings.Name = "btnSave";
+                             settings.Text = "Full Screen";
+                             settings.UseSubmitBehavior = false;
+                             settings.ControlStyle.CssClass = "btn btn-primary";
+                             settings.Styles.Native = true;
+                             settings.ClientSideEvents.Click = "OpenFullScreen";
+
+                         }).GetHtml()*@
+
+                @if (!Model.IsReadOnly)
+                {
+                    @Html.DevExpress().Button(
+                          settings =>
+                          {
+                              settings.Name = "btnSave";
+                              settings.Text = "Save";
+                              settings.UseSubmitBehavior = true;
+                              settings.ControlStyle.CssClass = "btn btn-primary";
+                              settings.Styles.Native = true;
+                              settings.ClientSideEvents.Click = "OnClick";
+
+                          }).GetHtml()
+                }
+            </div>
+        </div>
+    </div>
+}
+
+
+<script>
+    function OnClick(s, e) {
+        ASPxClientSpreadsheet.activeSpreadsheetControl.finishEditing();
+
+        //var url = "Home/SaveInlineExcel/";
+        //Spreadsheet.OnPost();
+        //$.ajax({
+        //    type: "POST",
+        //    url: url,
+        //    data: $('form').serialize(),
+        //    success: function (data) {
+        //        console.log("success");
+        //    }
+        //});
+    }
+
+    //function OpenFullScreen(s, e) {
+    //    console.log("fullScreen");
+    //    spreadsheet.SetFullscreenMode(true);
+    //    //s.OpenFullScreen(true);
+    //}
+
+
+    //$('body').keydown(function (e) {
+    //    console.log("KeyPress");
+    //    if (e.keyCode == 27) {
+    //        console.log("exitScreen");
+    //        spreadsheet.SetFullscreenMode(false);
+    //    }
+    //});
+
+
+</script>

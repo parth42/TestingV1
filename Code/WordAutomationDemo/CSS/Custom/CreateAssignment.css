@@ -1,0 +1,182 @@
+﻿.k-picker-wrap .k-select, .k-numeric-wrap .k-select, .k-dropdown-wrap .k-select {
+    padding: 7px !important;
+}
+
+.k-dropdown .k-dropdown-wrap {
+    background: #fff !important;
+    border-radius: 0 !important;
+    height: 27px !important;
+    padding-top: 4px !important;
+}
+
+.k-list {
+    max-height: 160px !important;
+    height: auto !important;
+}
+
+.k-list-container {
+    background-color: #fff !important;
+    border-color: #c5c5c5 !important;
+    max-height: 200px !important;
+    height: auto !important;
+}
+
+.k-group-header {
+    padding: 5px 8px !important;
+    color: #000 !important;
+    background: #dedede !important;
+}
+
+.k-state-default p {
+    margin: 0px !important;
+    padding-left: 0px !important;
+    font-size: 11px !important;
+    line-height: 18px !important;
+}
+
+.k-list .k-state-hover, .k-state-focused {
+    background: #4ca0dd !important;
+    border-radius: 0px !important;
+    color: #fff !important;
+    border: 0px !important;
+}
+
+.k-animation-container {
+    max-height: 200px !important;
+    height: auto !important;
+}
+
+.k-list-optionlabel {
+    background: #4ca0dd !important;
+    box-shadow: none !important;
+    padding: 5px !important;
+}
+
+.ui-multiselect-menu.ui-widget.ui-widget-content.ui-corner-all {
+    width: 400px !important;
+}
+
+#spreadsheet_SSFB {
+    display: none !important;
+}
+
+#spreadsheetChanged_SSFB {
+    display: none !important;
+}
+
+#spreadsheetOriginal_SSFB {
+    display: none !important;
+}
+
+#spreadsheetInline_SSFB {
+    display: none !important;
+}
+
+/* layout.css Style */
+.upload-drop-zone {
+    height: 200px;
+    border-width: 2px;
+    margin-bottom: 20px;
+}
+
+/* skin.css Style*/
+.upload-drop-zone {
+    color: #ccc;
+    border-style: dashed;
+    border-color: #ccc;
+    line-height: 200px;
+    text-align: center
+}
+
+    .upload-drop-zone.drop {
+        color: #222;
+        border-color: #222;
+    }
+
+#grid {
+    border: 0;
+}
+
+    #grid table {
+        border-spacing: 1px 1px;
+        border-color: white;
+        background-color: white;
+    }
+
+    #grid .k-filter-row th,
+    #grid .k-grid-header th.k-header {
+        border-color: white;
+        background-color: white;
+        text-align: center;
+        font-size: 16px;
+        color: #333;
+        font-weight: 300;
+        vertical-align: middle;
+    }
+
+    #grid th.k-header:first-child {
+        text-align: left;
+    }
+
+    #grid td {
+        border-width: 0px 0px 0px 0px;
+        height: 50px;
+        text-align: right;
+    }
+
+        #grid td .checkbox {
+            margin-left: auto;
+            margin-right: auto;
+            height: 20px;
+            width: 20px;
+        }
+
+    #grid tr {
+        background-color: rgb(255, 255, 255);
+        border-bottom-color: rgb(230, 230, 230);
+        border-bottom-width: 1px;
+    }
+
+    #grid tbody tr:hover {
+        background-image: none; /* needed to override kendo gradient */
+        background-color: rgb(255, 255, 255);
+    }
+
+        #grid tbody tr:hover td div {
+            background-image: none; /* needed to override kendo gradient */
+            opacity: 0.85;
+            filter: alpha(opacity=85);
+        }
+
+    #grid td:first-child {
+        text-align: left;
+        /*white-space: nowrap;*/
+        text-overflow: ellipsis;
+        overflow: hidden;
+        max-width: 1px;
+        vertical-align: middle;
+    }
+
+    /* kendo overrides */
+    #grid .k-grid-header {
+        border-color: white;
+        background-color: white;
+    }
+
+    #grid .k-grid-header-wrap {
+        border-color: white;
+    }
+
+.k-alt {
+    background-color: rgb(245, 245, 245);
+    border-bottom-color: rgb(230, 230, 230);
+    border-bottom-width: 1px;
+}
+
+#grid .k-grid-header {
+    padding: 0 !important;
+}
+
+#grid .k-grid-content {
+    overflow-y: visible;
+}

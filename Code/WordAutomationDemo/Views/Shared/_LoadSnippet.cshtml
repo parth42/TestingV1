@@ -1,0 +1,120 @@
+﻿@using DevExpress.Web.Mvc;
+@using DevExpress.Web.Mvc.UI;
+@model  WordAutomationDemo.Models.AssignmentModel
+
+@Html.DevExpress().RichEdit(settings =>
+{
+    settings.Name = "Snippet";
+    settings.CallbackRouteValues = new { Controller = "Home", Action = "LoadSnippet" };
+    settings.WorkDirectory = WordAutomationDemo.Models.DirectoryManagmentUtils.DocumentBrowsingFolderPath;
+    settings.Width = System.Web.UI.WebControls.Unit.Percentage(100);
+    settings.Height = System.Web.UI.WebControls.Unit.Pixel(700);
+    //settings.ReadOnly = Model.IsReadOnly;
+    //settings.Settings.HorizontalRuler.Visibility = DevExpress.XtraRichEdit.RichEditRulerVisibility.Visible;
+    settings.ShowConfirmOnLosingChanges = false;
+    settings.ActiveTabIndex = 0;
+
+    if (!Model.IsReadOnly)
+    {
+        //settings.AutoSaveMode = DevExpress.Web.Office.Internal.AutoSaveMode.On;
+        settings.RibbonMode = DevExpress.Web.ASPxRichEdit.RichEditRibbonMode.Auto;
+        settings.ClientSideEvents.DocumentChanged = "function(s, e){DocumentChanged(s,e)}";
+        settings.ClientSideEvents.Init = "function(s, e){DocumentInit(s,e)}";
+    } else
+    {
+        settings.ReadOnly = true;
+    }
+
+    settings.EnableClientSideAPI = true;
+    //settings.Settings.Behavior.Cut = DevExpress.XtraRichEdit.DocumentCapability.Hidden;
+    //settings.Settings.Behavior.Copy = DevExpress.XtraRichEdit.DocumentCapability.Hidden;
+    //settings.Settings.Behavior.Paste = DevExpress.XtraRichEdit.DocumentCapability.Hidden;
+
+    settings.ClientSideEvents.SelectionChanged = "function(s, e) { SelectionChanged(s,e)}";
+    settings.PreRender = (s, e) =>
+    {
+        MVCxRichEdit rEdits = (MVCxRichEdit)s;
+        rEdits.ForeColor = System.Drawing.Color.Blue;
+        rEdits.Focus();
+
+    };
+}).Open(Path.Combine(WordAutomationDemo.Models.DirectoryManagmentUtils.InitialDemoFilesPathDocument, Model.DocumentName), (Model.DocumentName.Split('.').Last() == "doc") ? DevExpress.XtraRichEdit.DocumentFormat.Doc : DevExpress.XtraRichEdit.DocumentFormat.OpenXml).GetHtml()
+
+
+
+@*<script type="text/javascript">
+        var x = 0;
+        var flag = false;
+        var Strikeflag = false;
+        var isBackSpace = false;
+        var BackSpaceCommand;
+        var InsertCommand;
+        //var FontStrikeCommand;
+        //var UndoCommand;
+        function DocumentChanged(s, e) {
+            console.log("-- Document Changed --");
+            var CurrentCommand = Snippet.core.commandManager.lastCommandsChain[0]; // detect BACKSPACE
+            console.log(CurrentCommand);
+            if (CurrentCommand == BackSpaceCommand) {
+                console.log("-- BackSpace Pressed --");
+                console.log(s);
+                OverrideBackSpace(Snippet, e);
+            }
+                //else if (CurrentCommand != FontStrikeCommand || CurrentCommand != UndoCommand) {
+            else if (CurrentCommand == InsertCommand) { // detect INSERT Text
+                console.log("-- No BackSpace --");
+                console.log(s);
+                GetNewAddedText(Snippet);
+            }
+            else {
+                flag = false;
+            }
+        }
+
+        function DocumentInit(s, e) {
+            var pointer = Snippet.core.selection.getLastSelectedInterval();
+            x = (pointer.start);
+            BackSpaceCommand = Snippet.core.commandManager.getCommand(__aspxRichEdit.RichEditClientCommand.ToggleBackspaceKey); // or 125
+            InsertCommand = Snippet.core.commandManager.commands["117"];  // Set insert command at init
+            //FontStrikeCommand = Snippet.core.commandManager.commands["24"]; // Set strike command at init
+            //UndoCommand = Snippet.core.commandManager.commands["6"]; // Set undo command at init
+        }
+
+        function OverrideBackSpace(rich, e) {
+           
+            Strikeflag = false;
+            var selection = rich.core.selection.getLastSelectedInterval();
+            if (Strikeflag == false) {
+                Strikeflag = true;
+                rich.core.commandManager.commands["6"].execute(); // undo command
+                rich.core.selection.setSelection(selection.start, selection.start + 1);
+                if (rich.core.commandManager.commands["24"].getState().value == 0) {
+                    rich.commands.changeFontStrikeout.execute()
+                }
+                rich.core.selection.setSelection(selection.start, selection.start);
+            }
+        }
+
+        function GetNewAddedText(rich) {
+            var selection = rich.core.selection.getLastSelectedInterval();
+            //if (x != selection.start) {
+            x = (selection.start);
+            if (flag == false) {
+                flag = true;
+                rich.core.selection.setSelection(selection.start - 1, selection.start);
+                if (rich.core.commandManager.commands["24"].getState().value == 1) {
+                    rich.commands.changeFontStrikeout.execute();
+                }
+                rich.commands.changeFontFormatting.execute({ foreColor: "#0000FF" })
+                rich.core.selection.setSelection(selection.start, selection.start);
+            }
+            else {
+                rich.core.selection.setSelection(selection.start, selection.start);
+                flag = false;
+            }
+            //}
+
+        }
+
+    </script>*@
+

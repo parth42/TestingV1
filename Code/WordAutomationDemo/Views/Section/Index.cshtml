@@ -1,0 +1,247 @@
+﻿@model IEnumerable<WordAutomationDemo.Models.SectionModel>
+@using Kendo.Mvc.UI
+
+@{
+    ViewBag.Title = "Sections";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+<div class="row">
+    @using (Html.BeginForm("Delete", "Section", FormMethod.Post, new { @onkeypress = "return event.keyCode != 13;" }))
+    {
+        if (Request.QueryString["Msg"] != null && Request.QueryString["Msg"].ToString() == "Created")
+        {
+            <div class="alert alert-success" id="upload">
+                <ul>
+                    <li>
+                        @Html.Encode(String.Format(WordAutomationDemo.Common.Messages.SectionCreated))
+                    </li>
+                </ul>
+            </div>
+            <script>
+                $("#upload").show().focus();
+                setTimeout(function () {
+                    $("#upload").hide();
+                }, 5000);
+            </script>
+
+        }
+        if (Request.QueryString["Msg"] != null && Request.QueryString["Msg"].ToString() == "NotFound")
+        {
+            <div class="alert alert-danger" id="upload">
+                <ul>
+                    <li>
+                        @Html.Encode(String.Format(WordAutomationDemo.Common.Messages.SectionNotFound))
+                    </li>
+                </ul>
+            </div>
+            <script>
+                $("#upload").show().focus();
+                setTimeout(function () {
+                    $("#upload").hide();
+                }, 5000);
+            </script>
+        }
+        if (Request.QueryString["Msg"] != null && Request.QueryString["Msg"].ToString() == "Error")
+        {
+            <div class="alert alert-danger" id="upload">
+                <ul>
+                    <li>
+                        @Html.Encode(String.Format(WordAutomationDemo.Common.Messages.Error))
+                    </li>
+                </ul>
+            </div>
+            <script>
+                $("#upload").show().focus();
+                setTimeout(function () {
+                    $("#upload").hide();
+                }, 5000);
+            </script>
+        }
+
+        if (Request.QueryString["Msg"] != null && Request.QueryString["Msg"].ToString() == "Deleted")
+        {
+            <div class="alert alert-success" id="upload">
+                <ul>
+                    <li>
+                        @Html.Encode(String.Format(WordAutomationDemo.Common.Messages.SectionDeleted))
+                    </li>
+                </ul>
+            </div>
+            <script>
+                $("#upload").show().focus();
+                setTimeout(function () {
+                    $("#upload").hide();
+                }, 5000);
+            </script>
+        }
+
+        if (Request.QueryString["Msg"] != null && Request.QueryString["Msg"].ToString() == "Updated")
+        {
+            <div class="alert alert-success" id="upload">
+                <ul>
+                    <li>
+                        @Html.Encode(String.Format(WordAutomationDemo.Common.Messages.SectionEdited))
+                    </li>
+                </ul>
+            </div>
+            <script>
+                $("#upload").show().focus();
+                setTimeout(function () {
+                    $("#upload").hide();
+                }, 5000);
+            </script>
+        }
+        <div class="col-sm-12">
+            <div class="main-heading title-row mbp15">
+                <div class="row">
+                    <div class="col-xs-12">
+                        <h1 class="heading01">Sections</h1>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-sm-12">
+            <div class="row">
+                <div class="col-sm-4 col-sm-push-8 text-lr-xs">
+                    <a href="@Url.Action("Create", "Section")" class="lightblue-btn btnspace"><i class="fa fa-plus" aria-hidden="true"></i> Create New Section</a>
+                    <a href="@Url.Action("CreateDocument", "Section")" class="lightblue-btn btnspace"><i class="fa fa-plus" aria-hidden="true"></i> Create New Document</a>
+                </div>
+                <div class="col-sm-8 col-sm-pull-4">
+                    <button type="submit" class="darkred-btn btnspace" name="btnDelete" id="btnDelete" onclick="return Check_CheckBox_Count('SectionID');"><i class="fa fa-trash-o" aria-hidden="true"></i> Delete</button>
+                </div>
+            </div>
+        </div>
+        <div class="col-sm-12 mtp10">
+            <div class="table-responsive bluetheme">
+                @(Html.Kendo().Grid<WordAutomationDemo.Models.SectionModel>()
+                                                  .Name("sectionGrid")
+                                                  .Events(e => e.DataBound("onGridDataBound"))
+                                                  .Columns(columns =>
+                                                  {
+
+                                                      columns.Template(@<text><input id="chkDelete" name="chkDelete" type="checkbox" class="singleCheckBox" value="@item.SectionID" onclick="return initializeSingleCheckBox(this.id);" />}</text>)
+                                                            .ClientTemplate("<input type='checkbox' id='chkDelete' name='chkDelete' class='singleCheckBox' value='#= SectionID #' onclick='return initializeSingleCheckBox(this);' />")
+                                                            .HeaderTemplate(@<input id="allCheckBox" name="allCheckBox" type="checkbox" title="check all records" onclick="return initializeAllCheckBox();" />)
+                                                            .HtmlAttributes(new { @class = "textalign" })
+                                                            .HeaderHtmlAttributes(new { @class = "textalign" }).Width("2%");
+
+                                                      columns.Template(@<text><a href="@Url.Action("Edit", "User", new { UID = item.EncryptedSectionID})" class="tableicon bluebg" data-original-title="Edit Section" data-toggle="tooltip" data-placement="top"><i class="fa fa-pencil" aria-hidden="true"></i></a>
+                                                    </text>)
+                                                            .ClientTemplate("<a href='" + Url.Action("Edit", "Section", new { UID = "#= EncryptedSectionID #" }) + "'" + " class='tableicon bluebg' data-original-title='Edit Section' data-toggle='tooltip' data-placement='top'><i class='fa fa-pencil' aria-hidden='true'></i></a>")
+                                                            .HtmlAttributes(new { style = "text-align:center" })
+                                                            .HeaderHtmlAttributes(new { style = "text-align:center;width:4%" })
+                                                            .Title("Edit");
+
+                                                      columns.Bound(x => x.SectionName)
+                                                          .Groupable(false)
+                                                          .Width("12%");
+
+                                                      columns.Bound(x => x.SectionURL)
+                                                          .Groupable(false)
+                                                          .Sortable(false)
+                                                          .Width("22%");
+
+                                                      columns.Bound(x => x.Description)
+                                                          .Width("15%")
+                                                          .Groupable(false);
+
+                                                      columns.Template(@<text><a title="Content File">@item.ContentFileName</a></text>)
+                                                             .ClientTemplate("<a title = 'View' style='cursor:pointer;' onClick='OpenSnippet(this)' id='#=ContentFileName#'  >#=ViewIcon#</a>")
+                                                             .Title("Section Doc")
+                                                             .HtmlAttributes(new { style = "text-align:center" })
+                                                             .Width("7%");
+
+                                                      columns.Bound(x => x.CreatedBy)
+                                                          .Width("16%");
+
+                                                      columns.Bound(x => x.CreatedDate)
+                                                          .Format("{0:" + WordAutomationDemo.Helpers.CurrentUserSession.User.DTFormatGrid + " hh:mm tt}")
+                                                          .Groupable(false)
+                                                          .Width("13%");
+
+                                                      columns.Bound(x => x.strStatus)
+                                                          .Width("5%")
+                                                          .Title("Status")
+                                                          .Groupable(false)
+                                                          .Sortable(false)
+                                                          .Filterable(false);
+                                                  }).Pageable(pageable => pageable.Refresh(true).PageSizes(WordAutomationDemo.Common.Global.recordPerPageList).ButtonCount(5).Input(true).Numeric(true)).DataSource(dataSource => dataSource.Ajax().PageSize(WordAutomationDemo.Common.Global.PageSize).Read(read => read.Action("GetAllSections", "Section"))).Sortable().Filterable(f=>f.Extra(false)).Groupable().EnableCustomBinding(false).AutoBind(true))
+            </div>
+        </div>
+    }
+</div>
+
+
+<div class="modal fade bs-example-modal-lg" id="ReportsModal" tabindex="1000" role="dialog" aria-labelledby="myLargeModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg" style="overflow:auto;">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+                <h4 class="modal-title" id="myModalLabel">  <span id="contentType">View Document </span></h4>
+            </div>
+            <div class="modal-body" id="partialContent" style="line-height:25px;">
+                <div>
+
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-primary" data-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<script>
+    //databound column
+    function onGridDataBound(e) {
+        $(".k-grouping-header").remove();
+        var grid = $("#" + e.sender.element[0].id).data("kendoGrid");
+        var dataSource = grid.dataSource;
+
+        var totalRecords = dataSource.total();
+        if (totalRecords <= 0) {
+            var colCount = grid.columns.length;
+            $("#" + e.sender.element[0].id).find('tbody').html('');
+            $("#" + e.sender.element[0].id).find('tbody').append('<tr class="kendo-data-row"><td colspan="' + colCount + '" class="no-data" style="text-align: center;">No records found.</td></tr>');
+        }
+    }
+
+    function OpenSnippet(e) {
+        //var name = "Documents/" + e.id;
+        var name = e.id;
+        var docExtenstion = name.split('.').pop();
+        var DocumentType;
+
+        if (docExtenstion == 'xls' || docExtenstion == 'xlsx') {
+            DocumentType = 2;
+            $.get('@Url.Action("LoadSectionXLS", "Section")', { name: name, userid: 1, IsReadOnly: true, DocumentType: DocumentType }, function (partialView) {
+                $('#ReportsModal').modal('show');
+                $("#partialContent").html(partialView);
+            });
+        }
+        else {
+            DocumentType = 1;
+
+            $.get('@Url.Action("LoadSectionDoc", "Section")', { name: name, userid: 1, IsReadOnly: true, DocumentType: DocumentType }, function (partialView) {
+                $('#ReportsModal').modal('show');
+                $("#partialContent").html(partialView);
+            });
+        }
+    }
+
+
+
+    $("#ReportsModal").on('shown.bs.modal', function () {
+        $('#SectionDoc_R_TC_TPTCL_MinBtn').click();
+    });
+
+    function initializeSingleCheckBox(n) {
+        var t = $(n).is(":checked"); $(n).closest("tr").addClass(t ? "selected-row" : "not-selected-row"); $(n).closest("tr").removeClass(t ? "not-selected-row" : "selected-row"); t && $(".singleCheckBox").length == $(".selected-row").length ? $("#allCheckBox").prop("checked", !0) : $("#allCheckBox").prop("checked", !1)
+    }
+
+
+    function Check_CheckBox_Count() {
+        var n = $("input[name=chkDelete]"), t = n.filter(":checked").length; return t > 0 ? confirm("Are you sure? Do you want to delete record(s)?") : (alert("Please select at least one checkbox to delete."), !1)
+    }
+</script>

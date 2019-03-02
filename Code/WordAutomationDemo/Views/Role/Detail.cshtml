@@ -1,0 +1,54 @@
+﻿@model WordAutomationDemo.Models.RoleModel
+@{
+    ViewBag.Title = "Role Detail";
+}
+<div class="row">
+    <div class="col-sm-12">
+        <div class="main-heading title-row mbp15">
+            <div class="row">
+                <div class="col-xs-12">
+                    <h1 class="heading01">Role Details</h1>
+                </div>
+
+            </div>
+        </div>
+    </div>
+    @if (Model != null)
+    {
+        <div class="col-sm-12 mtp10">
+            <div class="form-details">
+                <div class="row">
+                    <div class="col-sm-3">
+                        <div class="form-group">
+                            <label>Role</label>
+                            <p class="form-control-static">@Html.Raw(Model.Role)</p>
+                        </div>
+                    </div>
+                    <div class="col-sm-3">
+                        <div class="form-group">
+                            <label>Description</label>
+                            <p class="form-control-static">@Html.Raw(Model.Description)</p>
+                        </div>
+                    </div>
+                    <div class="col-sm-3">
+                        <div class="form-group">
+                            <label>Company</label>
+                            <p class="form-control-static">@Html.Raw(Model.Company)</p>
+                        </div>
+                    </div>
+                    <div class="col-sm-3">
+                        <div class="form-group">
+                            <label>Status</label>
+                            <p class="form-control-static">@Html.Raw(Model.Active)</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-sm-12">
+                        <button class="darkblue-btn btnspace" type="button" onclick="location.href='@Url.Action("Index", "Role")';return false;"><i class="fa fa-angle-left" aria-hidden="true"></i> Back</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+                                    }
+</div>

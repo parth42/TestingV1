@@ -1,0 +1,18 @@
+﻿@using DevExpress.Web.Mvc;
+@using DevExpress.Web.Mvc.UI;
+@model  WordAutomationDemo.Models.AssignmentModel
+
+@Html.DevExpress().Spreadsheet(
+    settings =>
+    {
+        settings.Name = "spreadsheetChanged";
+        settings.CallbackRouteValues = new { Controller = "Home", Action = "LoadExcel" };
+        settings.Width = System.Web.UI.WebControls.Unit.Percentage(100);
+        settings.Height = System.Web.UI.WebControls.Unit.Pixel(600);
+        settings.RibbonMode = DevExpress.Web.ASPxSpreadsheet.SpreadsheetRibbonMode.None;
+        settings.ReadOnly = Model.IsReadOnly;
+
+        settings.AutoSaveMode = DevExpress.Web.Office.Internal.AutoSaveMode.On;
+        settings.EnableClientSideAPI = true;
+    }
+            ).Open(Path.Combine(WordAutomationDemo.Models.DirectoryManagmentUtils.InitialDemoFilesPathExcels, Model.OriginalDocumentName + "/AssignedDoc/" + Model.DocumentName)).GetHtml()

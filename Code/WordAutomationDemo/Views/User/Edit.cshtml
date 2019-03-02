@@ -1,0 +1,303 @@
+﻿@model WordAutomationDemo.Models.UserModel
+@using WordAutomationDemo.Common
+@{
+    ViewBag.Title = "Edit User";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+<script src="@Url.Content("~/Scripts/Common/passwordStrengthMeter.js")" type="text/javascript"></script>
+<script src="@Url.Content("~/Scripts/Custom/User.js")" type="text/javascript"></script>
+<style>
+    img {
+        max-width: 100%; /* This rule is very important, please do not ignore this! */
+    }
+</style>
+@*@{Html.EnableClientValidation();}*@
+<div class="row">
+    <div class="col-sm-12">
+        <div class="main-heading title-row mbp15">
+            <div class="row">
+                <div class="col-xs-12">
+                    <h1 class="heading01">Edit User</h1>
+                </div>
+
+            </div>
+        </div>
+    </div>
+    <div class="col-sm-12 mtp10">
+        <div class="alert alert-success" id="SuccessMessage" style="display: none;">
+        </div>
+        <div class="alert alert-danger" id="ErrorMessage" style="display: none;">
+        </div>
+        @if (Request.QueryString["Msg"] != null && Request.QueryString["Msg"].ToString().ToLower() == "dup")
+        {
+            <div style="display: none;" class="alert alert-danger">
+                <ul>
+                    <li>@Html.Encode(String.Format(Messages.AlreadyExists, "User"))</li>
+                </ul>
+            </div>
+        }
+
+        @using (Html.BeginForm("Edit", "User", FormMethod.Post, new { enctype = "multipart/form-data", id = "UpdateUser" }))
+        {
+            <div class="row">
+                <div class="col-sm-4">
+                    <div class="form-group">
+                        <label for="name">User Name<span class="mandatory">*</span></label>
+                        @Html.HiddenFor(model => model.UserId)
+                        @Html.TextBoxFor(model => model.UserName, new { @class = "form-control", @maxlength = 20, onchange = "javascript:return ValidateDuplicateUser('User/ValidateDuplicateUser','UserName','UserName','UserId','User');" })
+                        <p class="errormessage">
+                            @Html.ValidationMessageFor(model => model.UserName)
+                        </p>
+                    </div>
+                </div>
+                <div class="col-sm-4">
+                    <div class="form-group">
+                        <label for="name">Password<span class="mandatory">*</span></label>
+                        @Html.TextBoxFor(model => model.Password, new { @type = "password", @class = "form-control", @maxlength = 20, onchange = "funCofirmPassword();" })
+                        @Html.Hidden("hfpassword", Model.Password)
+                        <span style="color: green" name="result" id='passComment'></span>
+                        <p class="errormessage">
+                            @Html.ValidationMessageFor(model => model.Password)
+                        </p>
+                    </div>
+                </div>
+                <div class="col-sm-4">
+                    <div class="form-group">
+                        <label for="name">Confirm Password<span class="mandatory">*</span></label>
+                        @Html.TextBoxFor(model => model.ConfirmPassword, new { @type = "password", @class = "form-control", @maxlength = 20, onchange = "funCofirmPassword();" })
+                        <p class="errormessage">
+                            @Html.ValidationMessageFor(model => model.ConfirmPassword)
+                            <span id='spanConfirm'></span>
+                        </p>
+                    </div>
+                </div>
+            </div>
+                <div class="row">
+                    <div class="col-sm-4">
+                        <div class="form-group">
+                            <label for="name">Full Name<span class="mandatory">*</span></label>
+                            @Html.TextBoxFor(model => model.FullName, new { @class = "form-control", @maxlength = 50 })
+                            <p class="errormessage">
+                                @Html.ValidationMessageFor(model => model.FullName)
+                            </p>
+                        </div>
+                    </div>
+                    <div class="col-sm-4">
+                        <div class="form-group">
+                            <label for="name">Email ID<span class="mandatory">*</span></label>
+                            @Html.TextBoxFor(model => model.EmailID, new { @class = "form-control", @maxlength = 250, onchange = "javascript:return ValidateDuplicateUser(SiteUrl + 'User/ValidateDuplicateUser','Email','Email','add','Email');" })
+                            <p class="errormessage">
+                                @Html.ValidationMessageFor(model => model.EmailID)
+                            </p>
+                        </div>
+                    </div>
+                    <div class="col-sm-4">
+                        <div class="form-group">
+                            <label for="role1">Company<span class="mandatory">*</span></label>
+                            @Html.DropDownListFor(model => model.Company_ID, Model.SelectCompany, "- Select Company -", new { @class = "form-control", onchange = "getRoles(this.value)" })
+                            <p class="errormessage">
+                                @Html.ValidationMessageFor(model => model.Company_ID)
+                            </p>
+                        </div>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-sm-4">
+                        <div class="form-group">
+                            <label for="role2">Role<span class="mandatory">*</span></label>
+                            @Html.DropDownListFor(model => model.Role_ID, Model.SelectRole ?? new List<SelectListItem>(), " - Select Role - ", new { @id = "Role_ID", @class = "form-control" })
+                            <p class="errormessage">
+                                @Html.ValidationMessageFor(model => model.Role_ID)
+                            </p>
+                        </div>
+                    </div>
+                    <div class="col-sm-4">
+                        <div class="form-group">
+                            <label for="name">Department</label>
+                            @Html.TextBoxFor(model => model.Department, new { @class = "form-control", @maxlength = 50 })
+                            <p class="errormessage">
+                                @Html.ValidationMessageFor(model => model.Department)
+                            </p>
+                        </div>
+                    </div>
+                    <div class="col-sm-4">
+                        <div class="form-group">
+                            <label for="name">Status<span class="mandatory">*</span></label>
+                            <div class="clearfix">
+                                <label class="radio-inline">
+                                    @Html.RadioButtonFor(model => model.IsActive, true, new { Checked = "checked" })
+                                    Active
+                                </label>
+                                <label class="radio-inline">
+                                    @Html.RadioButtonFor(model => model.IsActive, false)
+                                    Inactive
+                                </label>
+
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                @*<div class="row">
+                    <div class="col-sm-4">
+                        <div class="form-group">
+                            <label for="name">Subtask Creation<span class="mandatory">*</span></label>
+                            <div class="clearfix">
+                                <label class="radio-inline">
+                                    @Html.RadioButtonFor(model => model.CanCreateSubtasks, true, new { Checked = "checked" })
+                                    Active
+                                </label>
+                                <label class="radio-inline">
+                                    @Html.RadioButtonFor(model => model.CanCreateSubtasks, false)
+                                    Inactive
+                                </label>
+
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-sm-4">
+                        <div class="form-group">
+                            <label for="name">Publishing and Reviewing<span class="mandatory">*</span></label>
+                            <div class="clearfix">
+                                <label class="radio-inline">
+                                    @Html.CheckBoxFor(model => model.CanEdit, Model.CanEdit)
+                                    Edit Documents
+                                </label>
+                                <label class="radio-inline">
+                                    @Html.CheckBoxFor(model => model.CanApprove, Model.CanApprove)
+                                    Approve Tasks
+                                </label>
+
+                            </div>
+                        </div>
+                    </div>
+                </div>*@
+                <div class="row">
+                    <div class="col-sm-4">
+                        <div class="form-group multiselectbox">
+                            <label for="UploadNewFile">Upload Profile Image</label>
+                            <div class="input-group">
+                                <input type="text" class="form-control" readonly="">
+                                <label class="input-group-btn">
+                                    <span class="btn btn-primary">
+                                        <input type="hidden" id="hdnImage" name="hdnImage" value="">
+                                        Browse… <input type="file" name="imageUpload" value="" id="imageUpload" style="display: none;" accept="image/x-png,image/gif,image/jpeg" multiple="" />
+                                    </span>
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-sm-4">
+                        <div class="thumbimg">
+                            <a href="#" class="thclose" id="btnRemoveImage"><i class="fa fa-times" aria-hidden="true"></i></a>
+                            @Html.HiddenFor(model => model.ProfileImage)
+                            <img src="@Model.ProfileImage" id="imgProfile" class=" img-thumbnail img-responsive" />
+                        </div>
+                    </div>
+                    
+                </div>
+                
+                <div class="row">
+                    <div class="col-sm-12">
+                        <button class="lightblue-btn btnspace"><i class="fa fa-pencil" aria-hidden="true"></i> Update</button>
+                        <button class="darkblue-btn btnspace" type="button" onclick="location.href = '@string.Concat(Global.SiteUrl, "User/Index")'"><i class="fa fa-angle-left" aria-hidden="true"></i> Back</button>
+                    </div>
+                </div>
+        }
+    </div>
+</div>
+<div class="modal fade" id="ModelProfileImage" aria-labelledby="modalLabel" role="dialog" tabindex="-1">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                <h4 class="modal-title" id="myModalLabel">Crop the image</h4>
+            </div>
+            <div class="modal-body scroll-popup img-container" id="divCropImage">
+                <img id="imgCrop">
+            </div>
+            <div class="modal-footer">
+                <button class="lightblue-btn btnspace avatar-save" onclick="ApplyCrop();"><i class="fa fa-check" aria-hidden="true"></i> Apply</button>
+                <button class="darkblue-btn btnspace" type="button" data-dismiss="modal" aria-label="Close"><i class="fa fa-ban" aria-hidden="true"></i> Cancel</button>
+                @*<button type="button" class="btn btn-default" data-dismiss="modal">Close</button>*@
+            </div>
+        </div>
+    </div>
+</div>
+<script>
+        var $imgCrop = $('#imgCrop');
+        var cropImgData;
+        var cropBoxData;
+        var canvasData;
+        var $btn = $('.avatar-save');
+        function getRoles(id) {
+            $("#Role_ID option").remove();
+            $("#Role_ID").append('<option value=""> - Select Role - </option>');
+            $.get('@Url.Action("GetRolesByCompanyID", "User")', { companyID: id }, function (result) {
+
+                if (result.length > 0) {
+
+                    $.each(result, function (key, value) {
+                        $("#Role_ID").append('<option value="' + value["Value"] + '">' + value["Text"] + '</option>');
+                    });
+                }
+                else {
+                    $("#Role_ID option").remove();
+                    $("#Role_ID").append('<option value=""> - Select Role - </option>');
+                }
+
+            });
+        }
+        $('#imgUserProfile').on('change', function () {
+            $("#imgProfile, #btnRemoveImage").hide();
+            $("#hdnImage").val(null);
+            $('input[name=ProfileImage]').val(null);
+        });
+
+        $('#btnRemoveImage').on('click', function () {
+            $("#imgProfile, #btnRemoveImage").hide();
+            $("#hdnImage").val(null);
+            $('input[name=ProfileImage]').val(null);
+        });
+
+        $('#imgProfile').load(function () { }).error(function () {
+            $("#imgProfile, #btnRemoveImage").hide();
+        });
+        $("#imageUpload").change(readURL);
+        function readURL(e) {
+            if (this.files && this.files[0]) {
+                var reader = new FileReader();
+                $(reader).load(function (e) { $('#imgCrop').attr('src', e.target.result); });
+                reader.readAsDataURL(this.files[0]);
+                reader.onloadend = (function () {
+                });
+            }
+            $('#ModelProfileImage').modal('show');
+        }
+
+        $('#ModelProfileImage').on('shown.bs.modal', function () {
+            $imgCrop.cropper({
+                //autoCropArea: 0.80,
+                autoCropArea: 1,
+                //aspectRatio: 16/9,
+                scalable:false,
+                crop: function (data) {
+                    var canvas = $imgCrop.cropper('getCroppedCanvas');
+                    var dataURL = canvas.toDataURL("image/jpeg", 0.9);
+                    //$("#imgPreview").attr("src", dataURL);
+                    $('#hdnImage').val(dataURL.replace("data:image/jpeg;base64,", ""))
+                },
+                ready: function () {
+                    $imgCrop.cropper('setCanvasData', canvasData);
+                    $imgCrop.cropper('setCropBoxData', cropBoxData);
+                    $btn.on('click', function () {
+                        $('#ModelProfileImage').modal('hide');
+                    });//$btn.on
+                },
+            });
+        }).on('hidden.bs.modal', function () {
+            $imgCrop.cropper('destroy');
+        });
+        function ApplyCrop() {
+            $('#ModelProfileImage').modal('hide');
+        }
+</script>

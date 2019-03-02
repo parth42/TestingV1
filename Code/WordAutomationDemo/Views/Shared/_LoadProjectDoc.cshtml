@@ -1,0 +1,28 @@
+﻿@using DevExpress.Web.Mvc;
+@using DevExpress.Web.Mvc.UI;
+@model  WordAutomationDemo.Models.ProjectModel
+
+@Html.DevExpress().RichEdit(settings =>
+{
+    settings.Name = "ProjectDoc";
+    settings.CallbackRouteValues = new { Controller = "Projects", Action = "LoadProjectDoc" };
+    settings.WorkDirectory = WordAutomationDemo.Models.DirectoryManagmentUtils.DocumentBrowsingFolderPath;
+
+    settings.Width = System.Web.UI.WebControls.Unit.Percentage(100);
+    settings.Height = System.Web.UI.WebControls.Unit.Pixel(700);
+    settings.RibbonMode = DevExpress.Web.ASPxRichEdit.RichEditRibbonMode.Auto;
+    settings.ReadOnly = true;
+    settings.ShowConfirmOnLosingChanges = true;
+    settings.ActiveTabIndex = 0;
+    settings.AutoSaveMode = DevExpress.Web.Office.Internal.AutoSaveMode.On;
+    settings.EnableClientSideAPI = true;
+    //settings.Settings.Behavior.Cut = DevExpress.XtraRichEdit.DocumentCapability.Hidden;
+    //settings.Settings.Behavior.Copy = DevExpress.XtraRichEdit.DocumentCapability.Hidden;
+    //settings.Settings.Behavior.Paste = DevExpress.XtraRichEdit.DocumentCapability.Hidden;
+    settings.Settings.Behavior.FullScreen = DevExpress.XtraRichEdit.DocumentCapability.Hidden;
+    settings.PreRender = (s, e) =>
+    {
+        MVCxRichEdit rEdits = (MVCxRichEdit)s;
+        rEdits.Focus();
+    };
+}).Open(Path.Combine(WordAutomationDemo.Models.DirectoryManagmentUtils.ProjectsDocumentFilesPath + "/" + Model.ProjectID.ToString() + "/", Model.FileName), (Model.FileName.Split('.').Last() == "doc") ? DevExpress.XtraRichEdit.DocumentFormat.Doc : DevExpress.XtraRichEdit.DocumentFormat.OpenXml).GetHtml()

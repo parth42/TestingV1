@@ -1,0 +1,73 @@
+﻿@model WordAutomationDemo.Models.AssignmentModel
+
+<div id="fullscreenButtons" style="display:none">
+    <div class="btn btn-primary" id="closeFullscreen" onclick="CloseFullscreen()">Exit Fullscreen</div><br/>
+    <div class="btn btn-primary" id="showTaskDetails" onclick="ShowTaskDetails()">Show Task Details  <i class="fa fa-caret-down"></i></div>
+    <div class="btn btn-primary" id="hideTaskDetails" onclick="HideTaskDetails()" style="display:none">Hide Task Details  <i class="fa fa-caret-up"></i></div>
+</div>
+<script>
+    var isFullscreen = false;
+
+    function OpenFullscreen() {
+        if (!$("#openFullscreen").hasClass("disabled")) {
+            if (!isFullscreen) {
+                RichEdit.commands.setFullscreen.execute();
+            }
+
+            $("#taskDetails").hide();
+            $("#finishFullscreen").remove();
+            $("<div class='btn btn-primary' id='finishFullscreen' onclick='PostDataFullscreen()'>Finish</div>").insertAfter("#taskDetails > form");
+            $("#showTaskDetails").show();
+            $("#hideTaskDetails").hide();
+            $("#fullscreenButtons").show();
+            isFullscreen = true;
+        }
+    }
+
+    function ShowTaskDetails() {
+        $("#taskDetails").css('position', 'fixed');
+        $("#taskDetails").css('top', '11%');
+        $("#taskDetails").css('padding', '20px');
+        $("#taskDetails").css('background', 'white');
+        $("#taskDetails").css('border-radius', '5px');
+        $("#taskDetails").css('box-shadow', '0px 0px 5px #888888');
+        $("#taskDetails").css('z-index', '30000');
+        $("#taskDetails").css('right', '40px');
+        $("#taskDetails.input-group").css('padding-right', '');
+        $("#taskDetails").fadeIn();
+        $("#showTaskDetails").hide();
+        $("#hideTaskDetails").show();
+    }
+
+    function HideTaskDetails() {
+        $("#taskDetails").fadeOut();
+        $("#showTaskDetails").show();
+        $("#hideTaskDetails").hide();
+    }
+
+    function CloseFullscreen() {
+        if (isFullscreen) {
+            RichEdit.commands.setFullscreen.execute();
+        }
+        $("#taskDetails").css('position', 'absolute');
+        $("#taskDetails").css('top', 'initial');
+        $("#taskDetails").css('padding', '');
+        $("#taskDetails").css('background', 'none');
+        $("#taskDetails").css('right', '15px');
+        $("#taskDetails").css('box-shadow', '');
+        $("#taskDetails").css('border-radius', '');
+        $("#taskDetails").css('z-index', '');
+        $("#taskDetails.input-group").css('padding-right', '0');
+        $("#finishFullscreen").remove();
+        $("#taskDetails").show();        
+        $("#fullscreenButtons").hide();
+        isFullscreen = false;
+
+    }
+
+    function PostDataFullscreen() {
+        CloseFullscreen();
+        PostData(true);
+    }
+
+</script>

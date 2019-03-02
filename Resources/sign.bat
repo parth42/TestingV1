@@ -1,0 +1,1 @@
+signtool.exe sign /f Triyo.pfx /p nothanks /v /tr "http://sha256timestamp.ws.symantec.com/sha256/timestamp" /td SHA256 /fd SHA256 OfficeAddInSetup.msi

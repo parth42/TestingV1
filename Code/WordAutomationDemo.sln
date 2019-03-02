@@ -1,0 +1,34 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio 15
+VisualStudioVersion = 15.0.27004.2006
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WordAutomationDemo", "WordAutomationDemo\WordAutomationDemo.csproj", "{791FEBFE-885B-4738-8BA7-6373BCB2CB24}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		kamino-dev|Any CPU = kamino-dev|Any CPU
+		kamino-stage|Any CPU = kamino-stage|Any CPU
+		kamino-val|Any CPU = kamino-val|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{791FEBFE-885B-4738-8BA7-6373BCB2CB24}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{791FEBFE-885B-4738-8BA7-6373BCB2CB24}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{791FEBFE-885B-4738-8BA7-6373BCB2CB24}.kamino-dev|Any CPU.ActiveCfg = kamino-dev|Any CPU
+		{791FEBFE-885B-4738-8BA7-6373BCB2CB24}.kamino-dev|Any CPU.Build.0 = kamino-dev|Any CPU
+		{791FEBFE-885B-4738-8BA7-6373BCB2CB24}.kamino-stage|Any CPU.ActiveCfg = kamino-stage|Any CPU
+		{791FEBFE-885B-4738-8BA7-6373BCB2CB24}.kamino-stage|Any CPU.Build.0 = kamino-stage|Any CPU
+		{791FEBFE-885B-4738-8BA7-6373BCB2CB24}.kamino-val|Any CPU.ActiveCfg = kamino-val|Any CPU
+		{791FEBFE-885B-4738-8BA7-6373BCB2CB24}.kamino-val|Any CPU.Build.0 = kamino-val|Any CPU
+		{791FEBFE-885B-4738-8BA7-6373BCB2CB24}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{791FEBFE-885B-4738-8BA7-6373BCB2CB24}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {6CA9F73D-66F5-4BF6-94AB-FD33B33BB7DE}
+	EndGlobalSection
+EndGlobal

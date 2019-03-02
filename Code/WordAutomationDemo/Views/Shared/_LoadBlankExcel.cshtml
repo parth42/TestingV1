@@ -1,0 +1,10 @@
+﻿@using DevExpress.Web.Mvc;
+@using DevExpress.Web.Mvc.UI;
+
+@Html.DevExpress().Spreadsheet(
+    settings =>
+    {
+        settings.Name = "spreadsheet";
+        settings.CallbackRouteValues = new { Controller = "Test", Action = "LoadBlankExcel" };
+    }
+            ).Open(Path.Combine(WordAutomationDemo.Models.DirectoryManagmentUtils.InitialDemoFilesPathPPTs, "PPT System_636398039419121629.xlsx")).GetHtml()

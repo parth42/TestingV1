@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="utf-8"?>
+<edmx:Edmx Version="3.0" xmlns:edmx="http://schemas.microsoft.com/ado/2009/11/edmx">
+ <!-- EF Designer content (DO NOT EDIT MANUALLY BELOW HERE) -->
+  <edmx:Designer xmlns="http://schemas.microsoft.com/ado/2009/11/edmx">
+    <!-- Diagram content (shape and connector positions) -->
+    <edmx:Diagrams>
+      <Diagram DiagramId="e1bd24b251e64a78a3cff0d18a9bddb2" Name="Diagram1">
+        <EntityTypeShape EntityType="Models.tblAssignedWordPage" Width="1.5" PointX="14.25" PointY="29.75" IsExpanded="true" />
+        <EntityTypeShape EntityType="Models.tblAssignedExcelSheet" Width="1.5" PointX="14.25" PointY="37.5" IsExpanded="true" />
+        <EntityTypeShape EntityType="Models.tblAssignedPPTSlide" Width="1.5" PointX="0.75" PointY="0.75" IsExpanded="true" />
+        <EntityTypeShape EntityType="Models.tblAssignmentHistory" Width="1.5" PointX="9.75" PointY="24.25" IsExpanded="true" />
+        <EntityTypeShape EntityType="Models.tblAssignmentLog" Width="1.5" PointX="12.75" PointY="24" IsExpanded="true" />
+        <EntityTypeShape EntityType="Models.tblAssignmentMember" Width="1.5" PointX="9.75" PointY="20.375" IsExpanded="true" />
+        <EntityTypeShape EntityType="Models.tblAssignment" Width="1.5" PointX="12" PointY="31.375" IsExpanded="true" />
+        <EntityTypeShape EntityType="Models.tblChatMessage" Width="1.5" PointX="2.75" PointY="0.75" IsExpanded="true" />
+        <EntityTypeShape EntityType="Models.tblCompany" Width="1.5" PointX="3" PointY="22.5" IsExpanded="true" />
+        <EntityTypeShape EntityType="Models.tblDateFormat" Width="1.5" PointX="0.75" PointY="24.625" IsExpanded="true" />
+        <EntityTypeShape EntityType="Models.tblDocument" Width="1.5" PointX="9.75" PointY="32.75" IsExpanded="true" />
+        <EntityTypeShape EntityType="Models.tblExcelRowMap" Width="1.5" PointX="9.75" PointY="36.5" IsExpanded="true" />
+        <EntityTypeShape EntityType="Models.tblExcelSheet" Width="1.5" PointX="4.75" PointY="0.75" IsExpanded="true" />
+        <EntityTypeShape EntityType="Models.tblLogActivity" Width="1.5" PointX="0.75" PointY="4.75" IsExpanded="true" />
+        <EntityTypeShape EntityType="Models.tblMenuItem" Width="1.5" PointX="2.75" PointY="4.75" IsExpanded="true" />
+        <EntityTypeShape EntityType="Models.tblMenuItem1" Width="1.5" PointX="4.75" PointY="3.75" IsExpanded="true" />
+        <EntityTypeShape EntityType="Models.tblPPTSlide" Width="1.5" PointX="6.75" PointY="0.75" IsExpanded="true" />
+        <EntityTypeShape EntityType="Models.tblProjectDocument" Width="1.5" PointX="12" PointY="39" IsExpanded="true" />
+        <EntityTypeShape EntityType="Models.tblProjectMember" Width="1.5" PointX="15" PointY="33.25" IsExpanded="true" />
+        <EntityTypeShape EntityType="Models.tblProject" Width="1.5" PointX="9.75" PointY="43.125" IsExpanded="true" />
+        <EntityTypeShape EntityType="Models.tblRole" Width="1.5" PointX="5.25" PointY="23.875" IsExpanded="true" />
+        <EntityTypeShape EntityType="Models.tblRolePrivilage" Width="1.5" PointX="9.75" PointY="48.125" IsExpanded="true" />
+        <EntityTypeShape EntityType="Models.tblSectionMaster" Width="1.5" PointX="9.75" PointY="27.75" IsExpanded="true" />
+        <EntityTypeShape EntityType="Models.tblTemplateMaster" Width="1.5" PointX="9.75" PointY="57" IsExpanded="true" />
+        <EntityTypeShape EntityType="Models.tblUserDepartment" Width="1.5" PointX="7.5" PointY="21.75" IsExpanded="true" />
+        <EntityTypeShape EntityType="Models.tblLogActivityType" Width="1.5" PointX="6.75" PointY="3.75" IsExpanded="true" />
+        <EntityTypeShape EntityType="Models.vwRolePrivilege" Width="1.5" PointX="6.75" PointY="6.75" IsExpanded="true" />
+        <AssociationConnector Association="Models.FK_tblAssignedDocs_tblAssignments" ManuallyRouted="false" />
+        <AssociationConnector Association="Models.FK_tblAssignedExcelSheets_tblAssignments" ManuallyRouted="false" />
+        <AssociationConnector Association="Models.FK_tblAssignmentHistory_tblAssignmentLog" ManuallyRouted="false" />
+        <AssociationConnector Association="Models.FK_tblAssignmentHistory_tblUserDepartment" ManuallyRouted="false" />
+        <AssociationConnector Association="Models.FK_tblAssignmentLog_tblAssignments" ManuallyRouted="false" />
+        <AssociationConnector Association="Models.FK_tblAssignmentLog_tblUserDepartment" ManuallyRouted="false" />
+        <AssociationConnector Association="Models.FK_AssignmentID" ManuallyRouted="false" />
+        <AssociationConnector Association="Models.FK_UserID" ManuallyRouted="false" />
+        <AssociationConnector Association="Models.FK_tblAssignments_tblAssignments" ManuallyRouted="false" />
+        <AssociationConnector Association="Models.FK_tblAssignments_tblProjects" ManuallyRouted="false" />
+        <AssociationConnector Association="Models.FK_tblAssignments_tblUserDepartment" ManuallyRouted="false" />
+        <AssociationConnector Association="Models.FK_tblAssignments_tblUserDepartment1" ManuallyRouted="false" />
+        <AssociationConnector Association="Models.FK__tblCompan__DateF__27F8EE98" ManuallyRouted="false" />
+        <AssociationConnector Association="Models.FK_tblRole_tblCompany" ManuallyRouted="false" />
+        <AssociationConnector Association="Models.FK_tblSectionMaster_tblCompany" ManuallyRouted="false" />
+        <AssociationConnector Association="Models.FK_tblUserDepartment_tblCompany" ManuallyRouted="false" />
+        <AssociationConnector Association="Models.FK_tblDocument_tblUserDepartment" ManuallyRouted="false" />
+        <AssociationConnector Association="Models.FK_tblProjectDocuments_tblDocument" ManuallyRouted="false" />
+        <AssociationConnector Association="Models.FK_tblProjectDocuments_tblProjects" ManuallyRouted="false" />
+        <AssociationConnector Association="Models.FK_tblProjectMembers_tblProjects" ManuallyRouted="false" />
+        <AssociationConnector Association="Models.FK_tblProjectMembers_tblUserDepartment" ManuallyRouted="false" />
+        <AssociationConnector Association="Models.FK_tblProjectMembers_tblUserDepartment1" ManuallyRouted="false" />
+        <AssociationConnector Association="Models.FK_tblProjects_tblUserDepartment" ManuallyRouted="false" />
+        <AssociationConnector Association="Models.FK_tblProjects_tblUserDepartment1" ManuallyRouted="false" />
+        <AssociationConnector Association="Models.FK_tblUserDepartment_tblRole" ManuallyRouted="false" />
+        <AssociationConnector Association="Models.FK_tblRolePrivilages_tblUserDepartment" ManuallyRouted="false" />
+        <AssociationConnector Association="Models.FK_tblSectionMaster_tblUserDepartment" ManuallyRouted="false" />
+        <AssociationConnector Association="Models.FK_tblTemplateMaster_tblUserDepartment" ManuallyRouted="false" />
+        <AssociationConnector Association="Models.FK_tblTemplateMaster_tblUserDepartment1" ManuallyRouted="false" />
+        <AssociationConnector Association="Models.FK_tblExcelRowMap_tblAssignments" ManuallyRouted="false" />
+      </Diagram>
+    </edmx:Diagrams>
+  </edmx:Designer>
+</edmx:Edmx>

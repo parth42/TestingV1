@@ -1,0 +1,473 @@
+﻿@using DevExpress.Web.Mvc;
+@using DevExpress.Web.Mvc.UI;
+@using WordAutomationDemo.Helpers;
+@using WordAutomationDemo.Models
+<!DOCTYPE html>
+@*<style>
+        li {
+            list-style-type: none;
+        }
+
+        textarea {
+            resize: none;
+        }
+
+        .popup {
+            position: absolute;
+            width: 800px;
+            height: 600px;
+        }
+
+            .popup img {
+                width: 800px;
+                height: 600px;
+                position: fixed;
+            }
+
+        .field-validation-error {
+            color: red;
+        }
+
+        .input-validation-error {
+            color: red;
+        }
+
+        .k-group-cell {
+            display: none;
+        }
+
+        li {
+            list-style-type: none;
+        }
+
+        .glyphicon-spin {
+            -webkit-animation: spin 1000ms infinite linear;
+            animation: spin 1000ms infinite linear;
+        }
+
+        @@-webkit-keyframes spin {
+            0% {
+                -webkit-transform: rotate(0deg);
+                transform: rotate(0deg);
+            }
+
+            100% {
+                -webkit-transform: rotate(359deg);
+                transform: rotate(359deg);
+            }
+        }
+
+        @@keyframes spin {
+            0% {
+                -webkit-transform: rotate(0deg);
+                transform: rotate(0deg);
+            }
+
+            100% {
+                -webkit-transform: rotate(359deg);
+                transform: rotate(359deg);
+            }
+        }
+    </style>*@
+
+<html>
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=0, minimum-scale=1.0, maximum-scale=1.0" />
+    <meta http-equiv="X-UA-Compatible" content="IE=Edge" />
+    @{
+        if (Request != null && Request.Url != null && Request.Url.AbsoluteUri != null && Request.Url.AbsoluteUri.Contains("Home/EditPPT"))
+        {
+            <meta http-equiv="refresh" content="120">
+        }
+    }
+    @*@Styles.Render("~/Bundles/CSS/Common")
+        @Styles.Render("~/Bundles/CSS/Custom")
+        @Scripts.Render("~/Bundles/Scripts/Common")
+        @Scripts.Render("~/bundles/SignalR")*@
+    <title>@ViewBag.Title</title>
+    <link rel="shortcut icon" href="@Url.Content("~/favicon.ico")">
+
+    <link href="@Url.Content("~/CSS/fonts/fonts.css")" rel="stylesheet" />
+    <link href="https://fonts.googleapis.com/css?family=Open+Sans:300,400,700" rel="stylesheet">
+    <link href="@Url.Content("~/CSS/fonts/font-awesome.css")" rel="stylesheet" />
+    <!-- Bootstrap core CSS -->
+    <link href="@Url.Content("~/CSS/Common/bootstrap.css")" rel="stylesheet">
+    <link href="@Url.Content("~/CSS/Common/bootstrap-multiselect.css")" rel="stylesheet" />
+    <link href="@Url.Content("~/CSS/Common/bootstrap-datetimepicker.css")" rel="stylesheet" />
+    <link href="@Url.Content("~/CSS/Common/bootstrap-theme.css")" rel="stylesheet" />
+    <!-- Custom -->
+    <link href="@Url.Content("~/CSS/Common/lightgallery.css")" rel="stylesheet" />
+    <link href="@Url.Content("~/CSS/Common/jquery.smartmenus.bootstrap.css")" rel="stylesheet">
+    <link href="@Url.Content("~/CSS/Custom/style.css")" rel="stylesheet">
+
+
+
+
+    <link href="@Url.Content("~/CSS/Common/jquery-ui.min.css")" rel="stylesheet" />
+    <link href="@Url.Content("~/CSS/Common/jquery-ui.theme.css")" rel="stylesheet" />
+    @*<link href="@Url.Content("~/CSS/Custom/Site.css")" rel="stylesheet" />*@
+    @*<link href="@Url.Content("~/CSS/Custom/sm-core-css.css")" rel="stylesheet" />
+        <link href="@Url.Content("~/CSS/Custom/sm-blue.css")" rel="stylesheet" />*@
+    @*<link href="@Url.Content("~/CSS/Common/bootstrap-datetimepicker.min.css")" rel="stylesheet" />
+        <link href="@Url.Content("~/CSS/Common/bootstrap-datepicker.css")" rel="stylesheet" />*@
+    <link href="@Url.Content("~/Scripts/Common/ChatJs/Styles/jquery.chatjs.css")" rel="stylesheet" />
+    <link href="@Url.Content("~/CSS/Common/cropper.css")" rel="stylesheet" />
+    <link href="@Url.Content("~/CSS/Common/select2.css")" rel="stylesheet" />
+    <link href="@Url.Content("~/CSS/Custom/Custom.css")" rel="stylesheet" />
+
+    <script src="@Url.Content("~/Scripts/Common/jquery-1.10.2.min.js")"></script>
+    <script src="@Url.Content("~/Scripts/Common/jquery.signalR-1.1.2.min.js")"></script>
+    @*<script src="@Url.Content("~/Scripts/Common/jquery.signalR-1.2.2.min.js")"></script>*@
+    @*<script src="@Url.Content("~/Scripts/Common/twitter-bootstrap-hover-dropdown.min.js")"></script>*@
+    @*<script src="@Url.Content( "~/Scripts/Common/jquery.hoverIntent.minified.js")"></script>*@
+    <script src="@Url.Content("~/Scripts/Common/jquery.validate.min.js")"></script>
+    <script src="@Url.Content("~/Scripts/Common/jquery.validate.unobtrusive.min.js")"></script>
+    <script src="@Url.Content("~/Scripts/Common/modernizr-2.6.2.js")"></script>
+    <script src="@Url.Content("~/Scripts/Common/bootstrap.min.js")"></script>
+    <script src="@Url.Content("~/Scripts/Common/html5shiv.js")"></script>
+    <script src="@Url.Content("~/Scripts/Common/jquery.smartmenus.js")"></script>
+    <script src="@Url.Content("~/Scripts/Common/jquery.smartmenus.bootstrap.min.js")"></script>
+    <script src="@Url.Content("~/Scripts/Common/respond.min.js")"></script>
+    <script src="@Url.Content("~/Scripts/Common/jquery-ui.min.js ")"></script>
+    <script src="@Url.Content("~/Scripts/Common/kendo.all.min.js")"></script>
+    <script src="@Url.Content("~/Scripts/Common/kendo.aspnetmvc.min.js")"></script>
+    @*<link href="@Url.Content("~/CSS/Common/bootstrap.min.css")" rel="stylesheet" />*@
+    <link href="@Url.Content("~/CSS/Common/kendo.common.new.min.css")" rel="stylesheet" />
+    <link href="@Url.Content("~/CSS/Common/kendo.default.min.css")" rel="stylesheet" />
+    <link href="@Url.Content("~/CSS/Common/kendo.common.min.css")" rel="stylesheet" />
+
+    <script src="@Url.Content("~/Scripts/Common/moment.min.js")"></script>
+    @*<script src="@Url.Content("~/Scripts/Common/moment.js")"></script>*@
+    <script src="@Url.Content("~/Scripts/Common/bootstrap-datetimepicker.js")"></script>
+    <script src="@Url.Content("~/Scripts/Common/bootstrap-datepicker.js")"></script>
+    <script src="@Url.Content("~/Scripts/Custom/common.js")"></script>
+    <script src="@Url.Content("~/Scripts/Custom/CommonMessages.js")"></script>
+    <script src="@Url.Content("~/Scripts/Common/bootstrap-multiselect.js")"></script>
+    <script src="@Url.Content("~/Scripts/Common/lightgallery-all.js")"></script>
+    <script src="@Url.Content("~/Scripts/Common/jquery.mousewheel.min.js")"></script>
+    <script src="@Url.Content("~/Scripts/Common/cropper.js")"></script>
+    @*<script src="@Url.Content("~/Scripts/Custom/Layout.js")"></script>*@
+    <script src="@Url.Content("~/Scripts/Common/select2.min.js")"></script>
+    <script src="@Url.Content("~/Scripts/jquery.form.js")"></script>
+
+    @Html.DevExpress().GetStyleSheets(
+                new StyleSheet { ExtensionSuite = ExtensionSuite.Spreadsheet },
+                new StyleSheet { ExtensionSuite = ExtensionSuite.RichEdit },
+                new StyleSheet { ExtensionSuite = ExtensionSuite.SpellChecker }
+            )
+    @Html.DevExpress().GetScripts(
+                new Script { ExtensionSuite = ExtensionSuite.Spreadsheet },
+                new Script { ExtensionSuite = ExtensionSuite.RichEdit },
+                new Script { ExtensionSuite = ExtensionSuite.SpellChecker }
+            )
+    @RenderSection("scripts", required: false)
+</head>
+
+
+<body>
+
+    @*<header>
+            <div class="container-fluid">
+                <div class="col-lg-12 clearfix">
+                    <div class="row">
+                        <a class="logo-main" href="#" title="Home">
+                            <h3 style="color:white;"></h3>
+                            <img src="@Url.Content("~/CSS/images/login-logo.png")" alt="Triyo" style="max-height:60px;" />
+                        </a>
+                        <button type="button" class="navbar-toggle collapsed toggleMenu" data-toggle="collapse" data-target="#nav"> <span class="sr-only">Toggle navigation</span> <span class="icon-bar"></span> <span class="icon-bar"></span> <span class="icon-bar"></span> </button>
+                        <div class="col-sm-5 col-md-4 col-lg-3 user-box">
+                            <div class="header-right">
+                                <div class="top-home"><a href="@Url.Action("Logout","Home")" title="Logout"><span class="glyphicon glyphicon-log-out white"></span></a></div>
+
+                                <div class="user-main">
+                                    <div class="user-name">Welcome <span>@CurrentUserSession.FirstName</span></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </header>*@
+
+    <!--Header Part-->
+    <div id="wrapper" class="clearfix">
+        <header>
+            <div class="container-fluid">
+                <div class="row">
+                    <div class="col-xs-5 col-sm-4">
+                        @if (!string.IsNullOrEmpty(WordAutomationDemo.Helpers.CurrentUserSession.User.CompanyLogo))
+                        {
+                            <img src="/ApplicationDocuments/CompanyLogos/@WordAutomationDemo.Helpers.CurrentUserSession.User.CompanyLogo" class="img-responsive logo" />
+                        }
+                        else
+                        {
+                            <img src="@Url.Content("~/CSS/images/logo.png")" alt="Triyo" class="img-responsive logo" />
+                        }
+                    </div>
+                    <div class="col-xs-7 col-sm-8 nospaceleft">
+
+                        <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse">
+                            <span class="sr-only">Toggle navigation</span>
+                            <span class="icon-bar"></span>
+                            <span class="icon-bar"></span>
+                            <span class="icon-bar"></span>
+                        </button>
+
+                        <a href="@Url.Action("Logout","Home")" class="logoutbtn"><img src="@Url.Content("~/CSS/images/logout.png")" alt="" class="img-responsive"></a>
+                        <div class="userbox">
+                            <div class="hduserphoto">
+                                @if (!string.IsNullOrEmpty(CurrentUserSession.User.ProfileImage))
+
+                                {
+                                    <img src="@Url.Content(CurrentUserSession.User.ProfileImage)" alt="" class="img-responsive">
+                                }
+
+                                else
+                                {
+                                    <img src="@Url.Content("~/CSS/images/no-photo.jpg")" alt="Triyo" class="img-responsive logo" />
+                                }
+                            </div>
+                            <div class="hdbluerow">
+                                Welcome
+                            </div>
+                            <div class="hdwhiterow">
+                                @if (CurrentUserSession.User != null && CurrentUserSession.User.UserID > 0)
+                                {
+                                    <a href="@Url.Action("Profile", "ChangeProfile", new { UID = WordAutomationDemo.Common.Global.UrlEncrypt(CurrentUserSession.User.UserID.ToString()) })" class="tableicon" data-original-title="Change Profile" data-toggle="tooltip" title="Change Profile" data-placement="top">@CurrentUserSession.FirstName</a>
+                                }
+                            </div>
+                        </div>
+
+                    </div>
+
+                </div>
+            </div>
+        </header>
+
+        <!-- Menu -->
+        @*<div class="nav-collapse">
+                 Brand and toggle get grouped for better mobile display
+                <ul id="main-menu" class="sm sm-blue">
+                    @foreach (WordAutomationDemo.Models.vwRolePrivilege dtMainItem in (IList<WordAutomationDemo.Models.vwRolePrivilege>)Session["MainItems"])
+                {
+                        <li>
+                            <a href="@Url.Content(@Convert.ToString("~/" + @Html.Encode(Convert.ToString(dtMainItem.MenuItemController)) + "/" + @Html.Encode(Convert.ToString(dtMainItem.MenuItemView))))" id="@Html.Encode(Convert.ToString(dtMainItem.MenuItem))">
+                                @Html.Encode(Convert.ToString(dtMainItem.MenuItem))
+                            </a>
+                            <ul aria-labelledby="@Html.Encode(Convert.ToString(dtMainItem.MenuItem))">
+                                @foreach (WordAutomationDemo.Models.vwRolePrivilege dtMenuItemSecond in (IList<WordAutomationDemo.Models.vwRolePrivilege>)Session["MenuItems"])
+                                {
+                                    if (dtMenuItemSecond.ParentID == dtMainItem.MenuItemID)
+                                    {
+                                        <li>
+                                            <a href="@Url.Content(@Convert.ToString("~/" + @Html.Encode(Convert.ToString(dtMenuItemSecond.MenuItemController)) + "/" + @Html.Encode(Convert.ToString(dtMenuItemSecond.MenuItemView))))">
+                                                @Html.Encode(Convert.ToString(dtMenuItemSecond.MenuItem))
+                                            </a>
+                                        </li>
+                                    }
+                                }
+                            </ul>
+                        </li>
+                    }
+                </ul>
+            </div>*@
+        <!-- Menu End -->
+        <!--new menu start-->
+        <div class="navbar-collapse collapse navbg">
+            <ul class="nav navbar-nav">
+                @foreach (WordAutomationDemo.Models.vwRolePrivilege dtMainItem in (IList<WordAutomationDemo.Models.vwRolePrivilege>)Session["MainItems"])
+                {
+                    if (dtMainItem.MenuItem != "Updated Document")
+                    {
+                        <li>
+                            @if (((IList<WordAutomationDemo.Models.vwRolePrivilege>)Session["MenuItems"]).Any(x => x.ParentID == dtMainItem.MenuItemID))
+                            {
+                                <a style="cursor:default">@Html.Encode(Convert.ToString(dtMainItem.MenuItem))<span class="caret"></span></a>
+
+                                <ul class="dropdown-menu" aria-labelledby="@Html.Encode(Convert.ToString(dtMainItem.MenuItem))">
+                                    @if (!String.IsNullOrEmpty(dtMainItem.MenuItemController.Trim())|| !String.IsNullOrEmpty(dtMainItem.MenuItemView.Trim()))
+                                    {
+                                    <li>
+                                        <a href="@Url.Content(@Convert.ToString("~/" + @Html.Encode(Convert.ToString(dtMainItem.MenuItemController)) + "/" + @Html.Encode(Convert.ToString(dtMainItem.MenuItemView))))">
+                                            @Html.Encode(Convert.ToString(dtMainItem.MenuItem))
+                                        </a>
+                                    </li>
+
+                                    }
+                                    @foreach (WordAutomationDemo.Models.vwRolePrivilege dtMenuItemSecond in (IList<WordAutomationDemo.Models.vwRolePrivilege>)Session["MenuItems"])
+                                    {
+                                        if (dtMenuItemSecond.ParentID == dtMainItem.MenuItemID)
+                                        {
+                                            <li>
+                                                <a href="@Url.Content(@Convert.ToString("~/" + @Html.Encode(Convert.ToString(dtMenuItemSecond.MenuItemController)) + "/" + @Html.Encode(Convert.ToString(dtMenuItemSecond.MenuItemView))))">
+                                                    @Html.Encode(Convert.ToString(dtMenuItemSecond.MenuItem))
+                                                </a>
+                                            </li>
+                                        }
+                                    }
+                                </ul>
+                            }
+                            else
+                            {
+                                <a href="@Url.Content(@Convert.ToString("~/" + @Html.Encode(Convert.ToString(dtMainItem.MenuItemController)) + "/" + @Html.Encode(Convert.ToString(dtMainItem.MenuItemView))))" id="@Html.Encode(Convert.ToString(dtMainItem.MenuItem))">
+                                    @Html.Encode(Convert.ToString(dtMainItem.MenuItem))
+                                </a>
+                            }
+
+                        </li>
+                    }
+
+                }
+                <li><a href="#" id="helpGuide" data-toggle="modal" data-target="#helpGuideModal">User Manual <i class="fa fa-question-circle"></i></a></li>
+            </ul>
+            @*<li><a href="create-task.html">Create Task</a></li>
+                <li>
+                    <a href="#" class="sublink">
+                        <span class="hidden-xs">Master</span>
+                        <span onclick="window.location = '#'" class="mmenu visible-xs">Master</span> <span class="caret"></span>
+                    </a>
+                    <ul class="dropdown-menu">
+                        <li><a href="#">User</a></li>
+                        <li><a href="#">Role</a></li>
+                        <li><a href="#">Privileges</a></li>
+                        <li><a href="#">Company</a></li>
+                    </ul>
+                </li>
+                <li><a href="my-tasks.html">My Tasks</a></li>
+                <li><a href="#">Assigned Tasks</a></li>
+                <li>
+                    <a href="projects.html" class="sublink">
+                        <span class="hidden-xs">Projects</span>
+                        <span onclick="window.location = 'projects.html'" class="mmenu visible-xs">Projects</span> <span class="caret"></span>
+                    </a>
+                    <ul class="dropdown-menu">
+                        <li><a href="#">Archived Projects</a></li>
+                    </ul>
+                </li>
+                <li> <a href="#">Sections</a> </li>*@
+        </div>
+        <!--new menu end-->
+
+
+        <section class="tbspace">
+            <div class="container-fluid">
+                @RenderBody()
+            </div>
+
+            <div id="loading" style="display:none;">
+                <div class="overlay">
+                </div>
+                <div class="ProgressBar">
+                    <img src="@Url.Content("~/CSS/Images/squares.gif")" alt="Loading" />
+                </div>
+            </div>
+        </section>
+
+
+        <footer>
+            <div class="container-fluid">
+                <div class="row">
+                    <div class="col-sm-4 text-cl-xs">Copyright Triyosoft &copy; @DateTime.Now.Year</div>
+                    <div class="col-sm-8 text-cr-xs">Powered By <a target="_blank" href="http://www.triyosoft.com/">Triyosoft</a></div>
+                </div>
+            </div>
+        </footer>
+
+    </div>
+    <div id="divInstantMessage" class="modal fade bs-example-modal-lg" tabindex="-1" role="dialog" aria-labelledby="myLargeModalLabel" style="z-index:99999">
+        @using (Html.BeginForm("SendInstantMessageToUsers", "Home", FormMethod.Post, new { id = "frmInstantMessageToUsers", enctype = "multipart/form-data" }))
+        {
+            <div class="modal-dialog modal-lg">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                        <h4 class="modal-title">Instant Message</h4>
+                    </div>
+                    <div class="modal-body">
+                        <div class="row-fluid">
+                            <div class="span12">
+                                <div id="divErrorInsMsg" style="display: none;" class="alert alert-danger">
+                                </div>
+                                <div class="white-box">
+                                    <div class="content">
+                                        <label class="control-label leftpart">
+                                            <strong>Select User</strong>
+                                        </label>
+                                        <div class="control-group form-text table-responsive" id="divIMUsers">
+                                        </div>
+                                        <div class="control-group form-text">
+                                            <label class="control-label leftpart">
+                                                <strong>Instant Message</strong>
+                                            </label>
+                                            <div class="controls controls2">
+                                                <textarea id="instantMsgTxt" cols="31" rows="3" class="span12 uniform form-control" maxlength="1000" style="margin-bottom: 5px;"></textarea>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button title="Send Message" onclick="SendInstantMsgToUsers();" id="btnSendMsg" name="btnSendMsg" type="button" class="btn btn-primary" title="Send Instant Message">
+                            Send Message
+                        </button>
+                        <input id="hdnSelectedUserIDs" type="hidden" />
+                    </div>
+                </div>
+            </div>
+        }
+    </div>
+
+    <div class="modal fade" id="helpGuideModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+        <div class="modal-dialog" style="width:60%">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
+                    <h4 class="modal-title" id="helpGuideModalLabel">Triyo User Manual</h4>
+                </div>
+                <div class="modal-body">
+                    <div style="text-align: center;">
+                        <iframe src="@(WordAutomationDemo.Common.Global.SiteUrl)ApplicationDocuments/HelpGuide.pdf#zoom=80&page=1"
+                                style="width:100%; height:650px;" frameborder="0"></iframe>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    @*@Scripts.Render("~/bundles/SignalR")*@
+    <script src="@Url.Content("~/Scripts/Common/ChatJs/Scripts/jquery.chatjs.signalradapter.js")"></script>
+    <script src="@Url.Content("~/Scripts/Common/ChatJs/Scripts/jquery.autosize.min.js")"></script>
+    <script src="@Url.Content("~/Scripts/Common/ChatJs/Scripts/jquery.activity-indicator-1.0.0.min.js")"></script>
+    <script src="@Url.Content("~/Scripts/Common/ChatJs/Scripts/jquery.chatjs.js")"></script>
+    <script type="text/javascript" src="@Url.Content("~/signalr/hubs")"></script>
+    <script type="text/javascript">
+    var SiteUrl = '@WordAutomationDemo.Common.Global.SiteUrl';
+
+
+    var booleanValue = '@WordAutomationDemo.Helpers.CurrentUserSession.User.IsMessengerServiceEnable';
+    if (booleanValue.toUpperCase() === 'TRUE') {
+        $.chat({
+            user: {
+                Id: '@CurrentUserSession.User.UserID',
+                Name: '@CurrentUserSession.User.UserName',
+                ProfilePictureUrl: '@Session["EPT"]'
+            },
+
+            typingText: ' is typing...',
+            titleText: 'Messaging',
+            emptyRoomText: "There's no one around here. )",
+            adapter: new SignalRAdapter()
+        });
+        }
+
+    </script>
+
+</body>
+</html>
+

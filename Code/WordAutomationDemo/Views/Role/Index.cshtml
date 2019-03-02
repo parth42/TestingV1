@@ -1,0 +1,125 @@
+﻿@model WordAutomationDemo.Models.RoleModel
+@using Kendo.Mvc.UI
+@using WordAutomationDemo.Common
+@using WordAutomationDemo.Helpers
+@{
+    ViewBag.Title = "Role Management";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+<div class="row">
+    @Html.Partial("CommonMessages", Model.ModuleName)
+</div>
+<div class="row">
+    <div class="col-sm-12">
+        <div class="main-heading title-row mbp15">
+            <div class="row">
+                <div class="col-xs-12">
+                    <h1 class="heading01">Role Management</h1>
+                </div>
+            </div>
+        </div>
+    </div>
+    @using (Html.BeginForm("Delete", "Role", FormMethod.Post, new { @onkeypress = "return event.keyCode != 13;" }))
+    {
+        <div class="col-sm-12">
+            <div class="row">
+                @if (CurrentUserSession.HasAddPermission)
+                {
+                    <div class="col-sm-4 col-sm-push-8 text-lr-xs">
+                        <a href='@Url.Action("Create", "Role")' class="lightblue-btn btnspace"><i class="fa fa-plus" aria-hidden="true"></i>Create New Role</a>
+                    </div>
+                }
+                @if (CurrentUserSession.HasDeletePermission)
+                {
+                    <div class="col-sm-8 col-sm-pull-4">
+                        <button class="darkred-btn btnspace" type="submit" id="btnDelete" name="btnDelete" onclick="return Check_CheckBox_Count_Role('RoleID');"><i class="fa fa-trash-o" aria-hidden="true"></i> Delete</button>
+                    </div>
+                }
+            </div>
+        </div>
+
+    <div class="col-sm-12 mtp10">
+        <div class="table-responsive nospacetd">
+            <table class="table">
+                <tr>
+                    <td>
+
+                        @(Html.Kendo().Grid(Model.IListRole)
+      .Name("grid")
+      .Events(e => e.DataBound("onGridDataBound"))
+      .Columns(columns =>
+      {
+          if (CurrentUserSession.HasDeletePermission)
+          {
+              columns.Template(@<text>
+                @if (!item.IsAdminRole)
+                {<input id="chkDelete" name="chkDelete" type="checkbox" class="singleCheckBox" value="@item.RoleID" onclick="return initializeSingleCheckBox(this.id);" />}</text>)
+            .ClientTemplate("#if(!IsAdminRole) { #" + "<input type='checkbox' id='chkDelete' name='chkDelete' class='singleCheckBox' value='#= RoleID #' onclick='return initializeSingleCheckBox(this);' />" + "#} #")
+            .HeaderTemplate(@<input id="allCheckBox" name="allCheckBox" type="checkbox" title="check all records" onclick="return initializeAllCheckBox();" />).HtmlAttributes(new { @class = "textalign" })
+                                                            .HeaderHtmlAttributes(new { @class = "textalign" }).Width("2%");
+          }
+          if (CurrentUserSession.HasEditPermission)
+          {
+              columns.Template(@<text>@if (!item.IsAdminRole)
+              {<a href="@Url.Action("Edit", "Role", new { UID = item.EncryptedRoleID })" class="tableicon bluebg" data-original-title="Edit" data-toggle="tooltip" data-placement="top"><i class="fa fa-pencil" aria-hidden="true"></i></a>}</text>)
+                                          .ClientTemplate("#if(!IsAdminRole) { #" + "<a href='" + Url.Action("Edit", "Role", new { UID = "#= EncryptedRoleID #" }) + "'" + "  data-original-title='Edit Role' class='tableicon bluebg' data-toggle='tooltip' data-placement='top'><i class='fa fa-pencil' aria-hidden='true'></i></a>" + "#} #").HtmlAttributes(new { @class = "textalign" }).HtmlAttributes(new { style = "text-align:center" })
+                                                            .HeaderHtmlAttributes(new { style = "text-align:center;width:4%" })
+                                                            .Title("Edit");
+          }
+
+          if (CurrentUserSession.HasDetailPermission)
+          {
+              columns.Bound(u => u.Role).Template(@<text><a href="@Url.Action("Detail", "Role", new { UID = item.EncryptedRoleID })" title="Detail">@item.Role</a></text>)
+                                          .ClientTemplate("<a href='" + Url.Action("Detail", "Role", new { UID = "#= EncryptedRoleID #" }) + "'" + " class='grid-btn-edit' title = 'Detail'>#= Role #</a>").HtmlAttributes(new { style = "text-align:center" })
+                                                            .HeaderHtmlAttributes(new { style = "text-align:center;" })
+                                                            .Title("Role");
+          }
+          else
+          {
+              columns.Bound(u => u.Role).Title("Role");
+          }
+
+          columns.Bound(u => u.Company).Title("Company");
+          columns.Bound(u => u.Active).Title("Status");
+      }).Pageable(pageable => pageable.Refresh(true).PageSizes(Global.recordPerPageList).ButtonCount(Global.buttonCount).Input(true).Numeric(true))
+                                              .DataSource(dataSource => dataSource
+                                                  .Ajax()
+                                                  .PageSize(Global.PageSize)
+                                        .Read(read => read.Action("Role_Read", "Role")))
+                                                  .Sortable()
+                                                  .Filterable(f=>f.Extra(false))
+                                                  .Groupable()
+                                                  .EnableCustomBinding(false).AutoBind(true)
+                        )
+                    </td>
+                </tr>
+            </table>
+        </div>
+
+    </div>
+
+    }
+</div>
+<script>
+    $(document).ready(function () {
+        $(".k-grouping-header").remove();
+    });
+
+    //databound column
+    function onGridDataBound(e) {
+        $(".k-grouping-header").remove();
+        var grid = $("#" + e.sender.element[0].id).data("kendoGrid");
+        var dataSource = grid.dataSource;
+        //total records
+        var totalRecords = dataSource.total();
+        if (totalRecords <= 0) {
+            var colCount = grid.columns.length;
+            $("#" + e.sender.element[0].id).find('tbody').html('');
+            $("#" + e.sender.element[0].id).find('tbody').append('<tr class="kendo-data-row"><td colspan="' + colCount + '" class="no-data" style="text-align: center;">No records found.</td></tr>');
+        }
+    }
+
+    function Check_CheckBox_Count_Role() {
+        var n = $("input[name=chkDelete]"), t = n.filter(":checked").length; return t > 0 ? confirm("Are you sure? Do you want to delete selected roles?") : (alert("Please select at least one checkbox to delete."), !1)
+    }
+</script>

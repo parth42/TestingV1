@@ -1,0 +1,94 @@
+﻿@model WordAutomationDemo.Models.UserModel
+@using Kendo.Mvc.UI
+@using WordAutomationDemo.Helpers
+@using WordAutomationDemo.Common
+@{
+    ViewBag.Title = "User Management";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+<div class="row">
+    <div>
+        @Html.Partial("CommonMessages", Model.ModuleName)
+    </div>
+    @using (Html.BeginForm("Delete", "User", FormMethod.Post, new { @onkeypress = "return event.keyCode != 13;" }))
+    {
+        <div class="col-sm-12">
+            <div class="main-heading title-row mbp15">
+                <div class="row">
+                    <div class="col-xs-4">
+                        <h1 class="heading01">User Management</h1>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-sm-12">
+            <div class="row">
+                <div class="col-sm-4 col-sm-push-8 text-lr-xs">
+                    <a href="@Url.Action("Create", "User")" class="lightblue-btn btnspace"><i class="fa fa-plus" aria-hidden="true"></i> Create New User</a>
+                </div>
+                <div class="col-sm-8 col-sm-pull-4">
+                    <button type="submit" class="darkred-btn btnspace" id="btnDelete" onclick="return Check_CheckBox_Count_User('User');"><i class="fa fa-trash-o" aria-hidden="true"></i> Delete</button>
+                </div>
+            </div>
+        </div>
+    }
+    <div class="col-sm-12 mtp20">
+        <div class="table-responsive nospacetd">
+            <table class="table">
+                <tr>
+                    <td>
+                        @(Html.Kendo().Grid(Model.IListUser)
+      .Name("grid")
+      .Events(e => e.DataBound("onGridDataBound"))
+      .Columns(columns =>
+      {
+          if (CurrentUserSession.HasDeletePermission)
+          {
+              columns.Template(@<text>
+                @if (!item.IsAdminUser && !item.IsCurrentUser)
+                {<input id="chkDelete" name="chkDelete" type="checkbox" class="singleCheckBox" value="@item.UserId" onclick="return initializeSingleCheckBox(this.id);" />}</text>).HtmlAttributes(new { style = "text-align:center" })
+            .ClientTemplate("#if(!IsAdminUser && !IsCurrentUser) { #" + "<input type='checkbox' id='chkDelete' name='chkDelete' class='singleCheckBox' value='#= UserId #' onclick='return initializeSingleCheckBox(this.id);' />" + "#} #").HtmlAttributes(new { style = "text-align:center" })
+            .HeaderTemplate(@<input id="allCheckBox" name="allCheckBox" type="checkbox" title="check all records" onclick="return initializeAllCheckBox();" />).HeaderHtmlAttributes(new { style = "text-align:center" }).Width("2%");
+          }
+          if (CurrentUserSession.HasEditPermission)
+          {
+              columns.Template(@<text>
+                @if (!item.IsAdminUser)
+                {<a href="@Url.Action("Edit", "User", new { id = item.UserId })" class="tableicon bluebg" data-original-title="Edit User" data-toggle="tooltip" data-placement="top"><i class="fa fa-pencil" aria-hidden="true"></i></a>}</text>)
+                .ClientTemplate("# if(!IsAdminUser) { #" + "<a href='" + Url.Action("Edit", "User", new { id = "#= UserId #" }) + "'" + " class='tableicon bluebg' data-original-title='Edit User' data-toggle='tooltip' data-placement='top'><i class='fa fa-pencil' aria-hidden='true'></i></a>" + "# } #")
+                .HtmlAttributes(new { style = "text-align:center" })
+                .HeaderHtmlAttributes(new { style = "text-align:center;width:4%" }).Title("Edit");
+          }
+
+          if (CurrentUserSession.HasDetailPermission)
+          {
+              columns.Bound(u => u.UserName).Template(@<text><a href="@Url.Action("Detail", "User", new { id = item.UserId })" title="Detail">@item.UserName</a></text>)
+                                        .ClientTemplate("<a href='" + Url.Action("Detail", "User", new { id = "#= UserId #" }) + "'" + "  title = 'Detail'>#= UserName #</a>");
+          }
+          else
+          {
+              columns.Bound(u => u.UserName).Title("UserName");
+          }
+          columns.Bound(user => user.FullName);
+          columns.Bound(user => user.EmailID);
+          columns.Bound(user => user.Company);
+          columns.Bound(user => user.Role);
+          columns.Bound(user => user.Active).HeaderTemplate("Status");
+      }).Pageable(pageable => pageable.Refresh(true).PageSizes(Global.recordPerPageList).ButtonCount(Global.buttonCount).Input(true).Numeric(true))
+                                          .DataSource(dataSource => dataSource
+                                              .Ajax()
+                                              .PageSize(Global.PageSize)
+                                              .Read(read => read.Action("User_Read", "User")))
+                                              .Sortable()
+                                              .Filterable(f=>f.Extra(false))
+                                              .Groupable()
+                                              .EnableCustomBinding(true)
+                        )
+
+                    </td>
+                </tr>
+            </table>
+        </div>
+
+    </div>
+</div>

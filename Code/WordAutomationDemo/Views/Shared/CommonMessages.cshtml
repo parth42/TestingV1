@@ -1,0 +1,91 @@
+﻿@model WordAutomationDemo.Models.CommonMessagesModel
+@using WordAutomationDemo.Common
+@if (Request.QueryString["Msg"] != null && Request.QueryString["Msg"].ToString().ToLower() == "userinuse")
+{
+	<div class="col-sm-12">
+		<div class="alert alert-danger">
+			 @Html.Raw(string.Format(Messages.IsInUse, Convert.ToString(Model.ModuleName)))
+		</div>
+	</div>
+}
+@if (Request.QueryString["Msg"] != null && Request.QueryString["Msg"].ToString().ToLower() == "inuse")
+{
+	<div class="col-sm-12">
+		<div class="alert alert-danger">
+		  @Html.Raw(string.Format(Messages.IsInUse, Convert.ToString(Model.ModuleName)))
+		</div>
+	</div>
+}
+@if (Request.QueryString["Msg"] != null && Request.QueryString["Msg"].ToString().ToLower() == "added")
+{
+	<div class="col-sm-12">
+		<div class="alert alert-success">
+		 @Html.Raw(string.Format(Messages.Added, Convert.ToString(Model.ModuleName)))
+		</div>
+	</div>
+}
+@if (Request.QueryString["Msg"] != null && Request.QueryString["Msg"].ToString().ToLower() == "emailsent")
+{
+	<div class="col-sm-12">
+		<div class="alert alert-success">
+		   @Html.Raw(Messages.EmailSent)
+		</div>
+	</div>
+}
+@if (Request.QueryString["Msg"] != null && Request.QueryString["Msg"].ToString().ToLower() == "noemailsent")
+{
+	<div class="col-sm-12">
+		<div class="alert alert-success">
+		  @Html.Raw(string.Format(Messages.NoEmailSent, Convert.ToString(Model.ModuleName)))
+		</div>
+	</div>
+}
+@if (Request.QueryString["Msg"] != null && Request.QueryString["Msg"].ToString().ToLower() == "updated")
+{
+	<div class="col-sm-12">
+		<div class="alert alert-success">
+		 @Html.Raw(string.Format(Messages.Updated, Convert.ToString(Model.ModuleName)))
+		</div>
+	 </div>
+}
+@if (Request.QueryString["Msg"] != null && Request.QueryString["Msg"].ToString().ToLower() == "deleted")
+{
+	<div class="col-sm-12">
+		<div class="alert alert-success">
+		 @Html.Raw(string.Format(Messages.Deleted, Convert.ToString(Model.ModuleName)))
+		</div>
+	</div>
+}
+@if (Request.QueryString["Msg"] != null && Request.QueryString["Msg"].ToString().ToLower() == "drop")
+{
+	<div class="col-sm-12">
+		<div class="alert alert-danger">
+		  @Html.Raw(Messages.Drop)
+		 </div>
+	</div>
+}
+@if (Request.QueryString["Msg"] != null && Request.QueryString["Msg"].ToString().ToLower() == "noselect")
+{
+	<div class="col-sm-12">
+		<div class="alert alert-danger">
+		  @Html.Raw(Messages.NoSelect)
+		</div>
+	</div>
+}
+@if (Request.QueryString["Msg"] != null && Request.QueryString["Msg"].ToString().ToLower() == "status")
+{
+	<div class="col-sm-12">
+		<div class="alert alert-success">
+		   @Html.Raw(string.Format(Messages.Status, Convert.ToString(Model.ModuleName)))
+		</div>
+	 </div>
+}
+
+@if (Request.QueryString["Msg"] != null && Request.QueryString["Msg"].ToString().ToLower() == "error")
+{
+	<div class="col-sm-12">
+		<div class="alert alert-danger">
+		 @Html.Raw(Messages.Error)
+		</div>
+	</div>
+}

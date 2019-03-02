@@ -1,0 +1,413 @@
+﻿@using DevExpress.Web.Mvc;
+@using DevExpress.Web.Mvc.UI;
+@model WordAutomationDemo.Models.AssignmentModel
+@{
+    ViewBag.Title = "Edit Content";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+
+    var canPublish = WordAutomationDemo.Common.Global.AssignmentMemberCanPublish(Model.AssignID, WordAutomationDemo.Helpers.CurrentUserSession.User.UserID);
+    var canSendForApproval = WordAutomationDemo.Common.Global.AssignmentMemberCanSendForApproval(Model.AssignID, WordAutomationDemo.Helpers.CurrentUserSession.User.UserID);
+    var downloadLink = @Url.Content("~/App_Data/UserDocs/General/") + Model.OriginalDocumentName;
+}
+@using (Html.BeginForm("EditContent", "Home", FormMethod.Post, new { id = "frmEdit" }))
+{
+    <div class="col-sm-12">
+        <div class="alert alert-success" id="upload" style="display:none">
+            Document saved successfully!
+        </div>
+    </div>
+
+    <br />
+    <h2>Edit Content</h2>
+    <br />
+
+    <label class="control-label col-md-2 "> Project Name : </label>
+        <label class="control-label col-md-9"> @Model.ProjectName</label>
+
+        <br />
+        <br />
+
+        <label class="control-label col-md-2 "> Task Name : </label>
+        <label class="control-label col-md-9"> @Model.TaskName</label>
+
+        <br />
+        <br />
+        <div class="col-lg-6">
+            @Html.TextAreaFor(x => x.Remarks, new { @placeholder = "Remarks (Optional)", @class = "form-control col-md-5" })
+        </div>
+    <div class="col-lg-6 pull-right">
+        <div class="col-lg-12">
+            <div class="btn btn-primary pull-left" id="btnSave" onclick="SaveDoc()" style="margin-right: 10px;" disabled="disabled">Save</div>
+            @if (canPublish)
+            {
+                <input type="submit" class="btn btn-primary pull-left btnSubmit" onclick="SaveChages(true)" style="margin-right: 10px;" value="Publish" />
+            }
+
+            @if (canSendForApproval)
+            {
+                <input type="submit" class="btn btn-primary pull-left btnSubmit" onclick="SaveChages(false)" style="margin-right: 10px;" value="Request Review" />
+            }
+            <a style="cursor: pointer; line-height: 30px;" title="View" class="pull-left onlyicon bluecolor" data-toggle="modal" onclick="OpenUploadedCopy(this, '@Model.OriginalDocumentName')" id="TRIYO PROSPECTUS_Demo_636512580232846077.docx"><i class="fa fa-file-word-o" aria-hidden="true"></i> Preview Document</a>
+        </div>
+
+    </div>
+    <div class="col-lg-12 pull-left">
+        <a title="View Comment History" style="cursor:pointer;color:rgb(76,160,221);font-size:11px;position: absolute;/* top: 0; */" onclick="OpenCommentHistory('@Model.AssignID')">View Comments</a>
+    </div>
+        <div class="clearfix"></div>
+
+        <br />
+        <br />
+        <div class="clearfix"></div>
+
+    if (!string.IsNullOrEmpty(Model.Content))
+    {
+
+        <div class="clearfix">
+            @Html.TextAreaFor(m => m.Content, new { @style = "border:none;width:100%;", @cols = "50" })
+        </div>
+    }
+    <div class="col-lg-12" id="editSnippet">
+        <h3 id="editSnippetTitle" style="display:none">Assigned Content</h3><br/>
+        @Html.HiddenFor(x => x.DocumentName)
+        @Html.HiddenFor(x => x.AssignID)
+        @Html.Partial("_LoadSnippet", Model)
+    </div>
+    <div class="col-lg-6" id="originalSnippet" style="visibility: hidden; opacity: 0; transition: visibility 0s, opacity 0.5s linear;">
+        @*Here goes the original doc preview*@
+    </div>
+
+    <div class="modal fade bs-example-modal-lg" id="ReportsModal" tabindex="1000" role="dialog" aria-labelledby="myLargeModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-lg" style="overflow:auto;">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <div class="pull-right">
+                        @*<a id="DocdownloadLink" href="#"><i class="glyphicon glyphicon-download-alt " title="Click to Download "></i></a>*@
+                        &nbsp;&nbsp;
+                        <button type="button" title="Close" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+                    </div>
+                    <h4 class="modal-title" id="myModalLabel">  <span id="contentType">View Document </span></h4>
+                </div>
+                <div class="modal-body" id="partialContent" style="line-height:25px;">
+                    <div>
+
+                    </div>
+                </div>
+                @*<div class="modal-footer">
+                        <button type="button" class="btn btn-primary" data-dismiss="modal">Close</button>
+                    </div>*@
+            </div>
+        </div>
+    </div>
+
+    <div class="modal fade" id="CommentHistoryModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                    <h4 class="modal-title" id="myModalLabel">Comment History</h4>
+                </div>
+                <div class="modal-body">
+                    <div class="table-responsive bluetheme mtp15" id="partialContentComment">
+
+                    </div>
+                </div>
+                @*<div class="modal-footer">
+                    <button type="button" class="btn btn-primary" data-dismiss="modal">Close</button>
+                </div>*@
+            </div>
+        </div>
+    </div>
+
+}
+
+<script>
+
+    function SaveDoc() {
+        if ($("#btnSave").attr("disabled") != "disabled") {
+            Snippet.core.commandManager.commands["3"].execute();
+            $("#btnSave").attr("disabled", true);
+
+            $("#upload").show().focus();
+            setTimeout(function () {
+                $("#upload").hide();
+            }, 5000);
+        }
+    }
+
+    function SaveChages(published) {
+        //Snippet.core.commandManager.commands["3"].execute();
+        //$("#Snippet_R_T0G0I2_LI").trigger("click");
+        //console.log("clicked");
+
+        //Snippet.core.commandManager.commands["3"].execute(); //Save Document before form submit;
+        //console.log("saved");
+        //setTimeout(function () {
+        //Snippet.core.closeDocument();
+        //   console.log("closed doc");
+        //}, 5000);
+
+        $('#frmEdit').append('<input type="hidden" name="published" value="' + published + '" /> ');
+        $(".btnSubmit").attr('disabled', 'disabled');
+
+        $("#frmEdit").submit();
+
+
+    }
+
+    function OpenCommentHistory(assignmentID) {
+        //var name = "Documents/" + e.id;
+        $("#partialContentComment").html('<p class="center"><i class="glyphicon glyphicon-repeat glyphicon-spin"> </i>&nbsp;&nbsp;Loading...</p>');
+        $('#CommentHistoryModal').modal('show');
+        $.get('@Url.Action("LoadCommentHistory", "Home")', { assignmentID: assignmentID }, function (partialView) {
+            $("#partialContentComment").html(partialView);
+        });
+    }
+
+    function OpenUploadedCopy(e, name) {
+        //Resize assigned content 
+        $("#editSnippet").removeClass("col-lg-12").addClass("col-lg-6");
+        $('#editSnippet .dxr-minBtn').click();
+        $('#editSnippet .dxr-minBtn').click();
+        $("#editSnippetTitle").show();
+
+        //Update link content
+        $(e).attr("onclick", "CloseUploadedCopy(this,'"+name+"')");
+        var linkTitle = '<i class="fa fa-file-word-o" aria-hidden="true"></i> Hide Preview';
+        $(e).html(linkTitle);
+
+        //Show original doc content
+        $("#originalSnippet").html('<p class="center"><i class="glyphicon glyphicon-repeat glyphicon-spin"> </i>&nbsp;&nbsp;Loading...</p>');
+        $("#originalSnippet").css("visibility", "visible");
+        $("#originalSnippet").css("opacity", 1);
+        $.get('@Url.Action("LoadOrginalDoc", "Home")', { name: name, userid: 1, IsReadOnly: true }, function (partialView) {
+            var title = '<h3 id="originalSnippetTitle">Document Preview</h3><br/>';
+            $("#originalSnippet").css("visibility", "hidden");
+            $("#originalSnippet").css("opacity", 0);
+
+            setTimeout(function() {
+                $("#originalSnippet").html(title + partialView);
+                $("#originalSnippet").css("visibility", "visible");
+                $("#originalSnippet").css("opacity", 1);
+                $('#originalSnippet .dxr-minBtn').click();
+            }, 250);
+            
+        });
+    }
+
+    function CloseUploadedCopy(e, name) {
+        //Resize assigned content
+        $("#editSnippet").removeClass("col-lg-6").addClass("col-lg-12");
+        $("#editSnippetTitle").hide();
+        $('#editSnippet .dxr-minBtn').click();
+        $('#editSnippet .dxr-minBtn').click();
+
+        //Hide original doc content
+        $("#originalSnippet").css("visibility", "hidden");
+        $("#originalSnippet").css("opacity", 0);
+        $(e).attr("onclick", "OpenUploadedCopy(this,'" + name + "')");
+        var linkTitle = '<i class="fa fa-file-word-o" aria-hidden="true"></i> Preview Document';
+        $(e).html(linkTitle);
+    }
+
+</script>
+<script type="text/javascript">
+    var x = 0;
+    var flag = false;
+    var Strikeflag = false;
+    var isBackSpace = false;
+    var BackSpaceCommand;
+    var InsertCommand;
+    var DeleteCommand;
+    var CutCommand;
+    var PasteCommand;
+    var secondLastSelectionStart = 0;
+    var secondLastSelectionLength = 0;
+    var firstLastSelectionStart = 0;
+    var firstLastSelectionLength = 0;
+    var lastSelectionStart = 0;
+    var lastSelectionLength = 0;
+
+    function SelectionChanged(s, e) {
+        var selection = Snippet.core.selection.getLastSelectedInterval();
+        secondLastSelectionStart = firstLastSelectionStart;
+        secondLastSelectionLength = firstLastSelectionLength;
+        firstLastSelectionStart = lastSelectionStart;
+        firstLastSelectionLength = lastSelectionLength;
+        lastSelectionStart = selection.start;
+        lastSelectionLength = selection.length;
+        //console.log("Selection Changed", selection.start, selection.length);
+    }
+
+    function DocumentChanged(s, e) {
+
+        console.log("-- Document Changed --", secondLastSelectionLength, firstLastSelectionLength, lastSelectionLength);
+
+        var CurrentCommand = Snippet.core.commandManager.lastCommandsChain[0]; // detect BACKSPACE
+        //console.log(CurrentCommand);
+        if (CurrentCommand == BackSpaceCommand || CurrentCommand == CutCommand) {
+            //console.log("-- BackSpace Pressed --");
+            //console.log(s);
+            //check for newly added text for deletion
+            //var selection = Snippet.core.selection.getLastSelectedInterval();
+            //Snippet.core.selection.setSelection(selection.start - 1, selection.start + 1);
+            //var color = Snippet.commands.changeFontFormatting.getState().value.foreColor;
+            //console.log(color);
+            //if (color != '#0000FF') {
+            OverrideBackSpace(Snippet, e);
+            //}
+            //else {
+            //    Snippet.core.selection.setSelection(selection.start, selection.start);
+            //}
+
+        }
+        else if (CurrentCommand == DeleteCommand) {
+            OverrideDelete(Snippet, e);
+        }
+        else if (CurrentCommand == InsertCommand) { // detect INSERT Text
+            console.log("-- No BackSpace --");
+            console.log(s);
+            var selection = Snippet.core.selection.getLastSelectedInterval();
+            if (firstLastSelectionLength > 1) {
+                
+                //debugger;
+                
+                if (selection.length > 0) {
+                    var inserted = Snippet.document.activeSubDocument.text.substr(selection.start, selection.length);
+
+                    //Undo insertion and selection deletion
+                    Snippet.core.commandManager.commands["6"].execute();
+                    Snippet.core.commandManager.commands["6"].execute();
+
+                    //Cross out selection
+                    if (Snippet.core.commandManager.commands["24"].getState().value == 0 ||
+                        Snippet.core.commandManager.commands["24"].getState().value == undefined) {
+                        Snippet.commands.changeFontStrikeout.execute();
+                    }
+
+                    var newSelection = Snippet.core.selection.getLastSelectedInterval();
+                    //Move caret to end of selection
+                    Snippet.core.selection.setSelection(newSelection.start + newSelection.length,
+                        newSelection.start + newSelection.length);
+
+                    Snippet.commands.changeFontStrikeout.execute();
+                    //Set font color to blue
+                    Snippet.commands.changeFontFormatting.execute({ foreColor: "#0000FF" });
+                    selection = Snippet.core.selection.getLastSelectedInterval();
+                    //Insert new text
+                    flag = true;
+                    Snippet.core.commandManager.commands["117"].execute(inserted);
+                }
+                selection = Snippet.core.selection.getLastSelectedInterval();
+                
+                //return;
+            } else {
+                GetNewAddedText(Snippet, selection);
+            }
+
+        }
+        else {
+            flag = false;
+        }
+
+        $("#btnSave").attr("disabled", false);
+        //Snippet.core.commandManager.commands["3"].execute();
+    }
+
+    function DocumentInit(s, e) {
+        var pointer = Snippet.core.selection.getLastSelectedInterval();
+        x = (pointer.start);
+        BackSpaceCommand = Snippet.core.commandManager.getCommand(__aspxRichEdit.RichEditClientCommand.ToggleBackspaceKey); // or 125
+        InsertCommand = Snippet.core.commandManager.commands["117"];  // Set insert command at init
+        DeleteCommand = Snippet.core.commandManager.commands["126"];
+        PasteCommand = Snippet.core.commandManager.commands["8"];
+        CutCommand = Snippet.core.commandManager.commands["10"];
+    }
+
+    function OverrideDelete(rich, e) {
+        Strikeflag = false;
+        if (Strikeflag == false) {
+            Strikeflag = true;
+            rich.core.commandManager.commands["6"].execute(); // undo command
+            var selection = rich.core.selection.getLastSelectedInterval();
+            console.log(selection);
+            console.log(selection);
+            if (selection.length == 0) {
+                rich.core.selection.setSelection(selection.start, selection.start + 1);
+            }
+            else {
+                rich.core.selection.setSelection(selection.start, selection.start + selection.length);
+            }
+
+            if (rich.commands.changeFontFormatting.getState().value.foreColor == '#0000FF') {
+                rich.core.commandManager.commands["7"].execute(); // redo command
+            } else if (rich.commands.changeFontStrikeout.coreState.value == 1) {
+                rich.commands.changeFontStrikeout.execute();
+                rich.commands.changeFontStrikeout.execute();
+            } else {
+                rich.commands.changeFontStrikeout.execute();
+            }
+
+            if (selection.length == 0) {
+                rich.selection.goToNextCharacter();
+            } else {
+                rich.core.selection.setSelection(selection.start + selection.length, selection.start + selection.length);
+            }
+            console.log(rich);
+        }
+    }
+
+    function OverrideBackSpace(rich, e) {
+
+        Strikeflag = false;
+        if (Strikeflag == false) {
+            Strikeflag = true;
+            rich.core.commandManager.commands["6"].execute(); // undo command
+            var selection = rich.core.selection.getLastSelectedInterval();
+            if (selection.length == 0) {
+                rich.core.selection.setSelection(selection.start - 1, selection.start);
+            }
+            else if (selection.length > 0) {
+                rich.core.selection.setSelection(selection.start, selection.start + selection.length);
+            }
+            if (rich.commands.changeFontFormatting.getState().value.foreColor == '#0000FF') {
+                rich.core.commandManager.commands["7"].execute(); // redo command
+            }
+            else if (rich.core.commandManager.commands["24"].getState().value == 0 || rich.core.commandManager.commands["24"].getState().value == undefined) {
+                rich.commands.changeFontStrikeout.execute()
+            }
+            rich.core.selection.setSelection(selection.start - 1, selection.start - 1);
+        }
+    }
+
+    function GetNewAddedText(rich, selection) {
+        var selectionInsert = false;
+        //var selection = rich.core.selection.getLastSelectedInterval();
+        console.log("first last sel getnewaddedtext", firstLastSelectionLength);
+        console.log("last sel getnewaddedtext", lastSelectionLength);
+        //firstLastSelectionStart = lastSelectionStart;
+        //firstLastSelectionLength = lastSelectionLength;
+        //lastSelectionStart = selection.start;
+        //lastSelectionLength = selection.length;
+
+        x = (selection.start);
+
+        if (flag == false) {
+
+            flag = true;
+            rich.core.selection.setSelection(selection.start - 1, selection.start);
+            if (rich.core.commandManager.commands["24"].getState().value == 1) {
+                rich.commands.changeFontStrikeout.execute();
+            }
+            rich.commands.changeFontFormatting.execute({ foreColor: "#0000FF" });
+
+            if (lastSelectionStart <= selection.start){
+                rich.core.selection.setSelection(selection.start, selection.start);
+            }
+        }
+        else {
+            rich.core.selection.setSelection(selection.start, selection.start);
+            flag = false;
+        }
+    }
+</script>

@@ -1,0 +1,1709 @@
+﻿@model WordAutomationDemo.Models.AssignmentModel
+
+<script id="template" type="text/x-kendo-template">
+    <div class="toolbar">
+
+        <div class="row">
+            <div style="padding:0 17px;">
+                <div class="input-group">
+                    <span class="input-group-addon"><span class="glyphicon glyphicon-search" aria-hidden="true"></span></span>
+                    <input type="text" class="form-control" id='searchBox' placeholder="Search for...">
+                    @*<span class="input-group-btn">
+                            <button class="btn btn-default" type="button"><span class="glyphicon glyphicon-refresh" aria-hidden="true"></span></button>
+                        </span>*@
+                </div>
+            </div>
+        </div>
+    </div>
+</script>
+
+<script id="template-dropdown" type="text/x-kendo-template">
+    <select id="permission-dropdown">
+        <option value="-1" selected>Choose a permission</option>
+        <option value="1">Edit</option>
+        <option value="2">Publish</option>
+        <option value="3">Approve</option>
+        <option value="4">View</option>
+    </select>
+</script>
+
+<script type="text/javascript">
+    var DateFormatDy = '@WordAutomationDemo.Helpers.CurrentUserSession.User.DTformat';
+
+    $(function() {
+        $('#dtDuedate').datetimepicker({
+            format: '@WordAutomationDemo.Helpers.CurrentUserSession.User.DTformat',
+            defaultDate: new Date(),
+            minDate: new Date()
+        });
+    });
+
+    function openAddNewPopup() {
+        $("#duplicateRecord").hide();
+        $("#errorMessage").hide();
+        $("#Name").val('');
+        $("#Description").val('');
+        $("#strStartDate").val('@DateTime.Now.ToString(@WordAutomationDemo.Helpers.CurrentUserSession.User.DTFormatGrid)');
+        $("#strEndDate").val('@DateTime.Now.AddDays(1).ToString(@WordAutomationDemo.Helpers.CurrentUserSession.User.DTFormatGrid)');
+        $('input:checkbox').removeAttr('checked');
+        $('#projectDoc').multiselect({
+            includeSelectAllOption: true,
+            enableFiltering: true,
+            maxHeight: 240
+        });
+
+        $('#selectMembersProject').multiselect({
+            includeSelectAllOption: true,
+            enableFiltering: true,
+            maxHeight: 240
+        });
+        $('#AddNewProjectModal').modal('show');
+    }
+
+    function getProjectId() {
+        var ProjectId = 0
+        if ($("#frmCreate #ProjectID").val() > 0) {
+            ProjectId = $("#frmCreate #ProjectID").val();
+        } else if ($('input:hidden[name=ProjectID]').val() > 0) {
+            ProjectId = $('input:hidden[name=ProjectID]').val()
+        } else if ('@TempData["hdnDocProjectID"]' != '') {
+            ProjectId = parseInt('@TempData["hdnDocProjectID"]')
+        }
+        return ProjectId;
+    }
+    function getTaskId() {
+        return $('#frmCreate #TaskID').val();
+    }
+
+    function openAddNewMemberPopup() {
+        $("#duplicateRecord").hide();
+        $("#errorMessage").hide();
+        var ProjectId = getProjectId();
+        var existingUserIds = $('#grid').data('kendoGrid').dataSource._data.map(function (row) { return row.UserId; });
+        jQuery.ajaxSettings.traditional = true;
+        $.get('@Url.Action("GetAllMembersExcept", "Home")', { exclude: existingUserIds })
+            .success(function (result) { setAddMembersGrid(result); $('#addnewmember').modal('show'); })
+            .fail(function (result) { setAddMembersGrid(result) });
+
+    }
+
+    function setAddMembersGrid(result) {
+        $('#gridAddMembers').kendoGrid({
+            dataSource: {
+                data: result
+            },
+            groupable: false,
+            sortable: false,
+            pageable: false,
+            columns: [{
+                template: "<div class='inlinetitle'><div class='inlineuserphoto'><img class='img-responsive' src='#:data.ProfileImage#' /></div>" +
+                "<div class='inlineuserinfo'><h3>#: FullName #</h3><p>#: Company#</p></div></div>",
+                field: "FullName",
+                title: "Team Member",
+                width: "140px"
+            },
+            {
+                title: " ",
+                width: "80px",
+                template: '<button class="btn-primary btn" type="button" style="width:70px;" onclick="addMember(#:data#)"><i class="fa fa-plus" aria-hidden="true"></i> Add</button>',
+            }]
+        }).data("kendoGrid");
+    }
+
+
+    function OnRichEditEndCallback(s, e) {
+        GetDocs();
+        var FileName = RichEdit.document._native.fileName;
+        if (FileName == undefined || FileName == '' || FileName.length == 0) {
+            $("#generateDiv").hide();
+            $("#AssignDiv").show();
+        } else {
+            if (this.FileManager != undefined) {
+                var FolderName = this.FileManager.currentFolderId;
+                if (FolderName == 'Templates') {
+                    $("#generateDiv").show();
+                    $("#AssignDiv").hide();
+                } else if (FolderName == 'General') {
+                    $("#generateDiv").hide();
+                    $("#AssignDiv").show();
+                }
+            }
+        }
+    }
+
+    function AddSubtask() {
+        var totalSubtasks = $('#subtaskPartials').children().length;
+        var newContainer = '<div class="subtask" id="subtask-' + totalSubtasks + '"></div>';
+    }
+
+    function filterDocuments() {
+        var projID = 0
+        if ($("#frmCreate #ProjectID").val() > 0) {
+            projID = $("#frmCreate #ProjectID").val();
+        } else if ($('input:hidden[name=ProjectID]').val() > 0) {
+            projID = $('input:hidden[name=ProjectID]').val()
+        } else if ('@TempData["hdnDocProjectID"]' != '') {
+            projID = parseInt('@TempData["hdnDocProjectID"]')
+        }
+
+        return {
+            projectID: projID,
+            documentType: $("#frmCreate #DocumentType").val(),
+        };
+    }
+
+    function IsProjectExists() {
+        var name = $("#Name").val().trim();
+        $(".validation-summary-errors").html('').hide();
+        if (name.length > 0) {
+            var n = SiteUrl + "/Projects/CheckDuplication",
+                t = {
+                    Name: name,
+                    ProjectId: 0
+                };
+            $.post(n, t, function(n) {
+                n == "1" ? ($("#duplicateRecord").show(), $("#btnSubmit").prop("disabled", !0)) : ($("#duplicateRecord").hide(), $("#btnSubmit").prop("disabled", !1))
+            }, "json")
+        }
+    }
+    $(function() {
+        $("#Name").focus();
+        $("#Name").change(function() {
+            IsProjectExists()
+        })
+    })
+
+    function GetProjectList() {
+        $("#ProjectID").attr("disabled", "disabled");
+        $.ajax({
+            url: SiteUrl + 'Home/GetAllProjectsJson',
+            type: "GET",
+            dataType: "JSON",
+            async: false,
+            data: {},
+            error: function() {
+                alert("Server access failure!");
+            },
+            success: function(result) {
+                if (result != null && result.length) {
+                    if (result.length > 0) {
+                        $("#ProjectID option").remove();
+                        $("#ProjectID").append('<option value="">- Select Project -</option>');
+                    }
+                    $.each(result, function(key, value) {
+                        $("#ProjectID").append('<option value="' + value[" Value"] + '">' + value["Text"] + '</option>');
+                    })
+                    $('#AddNewProjectModal').modal('hide');
+                } else if (result == 2) {
+                    $("#duplicateRecord").show();
+                    $("#btnSubmit").prop("disabled", !0);
+                } else if (result == 3) {
+                    $("#errorMessage").html("<ul><li>Provide all required fields.</li></ul>")
+                    $("#errorMessage").show().focus();
+                } else if (result == 0) {
+                    $("#errorMessage").html("<ul><li>'@WordAutomationDemo.Common.Messages.Error'</li></ul>")
+                    $("#errorMessage").show().focus();
+                }
+            },
+        });
+        $("#ProjectID").removeAttr("disabled");
+
+    }
+
+    function SaveProject() {
+        var name = $("#Name").val();
+        var startDate = $("#strStartDate").val();
+        var endDate = $("#strEndDate").val();
+        var description = $("#Description").val();
+        var m = [];
+
+        var $b = $('input[name=MemberIDList]');
+        $b.filter(':checked').each(function() {
+            m.push($(this).val());
+        });
+
+        var userArray = (m);
+
+        if (name == null || name == "") {
+            $("#errorMessage").html("Please enter project name")
+            $("#errorMessage").show().focus();
+            $("#Name").addClass("input-validation-error").focus();
+            return false;
+        }
+
+        if ($('#selectMembersProject').val() == null || $('#selectMembersProject').val() == "") {
+            $("#errorMessage").html("Please select at least one member")
+            $("#errorMessage").show().focus();
+            return false;
+        }
+
+        if (name != null && name != "" && strStartDate != null && strEndDate != null) {
+            return true;
+        }
+    }
+
+    $(document).ready(function () {
+        $('.nav-tabs a').on('shown.bs.tab', function(event) {
+            if ($(event.target).data('ontabopen'))
+                eval($(event.target).data('ontabopen'));
+        });
+
+        $("#taskComments").val("");
+        $("#strStartDate").datetimepicker({
+            format: '@WordAutomationDemo.Helpers.CurrentUserSession.User.DTformat',
+            viewMode: 'days',
+            useCurrent: false,
+            defaultDate: moment(),
+            allowInputToggle: true,
+        });
+
+        $("#strEndDate").datetimepicker({
+            format: '@WordAutomationDemo.Helpers.CurrentUserSession.User.DTformat',
+            viewMode: 'days',
+            useCurrent: false,
+            defaultDate: moment().add("days", 1),
+            minDate: moment().add("days", -1),
+            allowInputToggle: true,
+
+        }).on('changeDate', function(e) {
+            $('strEndDate').datepicker('hide');
+        });
+
+        $("#DueDate").on("dp.change", function (e) {
+            $(this).blur();
+        });
+
+        var pptType = '@( (int)WordAutomationDemo.Common.Global.DocumentType.Ppt)';
+        var wordType = '@( (int)WordAutomationDemo.Common.Global.DocumentType.Word)';
+        var simpleTask = '@( (int)WordAutomationDemo.Common.Global.DocumentType.SimpleTask)';
+        var excelType = '@( (int)WordAutomationDemo.Common.Global.DocumentType.Xls)';
+
+        $('#UserID').val('');
+        $('#Comments').val('');
+        $('#docFile').val('');
+
+        $("#wordPageTab").click(function () {
+            $($("#wordTab .tab-content > div")[1]).removeClass("active");
+            $($("#wordTab .tab-content > div")[0]).removeClass("active");
+            $($("#wordTab .tab-content > div")[0]).addClass("active");
+            $("#openFullscreen").hide();
+            $("#selectEntireDoc").hide();
+            var docOriginalHeight = RichEditPage.GetHeight();
+            //RichEditPage.GetRibbon().SetMinimized(true);
+            RichEditPage.SetHeight(docOriginalHeight);
+        });
+
+        $("#wordTextTab").click(function() {
+            $($("#wordTab .tab-content > div")[0]).removeClass("active");
+            $($("#wordTab .tab-content > div")[1]).removeClass("active");
+            $($("#wordTab .tab-content > div")[1]).addClass("active");
+            $("#openFullscreen").show();
+            $("#selectEntireDoc").show();
+        });
+
+        if ('@TempData["hdnDocTaskType"]' != null && '@TempData["hdnDocTaskType"]' != '') {
+            $("#frmCreate #DocumentType").val('@TempData["hdnDocTaskType"]');
+            $("#DocumentType").val('@TempData["hdnDocTaskType"]');
+            $('input:hidden[name=DocumentType]').val('@TempData["hdnDocTaskType"]')
+        }
+        if ($("#DocumentType").val() == pptType) {
+            $("#lblDocumentTypeWord").removeClass("active");
+            $("#lblDocumentTypePPT").addClass("active");
+            $("#lblDocumentTypeSimple").removeClass("active");
+            $("#lblDocumentTypeExcel").removeClass("active");
+        } else if ($("#DocumentType").val() == wordType) {
+            $("#lblDocumentTypeWord").addClass("active");
+            $("#lblDocumentTypePPT").removeClass("active");
+            $("#lblDocumentTypeSimple").removeClass("active");
+            $("#lblDocumentTypeExcel").removeClass("active");
+        } else if ($("#DocumentType").val() == excelType) {
+            $("#lblDocumentTypeExcel").addClass("active");
+            $("#lblDocumentTypePPT").removeClass("active");
+            $("#lblDocumentTypeWord").removeClass("active");
+            $("#lblDocumentTypeSimple").removeClass("active");
+            GetAllRows();
+        } else if ($("#DocumentType").val() == simpleTask) {
+            $("#lblDocumentTypeExcel").removeClass("active");
+            $("#lblDocumentTypePPT").removeClass("active");
+            $("#lblDocumentTypeWord").removeClass("active");
+            $("#lblDocumentTypeSimple").addClass("active");
+        }
+
+        var docName = '@((TempData.ContainsKey("Document")) ? TempData["Document"].ToString() : "")';
+        if (docName != '') {
+            if ($("#DocumentType").val() == pptType) {
+                $("#OriginalDocumentNameDDL").val(docName);
+                $("#DocumentName").val(docName);
+                $('input:hidden[name=DocumentType]').val(pptType)
+                $("#frmCreate #DocumentType").val(pptType)
+                $("#divDoc").hide();
+                $("#divWord").hide();
+                $(".wordDiv").hide();
+                $("#divPPT").show();
+                $("#divSheet").hide();
+                $("#divDocFile").show();
+            } else if ($("#DocumentType").val() == excelType) {
+                $("#OriginalDocumentNameDDL").val(docName);
+                $("#DocumentName").val(docName);
+                $('input:hidden[name=DocumentType]').val(excelType)
+                $("#frmCreate #DocumentType").val(excelType)
+                $("#divDoc").hide();
+                $("#divWord").hide();
+                $(".wordDiv").hide();
+                $("#divPPT").hide();
+                $("#divSheet").show();
+                $("#divDocFile").show();
+            } else if ($("#DocumentType").val() == wordType) {
+                $('input:hidden[name=DocumentType]').val(wordType)
+                $("#frmCreate #DocumentType").val(wordType)
+                $("#OriginalWordDocumentNameDDL").val(docName);
+                $("#DocumentName").val(docName);
+                $("#divDoc").show();
+                $("#divWord").show();
+                $("#taskDetails").removeClass("wordTask");
+                $("#taskDetails").addClass("wordTask");
+                $(".wordDiv").show();
+                $("#divPPT").hide();
+                $("#divSheet").hide();
+                $("#divDocFile").show();
+            } else if ($("#DocumentType").val() == simpleTask) {
+                $('input:hidden[name=DocumentType]').val(simpleTask)
+                $("#frmCreate #DocumentType").val(simpleTask)
+                $("#divDoc").hide();
+                $("#divWord").hide();
+                $(".wordDiv").hide();
+                $("#divPPT").hide();
+                $("#divSheet").hide();
+                $("#divDocFile").hide();
+            }
+        } else if ($("#DocumentName").val() != '') {
+            if ($("#DocumentType").val() == pptType || $("#DocumentType").val() == wordType || $("#DocumentType").val() == excelType) {
+                if ($("#DocumentType").val() == pptType) {
+                    $("#OriginalDocumentNameDDL").val($("#DocumentName").val());
+                    $('input:hidden[name=DocumentType]').val(pptType)
+                    $("#frmCreate #DocumentType").val(pptType)
+                    $("#divDoc").hide();
+                    $("#divWord").hide();
+                    $(".wordDiv").hide();
+                    $("#divPPT").show();
+                    $("#divExcel").hide();
+                    $("#divDocFile").show();
+                    $("#lblDocumentTypeExcel").removeClass("active");
+                    $("#lblDocumentTypePPT").addClass("active");
+                    $("#lblDocumentTypeWord").removeClass("active");
+                    $("#lblDocumentTypeSimple").removeClass("active");
+                } else if ($("#DocumentType").val() == excelType) {
+                    $("#OriginalDocumentNameDDL").val($("#DocumentName").val());
+                    $('input:hidden[name=DocumentType]').val(excelType)
+                    $("#frmCreate #DocumentType").val(excelType)
+                    $("#divDoc").hide();
+                    $("#divWord").hide();
+                    $(".wordDiv").hide();
+                    $("#divPPT").hide();
+                    $("#divExcel").show();
+                    $("#divDocFile").show();
+                    $("#lblDocumentTypeExcel").addClass("active");
+                    $("#lblDocumentTypePPT").removeClass("active");
+                    $("#lblDocumentTypeWord").removeClass("active");
+                    $("#lblDocumentTypeSimple").removeClass("active");
+                } else if ($("#DocumentType").val() == wordType) {
+                    $('input:hidden[name=DocumentType]').val(wordType)
+                    $("#frmCreate #DocumentType").val(wordType)
+                    $("#OriginalWordDocumentNameDDL").val($("#DocumentName").val());
+                    $("#divDoc").show();
+                    $("#divWord").show();
+                    $(".wordDiv").show();
+                    $("#taskDetails").removeClass("wordTask");
+                    $("#taskDetails").addClass("wordTask");
+                    $("#divPPT").hide();
+                    $("#divExcel").hide();
+                    $("#divDocFile").show();
+                    $("#lblDocumentTypeExcel").removeClass("active");
+                    $("#lblDocumentTypePPT").removeClass("active");
+                    $("#lblDocumentTypeWord").addClass("active");
+                    $("#lblDocumentTypeSimple").removeClass("active");
+                    
+                    //GetDocument($("#DocumentName").val());
+                    
+                    //GetWordPages($("#DocumentName").val());
+                }
+
+                setTimeout(function() {
+                    var dropdownlist = $("#ProjectTaskID").data("kendoDropDownList");
+
+                    // selects item if its text is equal to "test" using predicate function
+                    dropdownlist.select(function(dataItem) {
+                        return dataItem.DocName === $("#DocumentName").val();
+                    });
+                }, 1000);
+            } else if ($("#DocumentType").val() == simpleTask) {
+                $('input:hidden[name=DocumentType]').val(simpleTask)
+                $("#frmCreate #DocumentType").val(simpleTask)
+                $("#divDoc").hide();
+                $("#divWord").hide();
+                $(".wordDiv").hide();
+                $("#divPPT").hide();
+                $("#divExcel").hide();
+                $("#divDocFile").hide();
+                $("#lblDocumentTypeExcel").removeClass("active");
+                $("#lblDocumentTypePPT").removeClass("active");
+                $("#lblDocumentTypeWord").removeClass("active");
+                $("#lblDocumentTypeSimple").addClass("active");
+            }
+        }
+        if ($("#DocumentType").val() == pptType) {
+            $('input:hidden[name=DocumentType]').val(pptType)
+            $("#frmCreate #DocumentType").val(pptType)
+            $("#OriginalDocumentNameDDL").val($("#DocumentName").val());
+            GetSlides($("#DocumentName").val());
+        } else if ($("#DocumentType").val() == excelType) {
+            $('input:hidden[name=DocumentType]').val(excelType)
+            $("#frmCreate #DocumentType").val(excelType)
+            $("#OriginalDocumentNameDDL").val($("#DocumentName").val());
+            $("#divExcel").show();
+        } else if ($("#DocumentType").val() == wordType) {
+            $('input:hidden[name=DocumentType]').val(wordType)
+            $("#frmCreate #DocumentType").val(wordType)
+            $("#OriginalWordDocumentNameDDL").val($("#DocumentName").val());
+            $("#taskDetails").removeClass("wordTask");
+            $("#taskDetails").addClass("wordTask");
+            $("#divWord").show();
+            $(".wordDiv").show();
+            //console.log("GetDocument");
+            GetDocument($("#DocumentName").val());
+            
+
+        } else if ($("#DocumentType").val() == simpleTask) {
+            $('input:hidden[name=DocumentType]').val(simpleTask)
+            $("#frmCreate #DocumentType").val(simpleTask)
+        }
+
+        var id = getTaskId();
+        if (id > 0) {
+            $.get('@Url.Action("GetMembersByTask", "Home")', { taskId: id })
+                .success(function (result) { setProjectGrid(result) })
+                .fail(function (result) { setProjectGrid(result) });
+        } else {
+            $.get('@Url.Action("GetMembersByProject", "Home")', { projectID: getProjectId() })
+                .success(function (result) { setProjectGrid(result) })
+                .fail(function (result) { setProjectGrid(result) });
+        }
+        if ('@TempData["hdnDocTaskName"]' != null && '@TempData["hdnDocTaskName"]' != '') {
+            $("#TaskName").val('@TempData["hdnDocTaskName"]');
+        }
+        if ('@TempData["hdnDocDueDate"]' != null && '@TempData["hdnDocDueDate"]' != '') {
+            $("#DueDate").val('@TempData["hdnDocDueDate"]');
+        }
+        if ('@TempData["hdnDocComments"]' != null && '@TempData["hdnDocComments"]' != '') {
+            //$("#Comments").val('@TempData["hdnDocComments"]');
+        }
+        if ('@TempData["hdnDocProjectID"]' != null && '@TempData["hdnDocProjectID"]' != '') {
+            $('#ProjectID').val('@TempData["hdnDocProjectID"]');
+            $('input:hidden[name=ProjectID]').val('@TempData["hdnDocProjectID"]');
+            $.get('@Url.Action("GetMembersByProject", "Home")', {
+                ProjectID: '@TempData["hdnDocProjectID"]'
+            }, function(result) {
+
+                if (result.length > 0) {
+                    $("#UserID option").remove();
+                    $("#UserID").append('<option value=""> - Select Assign To - </option>');
+
+                    $.each(result, function(key, value) {
+                        $("#UserID").append('<option value="' + value[" Value"] + '">' + value["Text"] + '</option>');
+                    });
+                } else {
+                    $("#UserID option").remove();
+                    $("#UserID").append('<option value=""> - Select Assign To - </option>');
+                }
+
+            });
+        }
+        if ('@TempData["hdnDocName"]' != null && '@TempData["hdnDocName"]' != '') {
+            setTimeout(function() {
+                var dropdownlist = $("#ProjectTaskID").data("kendoDropDownList");
+
+                // selects item if its text is equal to "test" using predicate function
+                dropdownlist.select(function(dataItem) {
+                    return dataItem.DocName === '@TempData["hdnDocName"]';
+                });
+
+                if ('@TempData["hdnDocumentID"]' != null && '@TempData["hdnDocumentID"]' != '') {
+                    $("#DocumentID").val('@TempData["hdnDocumentID"]');
+                }
+
+            }, 1000);
+        }
+        if ('@TempData["hdnDocAssignTo"]' != null && '@TempData["hdnDocAssignTo"]' != '') {
+            setTimeout(function() {
+                $("#UserID").val('@TempData["hdnDocAssignTo"]');
+            }, 1000);
+
+        }
+        if ('@ViewData.ContainsKey("Success")' == 'True') {
+            $("#TaskName").val('');
+            $("#UserID").val('')
+        }
+    });
+
+
+    function changeDocType(e) {
+        if (e.value == '1') {
+            RefreshDocs();
+            $("#divWord").hide();
+            $("#divDoc").hide();
+            $("#divPPT").hide();
+            $("#divExcel").hide();
+            $("#divDocFile").show();
+            $('input:hidden[name=DocumentType]').val(e.value)
+            $("#frmCreate #DocumentType").val(1);
+            $("#ProjectTaskID").data("kendoDropDownList").value(-1);
+            $("#ProjectTaskID").data("kendoDropDownList").dataSource.read();
+        } else if (e.value == '2') {
+            $("#divWord").hide();
+            $("#divDoc").hide();
+            $("#divPPT").hide();
+            $("#divDocFile").show();
+            $("#divExcel").hide();
+            $('input:hidden[name=DocumentType]').val(e.value)
+            $("#frmCreate #DocumentType").val(2);
+            $("#ProjectTaskID").data("kendoDropDownList").value(-1);
+            $("#ProjectTaskID").data("kendoDropDownList").dataSource.read();
+        } else if (e.value == '3') {
+            $("#divWord").hide();
+            $("#divDoc").hide();
+            $("#divPPT").hide();
+            $("#divDocFile").show();
+            $("#divExcel").hide();
+            $('input:hidden[name=DocumentType]').val(e.value)
+            $("#frmCreate #DocumentType").val(3);
+            $("#ProjectTaskID").data("kendoDropDownList").value(-1);
+            $("#ProjectTaskID").data("kendoDropDownList").dataSource.read();
+        } else if (e.value == '4') {
+            $("#DocumentType").val(4);
+            $("#divWord").hide();
+            $("#divDoc").hide();
+            $("#divPPT").hide();
+            $("#divDocFile").hide();
+            $('input:hidden[name=DocumentType]').val(e.value)
+            $("#ProjectTaskID").data("kendoDropDownList").value(-1);
+            $("#ProjectTaskID").data("kendoDropDownList").dataSource.read();
+        }
+    }
+
+    function changeProjectDoc(e) {
+        var item = this.dataItem(e.item);
+        $("#reqProjectDocuments").hide();
+        $("#divFile").hide();
+        $("#divFile").html("");
+        $("#DocumentName").val("");
+        if (item.ProjectID != "" && item.ProjectName != "") {
+            $('#divDocFile').hide();
+            //$('#dropzone').hide();
+            var docType = item.ProjectTaskID.split('_');
+            var docName = item.DocName;
+            $("#ProjectID").val(docType[0])
+            if (docType[0] > 0) {
+                selectedUsers = [];
+                $.get('@Url.Action("GetMembersByProject", "Home")', { projectID: docType[0] })
+                    .success(function(result) {
+                        setProjectGrid(result);
+                        unlockEntireDoc();
+                        wizard.steps("next");
+                    })
+                    .fail(function (result) { setProjectGrid(result) });
+            }
+
+            $('input:hidden[name=ProjectID]').val(docType[0])
+
+            if (docType[2] == '1') {
+                $("#divWord").hide();
+                $("#divDoc").show();
+                $("#divPPT").hide();
+                $("#divExcel").hide();
+                $("#divDocFile").show();
+                $(".wordDiv").show();
+                $("#taskDetails").removeClass("wordTask");
+                $("#taskDetails").addClass("wordTask");
+                $('input:hidden[name=DocumentType]').val(1)
+                $("#frmCreate #DocumentType").val(1);
+                $("#lblDocumentTypeWord").addClass("active");
+                $("#lblDocumentTypePPT").removeClass("active");
+                $("#lblDocumentTypeSimple").removeClass("active");
+                $("#lblDocumentTypeExcel").removeClass("active");
+                $("#OriginalWordDocumentNameDDL").val(docName);
+                $("#DocumentName").val(docName)
+                $('input:hidden[name=DocumentID]').val(docType[3])
+                //$("#divWord").change();
+                //GetDocument(docName);
+            } else if (docType[2] == '2') {
+                $("#frmCreate #DocumentType").val(2);
+                $("#divWord").hide();
+                $("#divDoc").hide();
+                $("#divPPT").hide();
+                $("#divExcel").show();
+                $('.wordDiv').hide();
+                $("#divDocFile").hide();
+                $("#taskDetails").removeClass("wordTask");
+                $("#lblDocumentTypeWord").removeClass("active");
+                $("#lblDocumentTypePPT").removeClass("active");
+                $("#lblDocumentTypeSimple").removeClass("active");
+                $("#lblDocumentTypeExcel").addClass("active");
+                $("#OriginalWordDocumentNameDDL").val(docName);
+                $("#DocumentName").val(docName)
+                $('input:hidden[name=DocumentID]').val(docType[3])
+                //GetRows(docName);
+
+            } else if (docType[2] == '3') {
+                $("#frmCreate #DocumentType").val(3);
+                $("#divWord").hide();
+                $("#divDoc").hide();
+                $("#divPPT").show();
+                $("#divDocFile").hide();
+                $('.wordDiv').hide();
+                $("#divExcel").hide();
+                $("#taskDetails").removeClass("wordTask");
+                $('input:hidden[name=DocumentType]').val(3)
+                $("#lblDocumentTypePPT").addClass("active");
+                $("#lblDocumentTypeWord").removeClass("active");
+                $("#lblDocumentTypeSimple").removeClass("active");
+                $("#lblDocumentTypeExcel").removeClass("active");
+                $("#OriginalDocumentNameDDL").val(docName);
+                $("#DocumentName").val(docName)
+                $('input:hidden[name=DocumentID]').val(docType[3])
+                GetSlides(docName);
+            } else if (docType[2] == '0') {
+                $("#frmCreate #DocumentType").val(4);
+                $("#divWord").hide();
+                $("#divDoc").hide();
+                $("#divPPT").hide();
+                $("#divExcel").hide();
+                $("#divDocFile").hide();
+                $("#taskDetails").removeClass("wordTask");
+                $('input:hidden[name=DocumentType]').val(docType[2])
+                $("#lblDocumentTypeSimple").addClass("active");
+                $("#lblDocumentTypeWord").removeClass("active");
+                $("#lblDocumentTypePPT").removeClass("active");
+                GetReadOnlyDocument(docType[1], docName)
+            }
+        } else {
+            $('#divDocFile').show();
+            //$('#dropzone').show();
+            $('.wordDiv').hide();
+            $("#divWord").hide();
+            $("#divDoc").hide();
+            $("#divPPT").hide();
+            $("#divExcel").hide();
+        }
+    }
+
+    $('input:radio[name="DocumentType"]').on('click', function(e) {
+
+        if (this.id == 'DocumentType1') {
+            RefreshDocs();
+            $("#divWord").show();
+            $(".wordDiv").show();
+            $("#divDoc").hide();
+            $("#divPPT").hide();
+            $("#divExcel").hide();
+            $("#divDocFile").show();
+        } else if (this.id == 'DocumentType2') {
+            $("#DocumentType").val(2);
+            $(".wordDiv").hide();
+            $("#divWord").hide();
+            $("#divDoc").hide();
+            $("#divExcel").show();
+            $("#divPPT").hide();
+            $("#divDocFile").show();
+        } else if (this.id == 'DocumentType3') {
+            $("#DocumentType").val(3);
+            $(".wordDiv").hide();
+            $("#divWord").hide();
+            $("#divDoc").hide();
+            $("#divExcel").hide();
+            $("#divPPT").show();
+            $("#divDocFile").show();
+        } else {
+            $("#DocumentType").val(4);
+            $(".wordDiv").hide();
+            $("#divWord").hide();
+            $("#divDoc").hide();
+            $("#divPPT").hide();
+            $("#divExcel").hide();
+            $("#divDocFile").hide();
+        }
+    });
+
+    var selectedUsers = [];
+
+    function selectUser(userID) {
+        var selected = $("#permission-" + userID).find(":selected").val();
+        var CanEdit = selected == 1;
+        var CanPublish = selected == 2;
+        var CanApprove = selected == 3;
+        var CanView = selected == 4;
+        var none = selected == -1;
+
+        var newSelectedUser = {
+            userID: userID,
+            canEdit: CanEdit,
+            CanApprove: CanApprove,
+            CanPublish: CanPublish
+        };
+
+        selectedUsers = selectedUsers.filter(function (su) {
+            return su.userID !== userID;
+        });
+
+        if (!none) {
+            selectedUsers.push(newSelectedUser);
+        }
+
+        $('input:hidden[name=AssignmentMemberList]').val(JSON.stringify(selectedUsers));
+    }
+
+    function changeUser(e) {
+        $("#reqAssignTo").hide();
+    }
+
+    function changeProject(e) {
+        var ProjectId = e.value;
+        $("#reqProjectID").hide();
+        $('input:hidden[name=ProjectID]').val(ProjectId)
+        $("#ProjectTaskID").data("kendoDropDownList").value(-1);
+        $("#ProjectTaskID").data("kendoDropDownList").dataSource.read();
+        selectedUsers = [];
+        $.get('@Url.Action("GetMembersByProject", "Home")', { projectID: getProjectId() })
+            .success(function (result) { setProjectGrid(result) })
+            .fail(function (result) { setProjectGrid(result) });
+    };
+
+    function setProjectGrid(result) {
+        if (result.length > 0) {
+            $('#grid').html('');
+            $('#grid').kendoGrid({
+                dataSource: {
+                    data: result
+                },
+                toolbar: [
+                    { template: kendo.template($("#template").html()) }
+                ],
+                groupable: false,
+                sortable: false,
+                pageable: false,
+                scrollable: true,
+                //height: "400px",
+                columns: [{
+                    template: "<div class='inlinetitle'>" +
+                    "<div class='inlineuserinfo' style='text-overflow: ellipsis;'><h3>#: FullName #</h3><p>#: Company#</p></div></div>",
+                    field: "FullName",
+                    title: "Team Member",
+                    width: "30%"
+                },
+                {
+                    field: "Permission",
+                    title: "Permission",
+                    width: "70%",
+                    //template: "<input type='checkbox' id='can-view-#=UserId#' class='checkbox' onclick='selectUser(#=UserId#);' />"
+                    //template: kendo.template($("#template-dropdown").html())
+                    template: "<select id='permission-#=UserId#' onchange='selectUser(#=UserId#);'>" +
+                        "<option value='-1' selected>Select a permission</option>" +
+                        "<option value='1'>Edit</option>" +
+                        "<option value='2'>Publish</option>" +
+                        "<option value='3'>Approve</option>" +
+                        "<option value='4'>View</option></select >"
+                }
+                //{
+                //    title: " ",
+                //    width: "80px",
+                //    template: '<button class="btn-primary btn" type="button" style="width:70px;" onclick="removeMember(#:data#)"><i class="fa fa-trash" aria-hidden="true"></i> Remove</button>',
+                //    headerTemplate: '<button class="btn-primary btn" type="button" style="width:70px;" data-toggle="modal" data-target="#addnewmember" onclick="openAddNewMemberPopup()"><i class="fa fa-plus" aria-hidden="true"></i> Add</button>'
+                //}
+                ]
+            }).data("kendoGrid");
+
+            $("#grid .k-grid-header").css('display', 'none');
+
+            $("#searchBox").keyup(function () {
+                var searchValue = $('#searchBox').val();
+                var grid = $("#grid").data("kendoGrid");
+                if (searchValue) {
+                    grid.dataSource.filter({ field: "FullName", operator: "contains", value: searchValue });
+                } else {
+                    grid.dataSource.filter({});
+                }
+
+            });
+
+        } else {
+            var msg = getProjectId > 0 ? "Add a team member" : "Select a project to choose team members";
+            $('#grid').html('<div class="jumbotron center data-hint" style="min-height:190px;">' + msg + '</div>');
+            $("#UserID option").remove();
+            $("#subtaskUserID").remove();
+            $("#UserID").append('<option value=""> - Select Assign To - </option>');
+            $("#subtaskUserID").append('<option value=""> - Select Assign To - </option>');
+        }
+    }
+
+    function GetWordPages(docName) {
+        var file = docName;
+
+        var lastPage = RichEdit.core.layout.lastMaxNumPages;
+        console.log("GetPageDocument");
+        GetPageDocument(docName);
+
+    }
+
+    function GetSlides(docName) {
+        var file = docName;
+        $.ajax({
+            url: '@Url.Action("GetSlides", "Home")',
+            type: "GET",
+            dataType: "JSON",
+            async: false,
+            data: {
+                FileName: file
+            },
+            success: function(result) {
+                var strhtml = '<table class="table table-bordered" id="SlideTable">';
+                if (result.length > 0) {
+                    strhtml += '<th width="50px">Select All<br/><input class="allSlides" type="checkbox" onClick="selectAllSlides(this)" /></th><th>Assignee</th><th>Slide Name</th><th>&nbsp;</th>';
+                    $.each(result, function(key, value) {
+                        strhtml += '<tr>';
+                        if (value["IsAssigned"] == false) {
+                            strhtml += '<td><input type="checkbox" id="' + value[" SlideName"] + '" class="" value="' + value["SlideName"] + '"/></td><td>&nbsp;</td>';
+                        } else {
+                            strhtml += '<td><a href="#" class="tableicon bluebg" data-toggle="tooltip" data-placement="right" title="Assigned"><i class="fa fa-check-square-o" aria-hidden="true"></i></a></td>';
+                            strhtml += '<td>' + value["AssignedToName"] + '</td>';
+                        }
+                        strhtml += '<td><a data-toggle="popover" data-trigger="hover" data-placement="right" data-container="body" id="ppt' + value["PPTSlideID"] + '" href="' + value["SlideLink"] + '">' + value["SlideName"] + '</a><div id="popover-content-ppt' + value["PPTSlideID"] + '" class="hide"><img src="' + value["ThumbnailLink"] + '" alt="" class="img-responsive"></div></td>';
+                        strhtml += '<td><a href="javascript:;" class="gridthumb" data-toggle="popover" data-trigger="hover" data-placement="right" data-container="body" id="ppt' + value["PPTSlideID"] + '"><img src="' + value["ThumbnailLink"] + '" alt="" class="img-responsive img-thumbnail"></a><div id="popover-content-ppt' + value["PPTSlideID"] + '" class="hide"><img src="' + value["SlideLink"] + '" alt="" class="img-responsive"></div></td>';
+                        strhtml += '</tr>';
+                    });
+                    strhtml += '</table>';
+                    $("#Slides").html(strhtml);
+                    $("[data-toggle=popover]").each(function(i, obj) {
+                        $(this).popover({
+                            html: true,
+                            content: function() {
+                                var id = $(this).attr('id')
+                                return $('#popover-content-' + id).html();
+                            }
+                        });
+                    });
+                    $(".aniimated-thumbnials").lightGallery({
+                        thumbnail: true,
+                        animateThumb: false,
+                        loop: false,
+                        enableSwipe: true
+                    });
+                } else {
+                    $("#Slides").html('<table class="table table-bordered"><tbody><tr><td>No Slides found.</td></tr></tbody></table>');
+                }
+            },
+            error: function () {
+                alert("Server access failure!");
+            }
+        });
+    }
+
+    function selectAllSlides(e) {
+        var status = e.checked;
+        $('#SlideTable input').each(function() {
+            this.checked = status;
+        });
+    }
+
+    function selectAllPages(e) {
+        var status = e.checked;
+        $('#WordPageTable input').each(function() {
+            this.checked = status;
+        });
+    }
+
+    function GetAllRows() {
+        GetRows($("#DocumentName").val());
+    }
+    _selection = null;
+    _selections = [];
+    _ignoreSelection = false;
+    _spreadsheet = null;
+
+    function spreadsheet_SelectionChanged(s, e) {
+        _spreadsheet = s;
+        if (!_ignoreSelection) {
+            if (e.selection.topRowIndex == -1 || e.selection.bottomRowIndex == -1) {
+                $('#sheetRowsText').text('You have not selected any rows, the entire workbook will be shared.');
+                _selection = [-1, -1, s.sheetIndex];
+                _ignoreSelection = true;
+                s.getStateController().setSelection(new ASPxClientSpreadsheet.Selection(new ASPxClientSpreadsheet.Range(-1, -1, -1, -1), 0, 0));
+                _ignoreSelection = false;
+
+            } else {
+                _selection = [e.selection.topRowIndex, e.selection.bottomRowIndex, s.sheetIndex];
+                $('#sheetRowsText').html('You are sharing ' + ((e.selection.bottomRowIndex + 1) - e.selection.topRowIndex) + ' rows. <button class="btn" type="button" onclick="clearSpreadsheetSelection()">Share All</button> <button class="btn" type="button" onclick="unSelectSpreadsheetSelection()">Unselect All</button>');
+                _ignoreSelection = true;
+                //s.getStateController().setSelection(new ASPxClientSpreadsheet.Selection(new ASPxClientSpreadsheet.Range(0, e.selection.topRowIndex, s.lastFilledCell.col, e.selection.bottomRowIndex), 0, e.selection.topRowIndex));
+                _ignoreSelection = false;
+            }
+        }
+    }
+
+    function word_SelectionChanged(s, e) {
+        var selection = s.core.selection.getLastSelectedInterval();
+        if (selection.length > 0) {
+            var pageInputs = $("#WordPageTable input:checkbox");
+            for (var i = 0; i < pageInputs.length; i++) {
+                $(pageInputs[i]).attr("checked",false);
+            }
+        }
+    }
+
+    function clearSpreadsheetSelection() {
+        _spreadsheet.getStateController().setSelection(new ASPxClientSpreadsheet.Selection(new ASPxClientSpreadsheet.Range(0, 0, _spreadsheet.lastFilledCell.col, _spreadsheet.lastFilledCell.row), 0, 0));
+    }
+
+    function unSelectSpreadsheetSelection() {
+        _spreadsheet.getStateController().setSelection(new ASPxClientSpreadsheet.Selection(new ASPxClientSpreadsheet.Range(0, 0, 0, 0), 0, 0));
+    }
+
+    function GetDocument(docName) {
+        $("#loading").show();
+            setTimeout(function () {
+                    $.get('@Url.Action("LoadAndSavePartial","Home")', {
+                            name: docName
+                    }, function (partialView) {
+                        $('#wordTab .nav-tabs a:last').tab('show');
+                        $($("#wordTab .tab-content > div")[0]).removeClass("active");
+                        $($("#wordTab .tab-content > div")[1]).removeClass("active");
+                        $($("#wordTab .tab-content > div")[1]).addClass("active");
+                        $("#divDoc").html(partialView);
+                            //Minimize ribbon on document load
+                            //var docOriginalHeight = RichEdit.GetHeight();
+                            //RichEdit.GetRibbon().SetMinimized(true);
+                            //RichEdit.SetHeight(docOriginalHeight);
+                        console.log("getWordPages");
+                            GetWordPages($("#DocumentName").val());
+
+                        }).fail(function () {
+                        $("#divDoc").html('<p class="center">&nbsp;&nbsp;Preview failed.</p>');
+
+                    });
+                }, 1000);
+    }
+
+
+    function GoToPage(pageNumber) {
+        var pageInterval = RichEditPage.core.layout.pages[pageNumber].contentIntervals[0];
+        RichEditPage.core.selection.setSelection(pageInterval.start, pageInterval.start + pageInterval.length);
+        RichEditPage.core.selection.setSelection(pageInterval.start, pageInterval.start);
+    }
+
+    function GetPageDocument(docName) {
+        $.get('@Url.Action("LoadAndSavePagePartial","Home")',
+            {
+                name: docName
+            },
+            function(partialView) {
+                $("#WordPagesDoc").html(partialView);
+
+                $("#loading").hide();
+                if ('@Model.IsFullscreen' == 'True' && !$("#loading").is(":visible")) {
+                    OpenFullscreen();
+                }
+                var pageCount = RichEditPage.core.layout.lastMaxNumPages;
+                console.log("GetwordPages");
+                $.ajax({
+                    url: '@Url.Action("GetWordPages","Home")',
+                    type: "GET",
+                    dataType: "JSON",
+                    async: false,
+                    data: {
+                        FileName: docName
+                    },
+                    success: function(result) {
+                        var strhtml = '<table class="table table-bordered" id="WordPageTable">';
+                        if (result.length > 0) {
+                            strhtml += '<th class="wordPageCol"><input class="allPages" type="checkbox" onClick="selectAllPages(this)" /></th><th class="wordPageCol">Page</th>';
+                            $.each(result,
+                                function(key, value) {
+                                    strhtml += '<tr>';
+                                    if (value["IsAssigned"] == false) {
+                                        strhtml += '<td class="wordPageCol"><input type="checkbox" id="' +
+                                            value["PageNumber"] +
+                                            '" class="" value="' +
+                                            value["PageNumber"] +
+                                            '"/></td>';
+                                    } else {
+                                        strhtml +=
+                                            '<td class="wordPageCol"><a href="#" class="tableicon bluebg" data-toggle="tooltip" data-placement="right" title="Assigned"><i class="fa fa-check-square-o" aria-hidden="true"></i></a></td>';                            }
+                                    strhtml += '<td class="wordPageCol"><div class="pgNum">' + value["PageNumber"] + '</div></td>';
+                                    strhtml += '</tr>';
+                                });
+                            strhtml += '</table>';
+                            $("#WordPages").html(strhtml);
+
+
+                            $("#WordPageTable input").click(function() {
+                                clearSelectedText(RichEdit);
+                            });
+                            $("#loading").hide();
+                        } else {
+                            $("#WordPages")
+                                .html(
+                                    '<table class="table table-bordered"><tbody><tr><td>No Pages found.</td></tr></tbody></table>');
+                            $("#loading").hide();
+                        }
+                        $("#WordPageTable td>div").click(function (e) {
+                            var selected = $("#WordPageTable input:checked");
+
+                            var pageNumber = $(this).text();
+                            GoToPage(pageNumber);
+                            selected.prop('checked', true);
+                        });
+                    },
+                    error: function() {
+                        alert("Server access failure!");
+                        $("#loading").hide();
+                    }
+                });
+            }).fail(function() {
+                $("#WordPagesDoc").html('<p class="center">&nbsp;&nbsp;Preview failed.</p>');
+                $("#loading").hide();
+            });
+        //$("#loading").hide();
+    }
+
+    function GetRows(docName) {
+        $("#loading").show();
+        $("#RowsDownloadLink").attr("href", '@Url.Content("~/ApplicationDocuments/Excels/")' + docName)
+        $("#RowsPartialContainer").html('<p class="center"><i class="glyphicon glyphicon-repeat glyphicon-spin"> </i>&nbsp;&nbsp;Loading...</p>');
+        setTimeout(function() {
+            $.get('@Url.Action("LoadExcel", "Home")', {
+                OriginalDocumentName: docName,
+                name: docName,
+                userid: 1,
+                IsReadOnly: true
+            }, function(partialView) {
+                $("#RowsPartialContainer").html(partialView);
+                $("#loading").hide();
+            }).fail(function() {
+                $("#RowsPartialContainer").html('<p class="center">&nbsp;&nbsp;Preview failed.</p>');
+                $("#loading").hide();
+            });
+        }, 1000);
+    }
+
+    function GetSheets(docName) {
+        var file = docName;
+        $.ajax({
+            url: SiteUrl + 'Home/GetSheets',
+            type: "GET",
+            dataType: "JSON",
+            async: false,
+            data: {
+                FileName: file
+            },
+            error: function() {
+                alert("Server access failure!");
+            },
+            success: function(result) {
+                var strhtml = '<table class="table table-bordered" id="SheetTable">';
+                if (result.length > 0) {
+                    strhtml += '<th width="50px">&nbsp;</th><th>Assignee</th><th>Sheet Name</th>';
+                    $.each(result, function(key, value) {
+                        strhtml += '<tr>';
+                        if (value["IsAssigned"] == false) {
+                            strhtml += '<td><input type="checkbox" id="' + value[" SheetName"] + '" class="" value="' + value["SheetName"] + '"/></td><td>&nbsp;</td>';
+                        } else {
+                            strhtml += '<td><a onclick="OpenExcelSheet(this)" id="' + value["SheetName"] + '" name=' + docName + ' class="tableicon bluebg cursor" data-toggle="tooltip" data-placement="right" title="Assigned"><i class="fa fa-check-square-o" aria-hidden="true"></i></a></td>';
+                            strhtml += '<td>' + value["AssignedToName"] + '</td>';
+                        }
+                        strhtml += '<td><a data-toggle="popover" data-trigger="hover" data-placement="right" onclick="OpenExcelSheet(this)" id="' + value["SheetName"] + '" name=' + docName + ' class="cursor">' + value["SheetName"] + '</a></td>';
+                        strhtml += '</tr>';
+                    });
+                    strhtml += '</table>';
+                    $("#Sheets").html(strhtml);
+
+                } else {
+                    $("#Sheets").html('<table class="table table-bordered"><tbody><tr><td>No Sheets found.</td></tr></tbody></table>');
+                }
+            },
+        });
+    }
+
+    function OpenExcelSheet(e) {
+        var name = e.id;
+        var originalDocumentName = e.name;
+        $("#ExcelDownloadLink").attr("href", '@Url.Content("~/ApplicationDocuments/Excels/")' + "Sheets_" + originalDocumentName + '/' + name)
+        $("#ExcelPartialContent").html('<p class="center"><i class="glyphicon glyphicon-repeat glyphicon-spin"> </i>&nbsp;&nbsp;Loading...</p>');
+        $('#ExcelModal').modal('show');
+        setTimeout(function() {
+            $.get('@Url.Action("LoadExcel", "Home")', {
+                OriginalDocumentName: originalDocumentName,
+                userid: 1,
+                IsReadOnly: true
+            }, function(partialView) {
+                $("#ExcelPartialContent").html(partialView);
+                $('.dxr-minBtn').click();
+                $('#Snippet_R_TC_TPTCL_MinBtn').click();
+            });
+        }, 1000);
+    }
+
+    function RefreshDocs() {
+        GetDocs();
+        $("#divDoc").html("");
+        $("#divDoc").hide();
+
+    }
+
+    function GetReadOnlyDocument(assignmentID, docName) {
+        $.ajax({
+            url: SiteUrl + 'Home/GetReadOnlyDocument',
+            type: "POST",
+            dataType: "JSON",
+            async: false,
+            data: {
+                assignmentID: assignmentID,
+                docName: docName
+            },
+            error: function() {
+                alert("Server access failure!");
+                $(".glyphicon-refresh").removeClass("glyphicon-spin");
+            },
+            success: function(result) {
+                if (result.IsSuccess) {
+                    $("#divFile").show();
+                    $("#divFile").html('<a href="' + '@Url.Content("~/App_Data/UserDocs/ReadOnlyFiles/")' + docName + '" title="Click to Download">Download</a>');
+                }
+            }
+        });
+    }
+
+    function GetDocs() {
+        $(".glyphicon-refresh").addClass("glyphicon-spin");
+
+        $.ajax({
+            url: SiteUrl + 'Home/GetDocFilesInDirectoryJson',
+            type: "GET",
+            dataType: "JSON",
+            async: false,
+            data: {},
+            error: function() {
+                alert("Server access failure!");
+                $(".glyphicon-refresh").removeClass("glyphicon-spin");
+
+            },
+            success: function(result) {
+                if (result.length > 0) {
+                    $("#OriginalWordDocumentNameDDL option").remove();
+                    $("#OriginalWordDocumentNameDDL").append('<option value="">- Select File -</option>');
+                }
+                $.each(result, function(key, value) {
+                    $("#OriginalWordDocumentNameDDL").append('<option value="' + value[" Value"] + '">' + value["Text"] + '</option>');
+                })
+                $(".glyphicon-refresh").removeClass("glyphicon-spin");
+            }
+        });
+    }
+    $("#createDoc").on("click", function() {
+        $("#divDoc").html('<p class="center"><i class="glyphicon glyphicon-repeat glyphicon-spin"> </i>&nbsp;&nbsp;Loading...</p>');
+        $("#divDoc").show();
+        $.get('@Url.Action("LoadAndSavePartial", "Home")', {
+            name: "",
+            userid: 1
+        }, function(partialView) {
+            $("#OriginalWordDocumentNameDDL").val("");
+            $("#divDoc").html(partialView);
+        });
+    });
+
+    $("#divWord").change(function(e) {
+        var name = $("#DocumentName").val();
+        if (name != "") {
+
+            $("#divDoc").html('<p class="center"><i class="glyphicon glyphicon-repeat glyphicon-spin"> </i>&nbsp;&nbsp;Loading...</p>');
+            $("#divDoc").show();
+
+            $.get('@Url.Action("LoadAndSavePartial", "Home")', {
+                name: name,
+                userid: 1
+            }, function(partialView) {
+                $("#divDoc").html(partialView);
+            });
+        } else {
+            $("#divDoc").hide();
+            $("#divDoc").html("");
+        }
+
+    });
+
+    $("#generateTemplate").submit(function() {
+        RichEdit.core.commandManager.commands["3"]; //Save Document before form submit;
+        var FileName = RichEdit.document._native.fileName;
+        $("#OriginalDocumentName").val(FileName);
+    });
+
+    $("#frmCreateProject").submit(function() {
+        $("#btnSubmit").attr('disabled', 'disabled');
+        var name = $("#Name").val();
+        var startDate = $("#strStartDate").val();
+        var endDate = $("#strEndDate").val();
+        var description = $("#Description").val();
+        var m = [];
+
+        var $b = $('input[name=MemberIDList]');
+        $b.filter(':checked').each(function() {
+            m.push($(this).val());
+        });
+
+        var userArray = (m);
+
+        if (name == null || name == "") {
+            $("#errorMessage").html("Please enter project name")
+            $("#errorMessage").show().focus();
+            $("#Name").addClass("input-validation-error").focus();
+            return false;
+        }
+
+        if ($('#selectMembersProject').val() == null || $('#selectMembersProject').val() == "") {
+            $("#errorMessage").html("Please select at least one member")
+            $("#errorMessage").show().focus();
+            return false;
+        }
+
+        if (name == null || name == "" || strStartDate == null || strEndDate == null) {
+            return false;
+        }
+
+    });
+
+    function ValidateType(e) {
+
+        if ($(e).val() != "") {
+            var ext = $(e).val().split('.').pop().toLowerCase();
+            if ($.inArray(ext, ['docx', 'doc', 'ppt', 'pptx', 'xls', 'xlsx']) == -1) {
+                alert("Only documents files can be uploaded!")
+                $(e).val('');
+            }
+        }
+    }
+
+    function SetDocData() {
+        if ($('#CreateUpload input[type="file"]').val() != "") {
+            if ($("#ProjectID").val() > 0) {
+                var fileName = $('#CreateUpload input[type="file"]').val().split('\\');
+                var last_element = fileName[fileName.length - 1];
+                $("#hdnDocTaskType").val($("#DocumentType").val());
+                $("#hdnDocProjectID").val($("#ProjectID").val());
+                $("#hdnDocTaskName").val($("#TaskName").val());
+                $("#hdnDocDueDate").val($("#DueDate").val());
+                $("#hdnDocAssignTo").val($("#UserID").val());
+                $("#hdnDocComments").val($("#Comments").val());
+                $("#DocumentName").val($("#ProjectTaskID").data("kendoDropDownList").text());
+                $("#hdnDocName").val($("#ProjectTaskID").data("kendoDropDownList").text());
+                $("#hdnDocumentID").val($("#DocumentID").val());
+                $("#hdnFileName").val(last_element);
+                return true;
+            } else {
+                alert("Please select project");
+                return false;
+            }
+        } else {
+            alert("Please select file");
+            return false;
+        }
+    }
+
+    function PostData(isFullscreen) {
+        $("#IsFullscreen").val(isFullscreen);
+        
+        $("#loading").show();
+        var isValid = true;
+        $("#reqTaskName").hide();
+        $("#reqProjectID").hide();
+        $("#reqDueDate").hide();
+        $("#reqAssignTo").hide();
+        $("#reqProjectDocuments").hide();
+
+        //Check if task name is not empty
+        var taskName = $("#TaskName").val();
+        if (taskName.trim() == "") {
+            $("#reqTaskName").show();
+            isValid = false
+            $("#btnCreateTask").attr('disabled', false);
+            $("#loading").hide();
+        }
+
+        //Check if project has been selected
+        var projectId = $("#ProjectID").val();
+        if (projectId == "" || parseInt(projectId) <= 0) {
+            $("#reqProjectID").show();
+            isValid = false
+            $("#btnCreateTask").attr('disabled', false);
+            $("#loading").hide();
+        }
+
+        //Check if document has been selected
+        var documentId = $("#DocumentID").val();
+        if (documentId == "" || parseInt(documentId) <= 0) {
+            alert("Please select a document");
+            $("#reqProjectDocuments").show();
+            isValid = false;
+            $("#btnCreateTask").attr('disabled', false);
+            $("#loading").hide();
+        }
+
+        // PPT docs
+        if ($("#DocumentType").val() == "3") {
+            if ($("#ProjectTaskID").val() != "" && ($("#DocumentName").val() != '' || $("#DocumentName").val() != undefined)) {
+                if ($('input:checkbox').is(':checked')) {
+                    var myArray = [];
+                    var count = 0;
+                    $("#SlideTable input:checkbox:checked").each(function() {
+                        if (!$(this).hasClass("allSlides")) {
+                            myArray.push($(this).val());
+                        }
+                        count++;
+                    });
+                    $("#SelectedSlides").val(myArray);
+                    $('input:hidden[name=DocumentType]').val('@((int)WordAutomationDemo.Common.Global.DocumentType.Ppt)')
+                } else {
+                    alert("Please select at least one slide.");
+                    $("#btnCreateTask").attr('disabled', false);
+                    $("#loading").hide();
+                    return;
+                }
+            } else {
+                $("#reqProjectDocuments").show();
+                isValid = false
+                $("#btnCreateTask").attr('disabled', false);
+            }
+        }
+
+        //Excel docs
+        else if ($("#DocumentType").val() == "2") {
+            if ($("#ProjectTaskID").val() != "" && ($("#DocumentName").val() != '' || $("#DocumentName").val() != undefined)) {
+
+                // If assigning by sheet:
+                if ($('#sheetTab').hasClass("active")) {
+                    if ($('input:checkbox').is(':checked')) {
+                        var myArray = [];
+                        $("#SheetTable input:checkbox:checked").each(function() {
+                            myArray.push($(this).val());
+                        })
+                        $("#SelectedSheets").val(myArray);
+                        $('input:hidden[name=DocumentType]').val('@((int)WordAutomationDemo.Common.Global.DocumentType.Xls)')
+                    } else {
+                        alert("Please select at least one sheet.");
+                        $("#btnCreateTask").attr('disabled', false);
+                        $("#loading").hide();
+                        return;
+                    }
+                    // If assigning by sheet:
+                } else if ($('#rowsTab').hasClass("active")) {
+                    if (_selection == null) {
+                        $('input:hidden[name=SelectedRows]').val("*:*:*");
+                    } else {
+                        $('input:hidden[name=SelectedRows]').val(_selection[0] + ":" + _selection[1] + ":" + _selection[2]);
+                    }
+                }
+
+            } else {
+                $("#reqProjectDocuments").show();
+                isValid = false
+                $("#btnCreateTask").attr('disabled', false);
+                $("#loading").hide();
+            }
+        }
+
+        //Word docs
+        else if ($("#DocumentType").val() == "1") {
+
+            if ($("#DocumentName").val() != "") {
+                var selectedPages = []
+                $("#WordPageTable input:checkbox:checked").each(function() {
+                    if (!$(this).hasClass("allPages")) {
+                        selectedPages.push($(this).val());
+                    }
+                });
+
+                var hasSelectedText = RichEdit.core.selection.getLastSelectedInterval().length > 0;
+                var hasSelectedPages = selectedPages.length > 0;
+                var isEntireDocument = $("#selectEntireDoc").hasClass("selected");
+                var hasMultipleSelections = RichEdit.core.selection.intervals.length > 1;
+
+                if (isEntireDocument) {
+                    $('input:hidden[name=IsEntireDocument]').val(true);
+                } else if (!hasSelectedText && !hasSelectedPages) {
+                    alert("Please make a selection.");
+                    $("#loading").hide();
+                    return;
+                } else if (hasSelectedText) {
+                    if (hasMultipleSelections) {
+                        if (!GetTextSelections()) {
+                            $("#loading").hide();
+                            return;
+                        };
+                    }
+                    else {
+                        if (!GetSelectedText(RichEdit)) {
+                            $("#loading").hide();
+                            return;
+                        }
+                    }
+                } else {
+                    if (!GetSelectedPages()) {
+                        $("#loading").hide();
+                        return;
+                    }
+                }
+
+            } else {
+                $("#reqProjectDocuments").show();
+                isValid = false;
+                $("#btnCreateTask").attr('disabled', false);
+                $("#loading").hide();
+            }
+            $("#loading").hide();
+        }
+
+        //Check if assignment members have been selected
+        if (selectedUsers.length > 0) {
+            var canEditCount = selectedUsers.filter(function (su) { return su.canEdit }).length;
+            var canPublishCount = selectedUsers.filter(function (su) { return su.CanPublish }).length;
+            var canApproveCount = selectedUsers.filter(function (su) { return su.CanApprove }).length;
+            var isEntireDocument = $("#selectEntireDoc").hasClass("selected");
+
+            if ((canEditCount + canPublishCount) == 0) {
+                alert("Please select at least one editor.");
+                $("#btnCreateTask").attr('disabled', false);
+                $("#loading").hide();
+                return;
+            }
+            var dueDate = $("#DueDate").val();
+            if (dueDate.trim() == "") {
+                $("#reqDueDate").show();
+                isValid = false
+                $("#btnCreateTask").attr('disabled', false);
+                $("#loading").hide();$("#loading").hide();
+            }
+            if (isValid == true) {
+                $('#frmCreate #Comments').val($("#taskComments").val())
+                $("#btnCreateTask").attr('disabled', 'disabled');
+                $("#frmCreate").submit();
+            }
+        } else {
+            $("#reqAssignTo").show();
+            isValid = false
+            $("#btnCreateTask").attr('disabled', false);
+            $("#loading").hide();
+        }
+        $("#loading").hide();
+    }
+
+    function SelectEntireDocument() {
+
+        if ($('#selectEntireDoc').hasClass("selected")) {
+            unlockEntireDoc();
+        } else
+        {
+            var totalPages = $("#WordPageTable tr").length -1;
+            var unassignedPages = $("#WordPageTable input").length - 1;
+
+            if (unassignedPages < totalPages) {
+                alert("Can't select entire document until all tasks have been completed.");
+            } else {
+                clearSelectedText(RichEdit);
+                $("#WordPageTable input:checkbox").attr('checked', false);
+                lockEntireDoc();
+            }
+        }
+    }
+
+    function unlockEntireDoc() {
+        $('.tab-content').fadeTo(500, 1);
+        $('.tab-content').css('pointer-events', 'auto');
+        $('#selectEntireDoc').html("Select entire document");
+        $('#selectEntireDoc').removeClass("selected");
+        $('#openFullscreen').removeClass("disabled");
+        $('#openFullscreen').attr("disabled", false);
+    }
+
+
+    function lockEntireDoc() {
+        $('.tab-content').fadeTo(500, 0.2);
+        $('.tab-content').css('pointer-events', 'none');
+        $('#selectEntireDoc').html("Unselect entire document");
+        $('#selectEntireDoc').removeClass("selected");
+        $('#selectEntireDoc').addClass("selected");
+        $('#openFullscreen').addClass("disabled");
+        $('#openFullscreen').attr("disabled", true);
+    }
+
+    function GetSelectedPages() {
+        //var selectedPages = $("#WordPageTable input:checkbox:checked");
+        var selectedPages = []
+        $("#WordPageTable input:checkbox:checked").each(function() {
+            if (!$(this).hasClass("allPages")) {
+                selectedPages.push($(this));
+            }
+        });
+        var filename = RichEdit.document._native.fileName;
+
+        var selectedIntervals;
+        if (selectedPages != null && selectedPages.length > 0) {
+            //var selections = getSelections(selectedPages);
+            //for (var i = 0; i < selectedPages.length; i++) {
+            //    pageNumbers.push($(selectedPages[i]).attr("id"));
+            //}
+            selectedIntervals = getSelections(selectedPages);
+        } else {
+            alert("Please select pages");
+            return false;
+        }
+
+        $("#selectedPages").val(JSON.stringify(selectedIntervals));
+        $("#DocumentName").val(filename);
+        $('input:hidden[name=DocumentType]').val('@((int)WordAutomationDemo.Common.Global.DocumentType.Word)');
+        $("#DocumentType").val('@((int)WordAutomationDemo.Common.Global.DocumentType.Word)');
+        return true;
+    }
+
+    function getSelections(selectedPages) {
+        var selectedIntervals = [];
+        RichEdit.selection.goToDocumentStart();
+        for (var i = 0; i < selectedPages.length; i++) {
+            var pageNumber = parseInt($(selectedPages[i]).attr("id"));
+            var pageInterval = RichEdit.core.layout.pages[pageNumber].contentIntervals[0];
+            selectedIntervals.push({ pageNumber: pageNumber, start: pageInterval.start, length: pageInterval.length });
+        }
+
+        return selectedIntervals;
+    }
+
+
+    function GetTextSelections() {
+        var selectedIntervals = RichEdit.core.selection.intervals;
+        var filename = RichEdit.document._native.fileName;
+
+        if (selectedIntervals.length === 0) {
+            alert("Please select text");
+            $("#btnCreateTask").attr('disabled', false);
+            return false;
+        } else {
+            var selectedRanges = [];
+            for (var i = 0; i < selectedIntervals.length; i++) {
+                var interval = selectedIntervals[i];
+                selectedRanges.push({ start: interval.start, length: interval.length });
+            }
+            $("#selectedRanges").val(JSON.stringify(selectedRanges));
+            $("#DocumentName").val(filename);
+            $('input:hidden[name=DocumentType]').val('@((int)WordAutomationDemo.Common.Global.DocumentType.Word)');
+            $("#DocumentType").val('@((int)WordAutomationDemo.Common.Global.DocumentType.Word)');
+            return true;
+        }
+    }
+
+    function GetSelectedText(rich) {
+        var selection = rich.core.selection.getLastSelectedInterval();
+        var filename = rich.document._native.fileName;
+
+        if (selection.length === 0) {
+            alert("Please select text");
+            $("#btnCreateTask").attr('disabled', false);
+            return false;
+        } else {
+            //get selected text
+            var documentInterval = new __aspxRichEdit.FixedInterval(selection.start, selection.length);
+            var planText = rich.core.model.activeSubDocument.getText(documentInterval);
+            var userId = $("#UserID").val();
+
+            $("#start").val(selection.start);
+            $("#length").val(selection.length);
+            $("#selectedText").val(planText);
+            $("#DocumentName").val(filename);
+            $('input:hidden[name=DocumentType]').val('@((int)WordAutomationDemo.Common.Global.DocumentType.Word)')
+            $("#DocumentType").val('@((int)WordAutomationDemo.Common.Global.DocumentType.Word)');
+        }
+        return true;
+    }
+
+    function clearSelectedText(rich) {
+        var selection = rich.core.selection.getLastSelectedInterval();
+        rich.core.selection.setSelection(selection.start, selection.start);
+    }
+
+    function addMember(data) {
+
+    }
+    function removeMember(data) {
+
+    }
+
+    // DROPZONE CLASS DEFINITION
+    // ======================
+    $(function () {
+        var dropZone = document.getElementById('dropzone');
+
+        var startUpload = function (files) {
+
+            if ($("#ProjectID").val() > 0) {
+                var fileName = files[0].name;
+                $("#hdnDocTaskType").val($("#DocumentType").val());
+                $("#hdnDocProjectID").val($("#ProjectID").val());
+                $("#hdnDocTaskName").val($("#TaskName").val());
+                $("#hdnDocDueDate").val($("#DueDate").val());
+                $("#hdnDocAssignTo").val($("#UserID").val());
+                $("#hdnDocComments").val($("#Comments").val());
+                $("#DocumentName").val($("#ProjectTaskID").data("kendoDropDownList").text());
+                $("#hdnDocName").val($("#ProjectTaskID").data("kendoDropDownList").text());
+                $("#hdnDocumentID").val($("#DocumentID").val());
+                $("#hdnFileName").val(fileName);
+
+                var formData = new FormData();
+
+                formData.append('file', files[0]);
+                formData.append('projectId', $("#ProjectID").val());
+
+                $.ajax({// and other parameter is set here
+                    url: '@Url.Action("UploadDocDropzone","Home")',
+                    type: "POST",
+                    data: formData,
+                    //dataType: "json",
+                    //cache: false,
+                    contentType: false,
+                    processData: false
+
+                })
+                    .success(function (response) {
+                        window.location.href = response.Url;
+                        //$("#ProjectTaskID").data("kendoDropDownList").dataSource.read();
+                    });
+
+            } else {
+                alert("Please select project");
+                return false;
+            }
+
+        }
+
+        dropZone.ondrop = function (e) {
+            e.preventDefault();
+            this.className = 'upload-drop-zone';
+
+            startUpload(e.dataTransfer.files)
+        }
+
+        dropZone.ondragover = function () {
+            this.className = 'upload-drop-zone drop';
+            return false;
+        }
+
+        dropZone.ondragleave = function () {
+            this.className = 'upload-drop-zone';
+            return false;
+        }
+    });
+
+</script>

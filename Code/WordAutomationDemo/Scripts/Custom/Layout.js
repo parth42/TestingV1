@@ -1,0 +1,1 @@
+$(document).ready(function(){$("#main-menu").smartmenus({subMenusSubOffsetX:1,subMenusSubOffsetY:-1});$("#year").text((new Date).getFullYear())})

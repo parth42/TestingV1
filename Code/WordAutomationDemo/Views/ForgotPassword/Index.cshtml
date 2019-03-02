@@ -1,0 +1,75 @@
+﻿@model WordAutomationDemo.Models.ForgotPasswordModel
+@{
+    Layout = null;
+}
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=0, minimum-scale=1.0, maximum-scale=1.0" />
+    <meta http-equiv="X-UA-Compatible" content="IE=Edge" />
+    <title>Triyosoft - Forgot Password</title>
+    <script src="@Url.Content("~/Scripts/Common/jquery-1.10.2.min.js")"></script>
+    <script src="~/Scripts/common.js"></script>
+    <!-- Bootstrap -->
+    <link href="@Url.Content("~/CSS/Common/bootstrap.css")" rel="stylesheet">
+    <link href="@Url.Content("~/CSS/Common/bootstrap-theme.css")" rel="stylesheet" />
+    <!-- Custom -->
+    <link href="@Url.Content("~/CSS/fonts/fonts.css")" rel="stylesheet" />
+    <link href="@Url.Content("~/CSS/Custom/style.css")" rel="stylesheet">
+</head>
+<body onload="javascript:document.getElementById('UserName').focus();">
+    <script src="@Url.Content("~/Scripts/Common/jquery.validate.min.js")"></script>
+    <script src="@Url.Content("~/Scripts/Common/jquery.validate.unobtrusive.min.js")"></script>
+@{Html.EnableClientValidation();}
+@using (Html.BeginForm("Index", "ForgotPassword", FormMethod.Post))
+        {
+    <div id="wrapper" class="clearfix">
+        <div class="loginbox">
+            <div class="loginlogo"><img src="~/CSS/images/logo.png" alt="" class="img-responsive center-block"></div>
+            <div class="loginform">
+                @if (Request.QueryString["Msg"] != null && Request.QueryString["Msg"].ToString() == "NotFound")
+                {
+                <div class="alert alert-danger" id="upload">
+                    @Html.Encode(String.Format(WordAutomationDemo.Common.Messages.NotExistsUser))
+                </div>
+                <script>
+                    $("#upload").show().focus();
+                    setTimeout(function () {
+                        $("#upload").hide();
+                    }, 5000);
+                </script>
+                }
+                <div class="col-sm-12">
+                    <div class="alert alert-danger" id="messageLogin" style="display: none;">
+                    </div>
+                </div>
+                <div class="form-group">
+                    @Html.TextBoxFor(model => model.UserName, new { @class = "form-control", placeholder="User Name", @maxlength = 50 })
+                    <p class="errormessage">
+                        @Html.ValidationMessageFor(model => model.UserName)
+                    </p>
+                </div>
+                <div class="form-group">
+                    @Html.TextBoxFor(model => model.Email, new { @class = "form-control", placeholder = "Email", @maxlength = 250 })
+                    <p class="errormessage">
+                        @Html.ValidationMessageFor(model => model.Email)
+                    </p>
+                </div>
+                <div class="row text-center mtp15 gutter-5 mbp10">
+                    <div class="col-xs-8">
+                        <button class="lightblue-btn btn-block btnspace" type="submit">Reset Password</button>
+                    </div>
+                    <div class="col-xs-4">
+                        <a href="@Url.Content("~/Login/Index")" class="lightblue-btn btn-block btnspace" style="text-transform:none;">Back</a>
+                    </div>
+                    </div>
+            </div>
+            <div class="clearfix login-footer">
+                Powered By <span>Triyosoft</span>
+            </div>
+        </div>
+        </div>
+}
+</body>
+</html>

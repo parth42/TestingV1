@@ -1,0 +1,399 @@
+﻿@using DevExpress.Web.Mvc;
+@using DevExpress.Web.Mvc.UI;
+@model WordAutomationDemo.Models.AssignmentModel
+@{
+    ViewBag.Title = "Edit Content";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+<script>
+    $(function () {
+
+        // We can attach the `fileselect` event to all file inputs on the page
+        $(document).on('change', ':file', function () {
+            var input = $(this),
+                numFiles = input.get(0).files ? input.get(0).files.length : 1,
+                label = input.val().replace(/\\/g, '/').replace(/.*\//, '');
+            input.trigger('fileselect', [numFiles, label]);
+        });
+
+        // We can watch for our custom `fileselect` event like this
+        $(document).ready(function () {
+            $(':file').on('fileselect', function (event, numFiles, label) {
+
+                var input = $(this).parents('.input-group').find(':text'),
+                    log = numFiles > 1 ? numFiles + ' files selected' : label;
+
+                if (input.length) {
+                    input.val(log);
+                } else {
+                }
+
+            });
+        });
+
+    });
+</script>
+<br />
+<h2>Edit Content</h2>
+<br />
+<input type="hidden" name="TaskDocPath" value="@Url.Content("~/ApplicationDocuments/TaskDocuments/")" id="TaskDocPath" />
+<div class="alert alert-success" id="msgSuccess" style="display:none"></div>
+<div class="alert alert-danger" id="msgFail" style="display:none"></div>
+<div class="clearfix"></div>
+<label class="control-label col-md-2 "> Project Name : </label>
+<label class="control-label col-md-9"> @Model.ProjectName</label>
+<br />
+<br />
+<label class="control-label col-md-2 "> Task Name : </label>
+<label class="control-label col-md-9"> @Model.TaskName</label>
+<br />
+<br />
+<div class="row">
+
+    @if (Request.QueryString["Msg"] != null && Request.QueryString["Msg"].ToString() == "Error")
+    {
+        <div class="alert alert-danger" id="error">
+            <ul>
+                <li>
+                    @Html.Encode(String.Format(WordAutomationDemo.Common.Messages.Error))
+                </li>
+            </ul>
+        </div>
+        <script>
+            $("#error").show().focus();
+            setTimeout(function () {
+                $("#error").hide();
+            }, 5000);
+        </script>
+    }
+    <div class="col-lg-12" style="padding-left:0">
+        @using (Html.BeginForm("EditTask", "Home", FormMethod.Post, new { enctype = "multipart/form-data", id = "CreateUpload" }))
+        {
+            @Html.HiddenFor(x => x.ProjectID);
+            @Html.HiddenFor(x => x.AssignID);
+            <div class="col-lg-6">
+                @Html.TextAreaFor(x => x.Remarks, new { @placeholder = "Remarks (Optional)", @class = "form-control col-md-5" })
+            </div>
+            <br />
+            <br />
+
+            <div class="col-lg-12" style="padding-top:15px; padding-bottom:15px;">
+                <div class="col-lg-2" style="padding-top:12px;">
+                    @*<label style="text-align:right !important;">Upload New File</label>*@
+                </div>
+                <div class="col-lg-3">
+                    @*@Html.TextBoxFor(model => model.files, "", new { @type = "file", @multiple = "multiple", @class = "form-control col-md-5", @id = "docFile", @accept = ".docx,.doc,.ppt,.pptx,.xls,.xlsx,.pdf", @onchange = "ValidateType(this)" })*@
+                </div>
+                <div class="col-lg-1">
+                    <input type="submit" class="btn btn-primary pull-right" name="Upload" value="Submit" title="Upload Document" />
+                </div>
+            </div>
+        }
+    </div>
+
+    <br />
+    <br />
+    <div class="clearfix"></div>
+
+    @if (!string.IsNullOrEmpty(Model.Content))
+    {
+
+        <div class="clearfix">
+            @Html.TextAreaFor(m => m.Content, new { @style = "border:none;width:100%;", @cols = "50" })
+        </div>
+    }
+    <div class="clearfix"></div>
+    @{
+        var totalSlides = 4;
+        //var count = 0;
+        string UploadedDocPath = @Url.Content("~/ApplicationDocuments/TaskDocuments/");
+        string DownloadImage = @WordAutomationDemo.Common.Global.SiteUrl + "Css/Images/download.png style='cursor:pointer' />";
+        <div class="col-lg-8">
+            <table class="table" style="word-break:break-all" id="DocTable">
+                <thead>
+                <th style="width:250px;"></th>
+                <th style="width:250px;">Name</th>
+                <th style="text-align: center; width: 100px;">Download</th>
+                <th style="text-align: center; width: 100px;">Delete</th>
+                </thead>
+                <tbody>
+                    @{
+                        @*foreach (var objUploadedDocModel in Model.lstUploadedDocModel)
+                              {
+                                  count++;
+
+                                <tr id="@string.Format("tr{0}", @objUploadedDocModel.AssignedDocsID)">
+                                    <td><span style="float:left; margin-right:10px; padding-top:5px;">Initial Attachment @count</span>  <label class="btn btn-primary" style="display:inherit; float:left; width:auto; padding:0px 6px; margin-top:5px;">
+                                +<input type="file" name="" onchange="AddNewFile(@count, this, @objUploadedDocModel.AssignedDocsID, 0, '@objUploadedDocModel.DocName')" value="" class="form-control col-md-5" id=" @string.Format("fl{0}", @objUploadedDocModel.AssignedDocsID)" accept=".docx,.doc,.ppt,.pptx,.xls,.xlsx,.pdf" style="display:none;" />
+                            </label></td>
+                                    <td id="@string.Format("td{0}", @objUploadedDocModel.AssignedDocsID)">
+                                        @objUploadedDocModel.DocName
+                                    </td>
+                                    <td style="text-align:center;"> <a id="@string.Format("url{0}", @objUploadedDocModel.AssignedDocsID)" href="@Url.Content("~/ApplicationDocuments/TaskDocuments/" + Model.AssignID + "/" + @objUploadedDocModel.DocName)"> <img id="@string.Format("imgDownload{0}", @objUploadedDocModel.AssignedDocsID)" src="@Url.Content(@WordAutomationDemo.Common.Global.SiteUrl + "Css/Images/download.png")" style=' cursor:pointer' /></a></td>
+                                    <td style="text-align:center;"> <a href="#"> <img id="@string.Format("del{0}", @objUploadedDocModel.AssignedDocsID)" src="@Url.Content(@WordAutomationDemo.Common.Global.SiteUrl + "Css/Images/delete.png")" style='cursor:pointer' onclick="DeleteDocument('@objUploadedDocModel.DocName', @objUploadedDocModel.AssignedDocsID)" /></a></td>
+                                </tr>
+                              }
+                              count++;*@
+                        for (int count = 1; count <= totalSlides; count++)
+                        {
+                            var objUploadedDocModel = Model.lstUploadedDocModel.Where(a => a.Sequence == count).FirstOrDefault();
+
+                            if (objUploadedDocModel != null)
+                            {
+                                <tr id="@string.Format("tr{0}", @objUploadedDocModel.AssignedDocsID)">
+                                    <td>
+                                        <span style="float:left; margin-right:10px; padding-top:5px;">Initial Attachment @count</span>  <label class="btn btn-primary" style="display:inherit; float:left; width:auto; padding:0px 6px; margin-top:5px;">
+                                            +<input type="file" name="" onchange="AddNewFile(@count, this, @objUploadedDocModel.AssignedDocsID, 0, '@objUploadedDocModel.DocName')" value="" class="form-control col-md-5" id="@string.Format("fl{0}", @objUploadedDocModel.AssignedDocsID)" accept=" .docx,.doc,.ppt,.pptx,.xls,.xlsx,.pdf" style="display:none;" />
+                                        </label>
+                                    </td>
+                                    <td id="@string.Format("td{0}", @objUploadedDocModel.AssignedDocsID)">
+                                        @objUploadedDocModel.DocName
+                                    </td>
+                                    <td style="text-align:center;"> <a id="@string.Format("url{0}", @objUploadedDocModel.AssignedDocsID)" href="@Url.Content("~/ApplicationDocuments/TaskDocuments/" + Model.AssignID + "/" + @objUploadedDocModel.DocName)"> <img id="@string.Format("imgDownload{0}", @objUploadedDocModel.AssignedDocsID)" src="@Url.Content(@WordAutomationDemo.Common.Global.SiteUrl + "Css/Images/download.png")" style=' cursor:pointer' /></a></td>
+                                    <td style="text-align:center;"> <a href="#"> <img id="@string.Format("del{0}", @objUploadedDocModel.AssignedDocsID)" src="@Url.Content(@WordAutomationDemo.Common.Global.SiteUrl + "Css/Images/delete.png")" style='cursor:pointer' onclick="DeleteDocument('@objUploadedDocModel.DocName', @objUploadedDocModel.AssignedDocsID)" /></a></td>
+                                </tr>
+                            }
+                            else
+                            {
+                                <tr id="@string.Format("tr{0}", count)">
+                                    <td>
+                                        <span style="float:left; margin-right:10px; padding-top:5px;">Initial Attachment @count</span>  <label class="btn btn-primary" style="display:inherit; float:left; width:auto; padding:0px 6px; margin-top:5px;">
+                                            +<input type="file" name="" onchange="AddNewFile(@count, this, @count, 1)" value="" class="form-control col-md-5" id="@string.Format("fl{0}", @count)" accept=".docx,.doc,.ppt,.pptx,.xls,.xlsx,.pdf" style="display:none;" />
+                                        </label>
+                                    </td>
+                                    <td id="@string.Format("td{0}", @count)"></td>
+                                    <td style="text-align:center;"> <a id="@string.Format("url{0}", @count)" href=""> <img id="@string.Format("imgDownload{0}", @count)" src="@Url.Content(@WordAutomationDemo.Common.Global.SiteUrl + "Css/Images/download.png") " style=' cursor:pointer;display:none;' /></a></td>
+                                    <td style="text-align:center;"> <a href="#"> <img id="@string.Format("del{0}", @count)" src="@Url.Content(@WordAutomationDemo.Common.Global.SiteUrl + "Css/Images/delete.png")" style='cursor: pointer; display: none;' onclick="DeleteDocument('', @count)" /></a></td>
+                                </tr>
+                            }
+
+
+
+                            //count++;
+                        }
+                    }
+                </tbody>
+            </table>
+        </div>
+
+    }
+</div>
+
+<script>
+
+    function SaveChages() {
+        $("#Snippet_R_T0G0I2_LI").trigger("click");
+        return true;
+    }
+
+    $("#frmEdit").submit(function (event) {
+        $("#btnSubmit").attr('disabled', 'disabled');
+        $("#msgSuccess").html("");
+        $("#msgFail").html("");
+        //Snippet.core.commandManager.commands["3"]; //Save Document before form submit;
+        //Snippet.core.closeDocument();
+    });
+
+    function ValidateType(e) {
+        $("#msgSuccess").html("");
+        $("#msgFail").html("");
+        var rowCount = 0;
+        if ($('#DocTable tr').length > 0) {
+            rowCount += $('#DocTable tr').length - 1;
+        }
+        if ($(e).val() != "") {
+            rowCount += e.files.length;
+
+            if (rowCount > 4) {
+                alert("Maximum 4 files can be uploaded!")
+                $(e).val('');
+            }
+            else {
+                var ext = $(e).val().split('.').pop().toLowerCase();
+                if ($.inArray(ext, ['docx', 'doc', 'ppt', 'pptx', 'pdf', 'xls', 'xlsx']) == -1) {
+                    alert("Only doc, ppt, excel and pdf files can be uploaded!")
+                    $(e).val('');
+                }
+            }
+            //if (input.size / 1024 / 1024 > 5) {
+            //    alert("Max 5Mb file size is allowed!")
+            //    $(input).val('');
+            //}
+        }
+    }
+
+    function ValidateFile(e, oldFileName, count) {
+        if ($(e).val() != "") {
+            var ext = $(e).val().split('.').pop().toLowerCase();
+            if ($.inArray(ext, ['docx', 'doc', 'ppt', 'pptx', 'pdf', 'xls', 'xlsx']) == -1) {
+                alert("Only doc, ppt, excel and pdf files can be uploaded!")
+                $(e).val('');
+            }
+            else {
+                if (confirm("Are you sure to upload selected file ?")) {
+                    var data = new FormData();
+                    data.append(e.files[0].name, e.files[0]);
+                    $.ajax({
+                        type: "POST",
+                        url: SiteUrl + "Home/UpdateFile?id=" + $("#AssignID").val() + "&oldFileName=" + oldFileName,
+                        contentType: false,
+                        processData: false,
+                        data: data,
+                        success: function (data) {
+                            if (data == "success") {
+                                $("#td" + count).html(e.files[0].name);
+                                var oldHref = $("#url" + count).attr("href");
+                                $("#url" + count).attr("href", oldHref.replace(oldFileName, e.files[0].name));
+                                $("#url" + count).attr("href", oldHref.replace(oldFileName, e.files[0].name));
+                                $("#del" + count).attr("onclick", "DeleteDocument('" + e.files[0].name + "'," + count + ')')
+                                $("#del" + count).show();
+                                $("#imgDownload" + count).show();
+                                $("#msgSuccess").html("Selected file has been uploaded successfully.");
+                                $("#msgSuccess").show().focus();
+                                setTimeout(function () {
+                                    $("#msgSuccess").hide();
+                                }, 5000);
+                            }
+                            else if (data == "fail") {
+                                $("#msgFail").html("Something went wrong,Please try again later.");
+                                $("#msgFail").show().focus();
+                                setTimeout(function () {
+                                    $("#msgFail").hide();
+                                }, 5000);
+                            }
+                        }
+                    });
+                }
+                else {
+                    $(e).val('');
+                }
+            }
+            //if (input.size / 1024 / 1024 > 5) {
+            //    alert("Max 5Mb file size is allowed!")
+            //    $(input).val('');
+            //}
+        }
+    }
+
+    function AddNewFile(sequence, e, count, isNewFile, oldFileName) {
+        if ($(e).val() != "") {
+            var ext = $(e).val().split('.').pop().toLowerCase();
+            if ($.inArray(ext, ['docx', 'doc', 'ppt', 'pptx', 'pdf', 'xls', 'xlsx']) == -1) {
+                alert("Only doc, ppt, excel and pdf files can be uploaded!")
+                $(e).val('');
+            }
+            else {
+                var data = new FormData();
+                data.append(e.files[0].name, e.files[0]);
+                if (isNewFile == 1) {
+                    postURL = SiteUrl + "Home/UpdateFile?sequence=" + sequence + "&id=" + $("#AssignID").val() + "&AssignedDocsID=" + count;
+                }
+                else {
+                    postURL = SiteUrl + "Home/UpdateFile?sequence=" + sequence + "&id=" + $("#AssignID").val() + "&AssignedDocsID=" + count + "&oldFileName=" + oldFileName;
+                }
+                $.ajax({
+                    type: "POST",
+                    url: postURL,
+                    contentType: false,
+                    processData: false,
+                    data: data,
+                    success: function (data) {
+                        if (data.IsSuccess == true) {
+                            $("#td" + count).html(data.FileName);
+                            $("#url" + count).attr("href", $("#TaskDocPath").val() + $("#AssignID").val() + "/" + data.FileName);
+                            $("#del" + count).attr("onclick", "DeleteDocument('" + data.FileName + "'," + data.AssignedDocsID + ')')
+                            //if(isNewFile)
+                            //{
+
+                            //}
+                            //else{
+                            //    $("#del" + count).attr("onclick", "DeleteDocument('" + oldFileName + "'," + count + ')')
+                            //}
+                            
+                            $("#del" + count).show();
+                            $("#imgDownload" + count).show();
+                            $("#tr" + count).attr("id", "tr" + data.AssignedDocsID);
+                            $("#td" + count).attr("id", "td" + data.AssignedDocsID);
+                            $("#fl" + count).attr("id", "fl" + data.AssignedDocsID);
+                            $("#url" + count).attr("id", "url" + data.AssignedDocsID);
+                            $("#imgDownload" + count).attr("id", "imgDownload" + data.AssignedDocsID);
+                            $("#del" + count).attr("id", "del" + data.AssignedDocsID);
+                            //$("#fl" + data.AssignedDocsID).attr("onchange", "AddNewFile(" + sequence + ",this," + data.AssignedDocsID + ",0,'" + data.FileName + "'" + ')')
+                            $("#fl" + data.AssignedDocsID).attr("onchange", 'AddNewFile(' + sequence + ',this,' + data.AssignedDocsID + ',0,"' + data.FileName + '")')
+                            $("#msgSuccess").html("Selected file has been uploaded successfully.");
+                            $("#msgSuccess").show().focus();
+                            setTimeout(function () {
+                                $("#msgSuccess").hide();
+                            }, 5000);
+                        }
+                        else if (data == "fail") {
+                            $("#msgFail").html("Something went wrong,Please try again later.");
+                            $("#msgFail").show().focus();
+                            setTimeout(function () {
+                                $("#msgFail").hide();
+                            }, 5000);
+                        }
+                    }
+                });
+            }
+            //if (input.size / 1024 / 1024 > 5) {
+            //    alert("Max 5Mb file size is allowed!")
+            //    $(input).val('');
+            //}
+        }
+    }
+
+    function DeleteDocument(oldFileName, count) {
+        if (confirm("Are you sure to delete selected file ?")) {
+            $.ajax({
+                type: "POST",
+                url: SiteUrl + "Home/DeleteDocument?id=" + $("#AssignID").val() + "&AssignedDocsID=" + count + "&oldFileName=" + oldFileName,
+                contentType: false,
+                processData: false,
+                success: function (data) {
+                    if (data == "success") {
+                        $("#td" + count).html("");
+                        //$("#tr" + count).remove();
+                        //if($('#DocTable tr').length < 2)
+                        //{
+                        //    $("#DocTable").remove();
+                        //}
+                        $("#del" + count).hide();
+                        $("#imgDownload" + count).hide();
+                        $("#msgSuccess").html("Selected file has been deleted successfully.");
+                        $("#msgSuccess").show().focus();
+                        setTimeout(function () {
+                            $("#msgSuccess").hide();
+                        }, 5000);
+                    }
+                    else if (data == "notexist") {
+                        $("#msgFail").html("File does not exist, Please try again later.");
+                        $("#msgFail").show().focus();
+                        setTimeout(function () {
+                            $("#msgFail").hide();
+                        }, 5000);
+                    }
+                    else if (data == "fail") {
+                        $("#msgFail").html("Something went wrong, Please try again later.");
+                        $("#msgFail").show().focus();
+                        setTimeout(function () {
+                            $("#msgFail").hide();
+                        }, 5000);
+                    }
+                }
+            });
+        }
+    }
+    $(document).ajaxStart(function () {
+        if ($(".k-loading-image:visible").length > 0) {
+            $("#loading").hide();
+        }
+        else {
+            $("#loading").show();
+        }
+        //$(".k-loading-image").hide();
+    });
+    $(document).ajaxStop(function () {
+        $("#loading").hide();
+    });
+</script>

@@ -1,0 +1,143 @@
+﻿/* Create Task Form Style */
+.createTaskForm {
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start;
+    /*max-width: 776px;*/
+    margin: 0 auto;
+    flex-wrap: wrap;
+    box-shadow: 0 2px 2px 0 rgba(0,0,0,0.14),0 3px 1px -2px rgba(0,0,0,0.2),0 1px 5px 0 rgba(0,0,0,0.12);
+    background-color: #fff;
+    padding: 10px;
+}
+
+.partialView {
+    margin: 0 auto;
+    /*box-shadow: 0 2px 2px 0 rgba(0,0,0,0.14),0 3px 1px -2px rgba(0,0,0,0.2),0 1px 5px 0 rgba(0,0,0,0.12);*/
+    padding: 10px;
+}
+
+#createSubtask {
+    margin-left: 5px;
+}
+
+/* basic positioning */
+.legend {
+    list-style: none;
+}
+
+.legend li {
+    float: left;
+    margin-right: 10px;
+}
+
+.legend span {
+    border: 1px solid #ccc;
+    float: left;
+    width: 12px;
+    height: 12px;
+    margin: 2px;
+}
+
+.legend .assignedRows {
+    background-color: #C6EFCE;
+}
+
+#wordTextTabButtons {
+    position: absolute;
+    right: 15px;
+}
+
+.wordTextTabButton{
+    padding: 10px;
+    border-radius: 3px 3px 0px 0px;
+}
+
+#finishFullscreen {
+    float: right;
+    margin-top: 15px;
+}
+
+#fullscreenButtons {
+    z-index: 30000;
+    position: fixed;
+    top: 2%;
+    right: 40px;
+}
+#fullscreenButtons > .btn {
+    float: right;
+    margin-bottom: 5px;
+}
+.k-grid-toolbar {
+    padding: 0.2em 0em !important;
+}
+
+#wordTab ul > li {
+    list-style: none;
+}
+
+#Slides {
+    height: 550px;
+}
+
+#grid .k-grid-content {
+    height: 350px;
+}
+
+.pgNum {
+    cursor: pointer;
+    color: #337ab7;
+}
+
+#WordPages {
+    width: 12% !important;
+}
+
+#WordPagesDoc {
+    width: 87.5% !important;
+}
+
+.k-list
+{
+    white-space: nowrap;
+}
+
+.tooltip-permission {
+    position: relative;
+    display: inline-block;
+    border-bottom: 1px dotted black;
+}
+
+.tooltip-permission .tooltiptext {
+    visibility: hidden;
+    width: 100px;
+    background-color: #555;
+    color: #fff;
+    text-align: center;
+    border-radius: 6px;
+    padding: 5px 0;
+    position: absolute;
+    z-index: 1;
+    bottom: 125%;
+    left: 0;
+    /*margin-left: -60px;*/
+    opacity: 0;
+    transition: opacity 0.3s;    
+}
+
+
+.tooltip-permission .tooltiptext::after {
+    content: "";
+    position: absolute;
+    top: 100%;
+    left: 45%;
+    /*margin-left: -5px;*/
+    border-width: 5px;
+    border-style: solid;
+    border-color: #555 transparent transparent transparent;
+}
+
+.tooltip-permission:hover .tooltiptext {
+    visibility: visible;
+    opacity: 1;
+}

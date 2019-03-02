@@ -1,0 +1,505 @@
+﻿@using DevExpress.Web.Mvc;
+@using DevExpress.Web.Mvc.UI;
+@model WordAutomationDemo.Models.PPTModel
+@{
+    ViewBag.Title = "Edit Content";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+
+    var canPublish = WordAutomationDemo.Common.Global.AssignmentMemberCanPublish(Model.AssignedTaskID, WordAutomationDemo.Helpers.CurrentUserSession.User.UserID);
+    var canSendForApproval = WordAutomationDemo.Common.Global.AssignmentMemberCanSendForApproval(Model.AssignedTaskID, WordAutomationDemo.Helpers.CurrentUserSession.User.UserID);
+}
+
+<div class="row">
+    <div class="col-sm-12">
+        <div class="main-heading title-row mbp15">
+            <div class="row">
+                <div class="col-xs-11">
+                    <h1 class="heading01">Edit Content</h1>
+                </div>
+                <div class="col-xs-1">
+                    <button href="#" class="darkblue-btn btnspace" data-toggle="tooltip" data-placement="top" title="" data-original-title="Refresh" onclick="RefreshPage()">Refresh</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-sm-12 mtp10">
+
+        @using (Html.BeginForm("EditPPT", "Home", FormMethod.Post, new { enctype = "multipart/form-data", id = "frmEdit" }))
+        {
+
+            @Html.HiddenFor(x => x.OriginalFile);
+            @Html.HiddenFor(x => x.AssignedTaskID);
+            @Html.HiddenFor(x => x.ListSlides);
+            @Html.HiddenFor(x => x.strPPTComments);
+
+            if (Request.QueryString["Msg"] != null && Request.QueryString["Msg"].ToString() == "Completed")
+            {
+                <div class="alert alert-success" id="Completed">
+                    @Html.Encode(String.Format(WordAutomationDemo.Common.Messages.SuccessChanged, "Slide"))
+                </div>
+                <script>
+                    $("#Completed").show().focus();
+                    setTimeout(function () {
+                        $("#Completed").hide();
+                    }, 5000);
+                </script>
+            }
+            <div class="row">
+                <div class="col-sm-3">
+                    <div class="form-group">
+                        <label for="UserName">Project Name </label>
+                        <p class="form-control-static">@Model.ProjectName</p>
+                    </div>
+                </div>
+
+                <div class="col-sm-3">
+                    <div class="form-group">
+                        <label for="FullName">Task Name</label>
+                        <p class="form-control-static">@Model.TaskName</p>
+                    </div>
+                </div>
+
+            </div>
+
+            <div class="row">
+                <div class="col-sm-12">
+
+                    <div class="table-responsive bluetheme">
+
+                        <table class="table table-bordered">
+                            <tr>
+                                <th>Download</th>
+                                <th>
+                                    Upload File
+                                    (optional)
+                                </th>
+                                <th>Assigned</th>
+                                <th>Changed</th>
+                                <th>Remarks</th>
+                                <th>Action</th>
+                            </tr>
+                            @{
+                                int imgCnt = 0;
+                                int cntThImg = 0;
+                                foreach (var item in Model.ListSlides)
+                                {
+                                    @Html.HiddenFor(x => x.SlideName);
+                                    <tr>
+                                        @*<td style="vertical-align:middle;"> <a class="names " data-id="@item.ThumbnailLink" href="@item.SlideLink" title="Click to download" target="_blank"><span class="glyphicon glyphicon-download-alt"> &nbsp;</span>@item.SlideName</a></td>*@
+                                        <td><a data-id="@item.ThumbnailLink" href="@item.SlideLink" title="Click to download" target="_blank"><i class="fa fa-download mr5" aria-hidden="true"></i> @item.SlideName</a></td>
+                                        @if (item.IsPPTApproved == true)
+                                        {
+                                            <td>
+                                                @*<label class="tableicon bluebg cursor">
+                                                        <input type="file" name="" value=" " id="newfiles265" data-id="sp265" accept=".ppt,.pptx" style="display:none;">
+                                                        <i class="fa fa-plus" aria-hidden="true"></i>
+                                                    </label>*@
+
+                                            </td>
+                                        }
+                                        else
+                                        {
+                                            <td>
+                                                <label class="tableicon bluebg cursor">
+                                                    <input type="file" name="newfiles" value="" onchange="ValidateType(this, '@item.SlideName')" id="@(String.Format("{0}", "newfiles" + item.AssignedPPTSlideID))" data-id="@(String.Format("{0}", "sp" + item.AssignedPPTSlideID))" accept=".ppt,.pptx" style="display:none;">
+                                                    <i class="fa fa-plus" aria-hidden="true"></i>
+                                                </label>
+                                                <span style="margin-left:5px;" id="@(String.Format("{0}", "sp" + item.AssignedPPTSlideID))"></span>
+                                            </td>
+                                        }
+
+
+                                        <td class="popover-hide-xs">
+
+                                            <a href="javascript:;" data-toggle="popover" data-trigger="hover" data-placement="top" id="@("pptA"+imgCnt)" class="gridthumb">
+                                                <img src="@item.AssignedThumbnail" alt="" class="img-responsive img-thumbnail">
+                                            </a>
+                                            <div id="popover-content-@("pptA"+imgCnt)" class="hide">
+                                                <img src="@item.AssignedThumbnail" alt="" class="img-responsive">
+                                            </div>
+                                        </td>
+
+                                        <td class="popover-hide-xs">
+                                            <div class="aniimated-thumbnials">
+                                                @if (item.lstThumbnailLinkForOldSlide.Count > 0)
+                                                {
+
+                                                    foreach (string link in item.lstThumbnailLinkForOldSlide)
+                                                    {
+
+                                                        <a href="@link" data-toggle="popover" data-trigger="hover" data-placement="top" id="@("pptTh"+cntThImg)" class="gridthumb">
+                                                            <img src="@link" alt="" class="img-responsive img-thumbnail">
+                                                            <div id="popover-content-@("pptTh"+cntThImg)" class="hide">
+                                                                <img src="@link" alt="" class="img-responsive">
+                                                            </div>
+                                                        </a>
+                                                        cntThImg += 1;
+                                                    }
+                                                }
+                                                else
+                                                {
+                                                    <span>No changes found.</span>
+                                                }
+                                            </div>
+                                        </td>
+                                        @if (item.IsPPTApproved == true)
+                                        {
+                                            <td>@item.PPTRemarks</td>
+                                            <td id="@(String.Format("{0}", "td" + item.AssignedPPTSlideID))">Approved</td>
+                                        }
+                                        else if (item.IsGrayedOut.HasValue && item.IsGrayedOut.Value == true)
+                                        {
+                                            <td>@item.PPTRemarks</td>
+                                            <td id="@(String.Format("{0}", "td" + item.AssignedPPTSlideID))">
+                                                @*<button disabled type="button" class="btn btn-primary pull-right">Complete</button>*@
+                                                <button disabled href="#" class="tableicon bluebg" data-toggle="tooltip" data-placement="top" title="" data-original-title="Complete"><i class="fa fa-check" aria-hidden="true"></i></button>
+                                            </td>
+                                        }
+                                        else if (item.IsPublished.HasValue && item.IsPublished == true)
+                                        {
+                                            <td>Slide already published.</td>
+                                        }
+                                        else if (item.ReviewRequested.HasValue && item.ReviewRequested == true)
+                                        {
+                                            <td>Waiting for approval.</td>
+                                        }
+                                        else
+                                        {
+                                            <td>
+                                                @Html.TextArea(String.Format("{0}", "txtSlideRemarks" + item.AssignedPPTSlideID), item.PPTRemarks, new { @class = "form-control", @txtRemarksPPT = "" })
+                                            </td>
+
+
+                                            <td id="@(String.Format("{0}", "td" + item.AssignedPPTSlideID))">
+                                            @if (canPublish)
+                                                    {
+                                                    <button type="button" onclick="PublishSlide(@item.AssignedTaskID, @item.AssignedPPTSlideID, '@item.OriginalFile', '@item.SlideName');" class="tableicon bluebg" data-toggle="tooltip" data-placement="top" title="" data-original-title="Complete">Publish</button>
+                                                    @*<button type="button" class="btn btn-primary pull-right" onclick="CompleteSlide(@item.AssignedTaskID, @item.AssignedPPTSlideID, '@item.OriginalFile', '@item.SlideName', true);">Complete</button>*@
+                                            }
+                                            @if (canSendForApproval)
+                                            {
+                                                    <button type="button" onclick="RequestReviewSlide(@item.AssignedTaskID, @item.AssignedPPTSlideID, '@item.OriginalFile', '@item.SlideName', false);" class="tableicon bluebg" data-toggle="tooltip" data-placement="top" title="" data-original-title="Complete">Request Review</button>
+                                            }
+                                            </td>
+
+                                        }
+
+                                    </tr>
+                                    imgCnt += 1;
+                                }
+                            }
+                        </table>
+
+                        @*@if (canPublish)
+                            {
+                                <button type="button" class="btn btn-primary pull-left" onclick="ApprovePPT()" style="margin-right:10px;">Publish</button>
+                            }
+
+                            @if (canSendForApproval)
+                            {
+                                <button type="button" class="btn btn-primary pull-left" onclick="RequestReviewPPT()">Request Review</button>
+                            }*@
+                    </div>
+                </div>
+            </div>
+            <div class="popup" style="border:1px solid gray;z-index:99999;display:none;">Popup</div>
+
+         }
+
+    </div>
+</div>
+
+<div class="popup" data-backdrop="static" style="z-index:11000;display:none;">Popup</div>
+<div id="spinner" style="display:none;">
+    <img src=@Url.Content("~/CSS/images/bx_loader.gif") class="ajax-loader loading-spinner">
+</div>
+
+<script>
+
+    function ValidateType(e, slideName) {
+        if ($(e).val() != "") {
+            var ext = $(e).val().split('.').pop().toLowerCase();
+            if ($.inArray(ext, ['ppt', 'pptx']) == -1) {
+                alert("Only ppt files can be uploaded!")
+                $(e).val('');
+            }
+            else {
+                $("#" + e.attributes["data-id"].value).text($(e).val().replace('C:\\fakepath\\', ""));
+                var slideID = e.attributes["id"].value;
+                console.log(slideID);
+
+                var fileUpload = $('#'+slideID).get(0);
+                console.log(fileUpload);
+                var files = fileUpload.files;
+
+                var assignedPPTSlideID = slideID.split('newfiles')[1];
+
+                //Upload file and set to modified
+                if (files.length > 0) {
+
+                    // Create FormData object
+                    var fileData = new FormData();
+                    for (var i = 0; i < files.length; i++) {
+                        fileData.append(files[i].name, files[i]);
+                    }
+                    fileData.append('assignmentID', '@Model.AssignedTaskID');
+                    fileData.append('assignedPPTSlideID', assignedPPTSlideID);
+                    fileData.append('originalFile', '@Model.OriginalFile');
+                    fileData.append('slideName', slideName);
+                    fileData.append('PPTRemarks', $('#txtSlideRemarks' + assignedPPTSlideID).val());
+                    console.log("here");
+                    $.ajax({
+                        url: SiteUrl + 'Home/UpdateSlide',
+                        type: "POST",
+                        contentType: false, // Not to set any content header
+                        processData: false, // Not to process data
+                        //dataType: "JSON",
+                        //async: false,
+                        data: fileData,
+                        error: function () {
+                            alert("Server access failure!");
+                            $(".glyphicon-refresh").removeClass("glyphicon-spin");
+                        },
+                        success: function (result) {
+                            if (result == "1") {
+                                window.location.href = SiteUrl + 'Home/Approval?Msg=Completed';
+                            }
+                            else if (result == "2") {
+                                window.location.href = SiteUrl + 'Home/EditPPT/' + '@Model.AssignedTaskID' + "?Msg=Completed";
+                            }
+                        }
+                    });
+                }
+
+                $("#" + e.attributes["data-id"].value).text($(e).val().replace('C:\\fakepath\\', ""));
+            }
+        }
+    }
+
+    $(document).ajaxStart(function () {
+        if ($(".k-loading-image:visible").length > 0) {
+            $("#loading").hide();
+        }
+        else {
+            $("#loading").show();
+        }
+        //$(".k-loading-image").hide();
+    });
+    $(document).ajaxStop(function () {
+        $("#loading").hide();
+    });
+
+    $("#frmEdit").submit(function (event) {
+        var data = $(".table-bordered").find("[txtremarksppt='']");
+        var strRemarks = '';
+        for (var i = 0; i < data.length; i++) {
+            if (data[i].value != '') {
+                strRemarks += data[i].id.replace('txtSlideRemarks','') + '`' + data[i].value + "~"
+            }
+        }
+        $('#strPPTComments').val(strRemarks);
+        $("#btnSubmit").attr('disabled', 'disabled');
+        Snippet.core.commandManager.commands["3"]; //Save Document before form submit;
+    });
+
+    $(document).ready(function () {
+        $(".aniimated-thumbnials").lightGallery({
+            thumbnail: true,
+            animateThumb: false,
+            loop: false,
+            enableSwipe: true
+
+        });
+
+        $(window).keydown(function (event) {
+            //if (event.keyCode == 13) {
+            //    event.preventDefault();
+            //    return false;
+            //}
+        });
+        $('.names').on('mouseenter', function (evt) {
+            $('.popup').html('<img style="border:1px solid"  src="' + $(this).data('id') + '">');
+            $('.popup').css({ left: 325, top: 0 }).show();
+            //$('.popup').show();
+            $(this).on('mouseleave', function () {
+                $('.popup').hide();
+            });
+        });
+    });
+
+
+    function ShowImg(obj) {
+        $('.popup').hide();
+        $('.popup').html('<img style="border:1px solid" src="' + $(obj).data('id') + '" />');
+        var offset = $(obj).offset();
+
+        $('.popup').css('left', 300);
+        if (offset.top < 200) {
+            $('.popup').css('top', (offset.top - 50));
+        }
+        else {
+            $('.popup').css('top', 50);
+        }
+        $('.popup').show();
+    }
+
+    function HideImg(obj) {
+        $('.popup').hide();
+    }
+
+    function RequestReviewSlide(assignmentID, assignedPPTSlideID, originalFile, slideName, isPPTModified) {
+        var fileData = new FormData();
+
+        // Adding one more key to FormData object
+        fileData.append('assignmentID', assignmentID);
+        fileData.append('assignedPPTSlideID', assignedPPTSlideID);
+        fileData.append('originalFile', originalFile);
+        fileData.append('slideName', slideName);
+        fileData.append('PPTRemarks', $('#txtSlideRemarks' + assignedPPTSlideID).val());
+        var remarks = "";
+        console.log(assignmentID, originalFile);
+        $.ajax({
+                url: SiteUrl + 'Home/RequestReviewSlide',
+                type: "POST",
+                contentType: false, // Not to set any content header
+                processData: false, // Not to process data
+                //dataType: "JSON",
+                //async: false,
+                data: fileData,
+                error: function () {
+                    alert("Server access failure!");
+                    $(".glyphicon-refresh").removeClass("glyphicon-spin");
+                },
+                success: function (result) {
+                    if (result == "1") {
+                        window.location.href = SiteUrl + 'Home/Approval?Msg=Completed';
+                    }
+                    else if (result == "2") {
+                        window.location.href = SiteUrl + 'Home/EditPPT/' + assignmentID + "?Msg=Completed";
+                    }
+                }
+            });
+    }
+
+    function PublishSlide(assignmentID, assignedPPTSlideID, originalFile, slideName){
+        var fileData = new FormData();
+        fileData.append('assignmentID', assignmentID);
+        fileData.append('assignedPPTSlideID', assignedPPTSlideID);
+        fileData.append('originalFile', originalFile);
+        fileData.append('slideName', slideName);
+        fileData.append('PPTRemarks', $('#txtSlideRemarks' + assignedPPTSlideID).val());
+        var remarks = "";
+        console.log(assignmentID, originalFile);
+        $.ajax({
+                url: SiteUrl + 'Home/PublishSlide',
+                type: "POST",
+                contentType: false, // Not to set any content header
+                processData: false, // Not to process data
+                //dataType: "JSON",
+                //async: false,
+                data: fileData,
+                error: function () {
+                    alert("Server access failure!");
+                    $(".glyphicon-refresh").removeClass("glyphicon-spin");
+                },
+                success: function (result) {
+                    if (result == "1") {
+                        window.location.href = SiteUrl + 'Home/Approval?Msg=Completed';
+                    }
+                    else if (result == "2") {
+                        window.location.href = SiteUrl + 'Home/EditPPT/' + assignmentID + "?Msg=Completed";
+                    }
+                }
+            });
+    }
+
+    function ApprovePPT() {
+        var assignmentID = '@Model.AssignedTaskID';
+        var originalFile = '@Model.OriginalFile';
+        var remarks = "";
+
+        $.get('@Url.Action("ApprovePPT", "Home")', { document: originalFile, Remarks: remarks, AssignID: assignmentID }, function (resp) {
+            if (resp) {
+                window.location.href = SiteUrl + 'Home/Approval?Msg=Completed';
+            }
+         });
+    }
+
+    function CompleteSlide(assignmentID, assignedPPTSlideID, originalFile, slideName, isPPTModified) {
+        var fileUpload = $("#newfiles" + assignedPPTSlideID).get(0);
+        var files = fileUpload.files;
+        //if (files.length > 0 || isPPTModified) {
+
+            // Create FormData object
+            var fileData = new FormData();
+
+            // Looping over all files an    d add it to FormData object
+            for (var i = 0; i < files.length; i++) {
+                fileData.append(files[i].name, files[i]);
+            }
+
+            // Adding one more key to FormData object
+            fileData.append('assignmentID', assignmentID);
+            //fileData.append('assignedPPTSlideID', assignedPPTSlideID);
+            fileData.append('originalFile', originalFile);
+            fileData.append('slideName', slideName);
+            fileData.append('PPTRemarks', $('#txtSlideRemarks' + assignedPPTSlideID).val());
+            $.ajax({
+                url: SiteUrl + 'Home/CompleteSlide',
+                type: "POST",
+                contentType: false, // Not to set any content header
+                processData: false, // Not to process data
+                //dataType: "JSON",
+                //async: false,
+                data: fileData,
+                error: function () {
+                    alert("Server access failure!");
+                    $(".glyphicon-refresh").removeClass("glyphicon-spin");
+                },
+                success: function (result) {
+                    if (result == "1") {
+                        window.location.href = SiteUrl + 'Home/Approval?Msg=Completed';
+                    }
+                    else if (result == "2") {
+                        window.location.href = SiteUrl + 'Home/EditPPT/' + assignmentID + "?Msg=Completed";
+                    }
+                }
+            });
+        //} else {
+        //    alert("Please upload file to update individual slide!");
+        //}
+    }
+
+    $("[data-toggle=popover]").each(function (i, obj) {
+        $(this).popover({
+            html: true,
+            content: function () {
+                var id = $(this).attr('id')
+                return $('#popover-content-' + id).html();
+            }
+        });
+
+    });
+    $(".aniimated-thumbnials").lightGallery({
+        thumbnail: true,
+        animateThumb: false,
+        loop: false,
+        enableSwipe: true
+
+    });
+    $(window).off("resize").on("resize", function () {
+        $(".popover").each(function () {
+            var popover = $(this);
+            if (popover.is(":visible")) {
+                var ctrl = $(popover.context);
+                ctrl.popover('show');
+            }
+        });
+    });
+
+    function RefreshPage() {
+        window.location.href = window.location.href;
+    }
+
+</script>

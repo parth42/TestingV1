@@ -1,0 +1,69 @@
+﻿@using DevExpress.Web.ASPxRichEdit
+@using DevExpress.Web.Mvc;
+@using DevExpress.Web.Mvc.UI;
+@model  WordAutomationDemo.Models.AssignmentModel
+
+@if (!string.IsNullOrEmpty(Model.DocumentName))
+{
+    @Html.DevExpress().RichEdit(settings =>
+{
+    settings.Name = "RichEdit";
+    settings.CallbackRouteValues = new { Controller = "Home", Action = "LoadAndSavePartial" };
+    settings.WorkDirectory = WordAutomationDemo.Models.DirectoryManagmentUtils.UserFilesPath;
+    settings.Width = System.Web.UI.WebControls.Unit.Percentage(100);
+    settings.Height = System.Web.UI.WebControls.Unit.Pixel(550);
+    settings.ShowConfirmOnLosingChanges = false;
+    settings.ActiveTabIndex = 0;
+    settings.EnableClientSideAPI = true;
+    settings.SettingsDocumentSelector.FileListSettings.ShowParentFolder = false;
+    settings.SettingsDocumentSelector.FileListSettings.View = DevExpress.Web.FileListView.Details;
+    settings.RibbonMode = RichEditRibbonMode.None; 
+    //settings.Settings.Behavior.Cut = DevExpress.XtraRichEdit.DocumentCapability.Hidden;
+    //settings.Settings.Behavior.Copy = DevExpress.XtraRichEdit.DocumentCapability.Hidden;
+    //settings.Settings.Behavior.Paste = DevExpress.XtraRichEdit.DocumentCapability.Hidden;
+    settings.ClientSideEvents.SelectionChanged = "word_SelectionChanged";
+
+    settings.PreRender = (s, e) =>
+    {
+        MVCxRichEdit richEdit = (MVCxRichEdit)s;
+
+        richEdit.Focus();
+
+    };
+}).Open(Path.Combine(WordAutomationDemo.Models.DirectoryManagmentUtils.InitialDemoFilesPathDemo, Model.DocumentName)).GetHtml()
+
+}
+else
+{
+    @Html.DevExpress().RichEdit(settings =>
+{
+
+    settings.Name = "RichEdit";
+    settings.CallbackRouteValues = new { Controller = "Home", Action = "LoadAndSavePartial" };
+    settings.WorkDirectory = WordAutomationDemo.Models.DirectoryManagmentUtils.UserFilesPath;
+    settings.Width = System.Web.UI.WebControls.Unit.Percentage(100);
+    //settings.Height = System.Web.UI.WebControls.Unit.Percentage(100);
+    settings.ClientSideEvents.EndCallback = "OnRichEditEndCallback";
+    settings.SettingsDocumentSelector.FileListSettings.ShowParentFolder = false;
+    settings.SettingsDocumentSelector.FileListSettings.View = DevExpress.Web.FileListView.Details;
+    settings.SettingsDocumentSelector.FoldersSettings.HideAspNetFolders = true;
+    settings.SettingsDocumentSelector.FileListSettings.ShowParentFolder = false;
+    settings.ShowConfirmOnLosingChanges = false;
+    settings.ActiveTabIndex = 0;
+    settings.EnableClientSideAPI = true;
+    //settings.Settings.Behavior.Cut = DevExpress.XtraRichEdit.DocumentCapability.Hidden;
+    //settings.Settings.Behavior.Copy = DevExpress.XtraRichEdit.DocumentCapability.Hidden;
+    //settings.Settings.Behavior.Paste = DevExpress.XtraRichEdit.DocumentCapability.Hidden;
+    //settings.PreRender = (s, e) =>
+    //{
+    //    MVCxRichEdit richEdit = (MVCxRichEdit)s;
+    //    richEdit.Focus();
+    //};
+}).GetHtml()
+}
+
+
+
+
+
+

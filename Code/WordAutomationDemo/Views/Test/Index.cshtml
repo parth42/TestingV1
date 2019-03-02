@@ -1,0 +1,144 @@
+﻿@using DevExpress.Web.Mvc;
+@using DevExpress.Web.Mvc.UI;
+@model WordAutomationDemo.Models.AssignmentModel
+@using Kendo.Mvc.UI
+@{
+    ViewBag.Title = "Test";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+<div class="contentbox page-video">
+    <div class="clearfix">
+        <div class="row">
+            <div>
+                <fieldset>
+                    <legend><b>Upload file</b></legend>
+                    <table style="width:100%">
+                        <tr>
+                            <td style="width:25%">File:</td>
+                            <td style="width:65%">
+                                <input id="fileUpload" type="file" />
+                            </td>
+                        </tr>
+                        <tr>
+                            <td style="width: 25%"></td>
+                            <td style="width:65%">
+                                <input type="submit" id="btnUploadFile" value="UploadFile"/>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td style="width: 25%"></td>
+                            <td style="width:65%"><div id="lblFileUploadOutput"></div></td>
+                        </tr>
+                    </table>
+                </fieldset>
+            </div>
+            <script>
+                $(document).ready(function () {
+                    $('#btnUploadFile').on('click', function (e) {
+
+                        var xhr = new XMLHttpRequest();
+                        var fd = new FormData();
+                        fd.append("objHttpPostedFile", document.getElementById('fileUpload').files[0]);
+                        fd.append("FileName", "499_Copy_1.pptx");
+                        fd.append("UserID", "7");
+                        xhr.open("POST", "/api/PPT/AddSlide/", true);
+                        xhr.send(fd);
+                        xhr.addEventListener("load", function (event) {
+                            alert(event.target.response);
+                        }, false);
+
+
+                        //var files = $("#fileUpload").get(0).files;
+                        //$.ajax({
+                        //    url: SiteUrl + 'Test/AddSlide',
+                        //    type: "POST",
+                        //    dataType: "JSON",
+                        //    async: false,
+                        //    data: {
+                        //        FileName: "7_496__Copy_1.PPTX",
+                        //        AssignmentID: "496",
+                        //        objHttpPostedFile: files[0]
+                        //    },
+                        //    error: function () {
+                        //        alert("Server access failure!");
+                        //    },
+                        //    success: function (result) {
+                        //        if (result.ErrorMessage) {
+                        //        }
+                        //    }
+                        //});
+
+                        //var files = $("#fileUpload").get(0).files;
+                        //if (files.length > 0) {
+                        //    $.ajax({
+                        //        url: SiteUrl + 'Test/AddSlide',
+                        //        type: "POST",
+                        //        dataType: "JSON",
+                        //        data: {
+                        //            FileName: "7_496__Copy_1.PPTX",
+                        //            AssignmentID: "496",
+                        //            objHttpPostedFile: files[0]
+                        //        },
+                        //        error: function () {
+                        //        },
+                        //        success: function (result) {
+                        //            alert(result.ErrorMessage)
+                        //        }
+                        //    });
+                        //}
+
+                        //var files = $("#fileUpload").get(0).files
+                        //var objPPTDocModel =
+                        //    {
+                        //        FileName: "7_496__Copy_1.PPTX",
+                        //        AssignmentID: "496",
+                        //        objHttpPostedFile: files[0]
+                        //    }
+                        //UploadFile(objPPTDocModel, function (key, value) {
+                        //});
+
+                    });
+                    //function UploadFile(objPPTDocModel, callback) {
+                    //    $.ajax(
+                    //        {
+                    //            url: SiteUrl + "api/PPT/AddSlide",
+                    //            data: JSON.stringify(objPPTDocModel),
+                    //            type: "POST",
+                    //            contentType: "application/json;charset=utf-8",
+                    //            success: function (data) {
+                    //                alert(data.ErrorMessage)
+                    //            },
+                    //            error: function () {
+                    //                alert(data.ErrorMessage)
+                    //            }
+                    //        });
+                    //}
+                //function UploadFile() {
+                //    var files = $("#fileUpload").get(0).files;
+                //    if (files.length > 0) {
+                //        var objPPTDocModel =
+                //        {
+                //            FileName: "7_496__Copy_1.PPTX",
+                //            AssignmentID: "496",
+                //            objHttpPostedFile: files[0]
+                //        }
+                //        var ajaxRequest = $.ajax({
+                //            type: "POST",
+                //            url: SiteUrl + "Test/AddSlide",
+                //            contentType: false,
+                //            processData: false,
+                //            data: JSON.stringify(objPPTDocModel)
+                //        });
+                //        ajaxRequest.done(function (xhr, textStatus) {
+                //            $("#lblFileUploadOutput").html(xhr);
+                //            clearFileInput('fileUpload');
+                //            // Do other operation
+                //        });
+                //    }
+
+                    
+                });
+            </script>
+            </div>
+        </div>
+    </div>

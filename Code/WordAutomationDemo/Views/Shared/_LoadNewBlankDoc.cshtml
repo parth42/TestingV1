@@ -1,0 +1,32 @@
+﻿@using DevExpress.Web.Mvc;
+@using DevExpress.Web.Mvc.UI;
+ 
+@Html.DevExpress().RichEdit(settings =>
+{
+    settings.Name = "BlankDoc";
+    settings.CallbackRouteValues = new { Controller = "Section", Action = "BlankDoc" };
+    settings.WorkDirectory = WordAutomationDemo.Models.DirectoryManagmentUtils.InitialDemoFilesPathSection;
+    settings.Width = System.Web.UI.WebControls.Unit.Percentage(100);
+    settings.Height = System.Web.UI.WebControls.Unit.Pixel(700);
+    settings.ShowConfirmOnLosingChanges = false;
+    settings.ActiveTabIndex = 0;
+    settings.EnableClientSideAPI = true;
+    //settings.Settings.Behavior.Cut = DevExpress.XtraRichEdit.DocumentCapability.Hidden;
+    //settings.Settings.Behavior.Copy = DevExpress.XtraRichEdit.DocumentCapability.Hidden;
+    //settings.Settings.Behavior.Paste = DevExpress.XtraRichEdit.DocumentCapability.Hidden;
+    settings.Settings.Behavior.FullScreen = DevExpress.XtraRichEdit.DocumentCapability.Hidden;
+    settings.Init = (s, e) =>
+    {
+        var rich = s as MVCxRichEdit;
+        rich.CreateDefaultRibbonTabs(true);
+        rich.RibbonTabs[0].Visible = false;
+        rich.RibbonTabs.Find(c => c.Text.Contains("Merge")).Visible = false;
+    };
+    settings.PreRender = (s, e) =>
+    {
+        MVCxRichEdit richEdit = (MVCxRichEdit)s;
+        richEdit.Focus();
+    };
+}).GetHtml()
+
+ 

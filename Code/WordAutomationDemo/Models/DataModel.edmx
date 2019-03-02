@@ -1,0 +1,2334 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<edmx:Edmx Version="3.0" xmlns:edmx="http://schemas.microsoft.com/ado/2009/11/edmx">
+  <!-- EF Runtime content -->
+  <edmx:Runtime>
+    <!-- SSDL content -->
+    <edmx:StorageModels>
+      <Schema Namespace="Models.Store" Provider="System.Data.SqlClient" ProviderManifestToken="2008" Alias="Self" xmlns:store="http://schemas.microsoft.com/ado/2007/12/edm/EntityStoreSchemaGenerator" xmlns:customannotation="http://schemas.microsoft.com/ado/2013/11/edm/customannotation" xmlns="http://schemas.microsoft.com/ado/2009/11/edm/ssdl">
+        <EntityType Name="tblAssignedWordPages">
+          <Key>
+            <PropertyRef Name="AssignedWordPageID" />
+          </Key>
+          <Property Name="AssignedWordPageID" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+          <Property Name="AssignmentID" Type="int" />
+          <Property Name="DocName" Type="varchar" MaxLength="100" />
+          <Property Name="Sequence" Type="int" />
+          <Property Name="ReviewRequested" Type="bit" />
+          <Property Name="IsPublished" Type="bit" />
+          <Property Name="PageRemarks" Type="varchar" MaxLength="500" />
+          <Property Name="Ticks" Type="varchar" MaxLength="100" />
+        </EntityType>
+        <EntityType Name="tblAssignedExcelSheets">
+          <Key>
+            <PropertyRef Name="AssignedExcelSheetID" />
+          </Key>
+          <Property Name="AssignedExcelSheetID" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+          <Property Name="AssignmentID" Type="int" Nullable="false" />
+          <Property Name="SheetName" Type="varchar" MaxLength="250" Nullable="false" />
+          <Property Name="Sequence" Type="int" Nullable="false" />
+          <Property Name="SheetRemarks" Type="varchar" MaxLength="500" />
+          <Property Name="IsSheetApproved" Type="bit" Nullable="false" />
+          <Property Name="IsSheetModified" Type="bit" Nullable="false" />
+          <Property Name="IsGrayedOut" Type="bit" Nullable="false" />
+        </EntityType>
+        <EntityType Name="tblAssignedPPTSlides">
+          <Key>
+            <PropertyRef Name="AssignedPPTSildeID" />
+          </Key>
+          <Property Name="AssignedPPTSildeID" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+          <Property Name="AssignmentID" Type="int" Nullable="false" />
+          <Property Name="SlideName" Type="nvarchar" MaxLength="50" Nullable="false" />
+          <Property Name="Sequence" Type="int" Nullable="false" />
+          <Property Name="PPTRemarks" Type="varchar" MaxLength="500" />
+          <Property Name="IsPPTApproved" Type="bit" />
+          <Property Name="IsTaskPPT" Type="bit" />
+          <Property Name="AssignedDocsID" Type="int" />
+          <Property Name="IsPPTModified" Type="bit" />
+          <Property Name="IsGrayedOut" Type="bit" />
+          <Property Name="ReviewRequested" Type="bit" />
+          <Property Name="IsPublished" Type="bit" />
+        </EntityType>
+        <EntityType Name="tblAssignmentHistory">
+          <Key>
+            <PropertyRef Name="AssignmentHistoryID" />
+          </Key>
+          <Property Name="AssignmentHistoryID" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+          <Property Name="AssignmentLogID" Type="int" />
+          <Property Name="DocumentName" Type="varchar(max)" />
+          <Property Name="Comments" Type="varchar(max)" />
+          <Property Name="CreatedBy" Type="int" />
+          <Property Name="CreatedDate" Type="datetime" />
+        </EntityType>
+        <EntityType Name="tblAssignmentLog">
+          <Key>
+            <PropertyRef Name="AssignmentLogID" />
+          </Key>
+          <Property Name="AssignmentLogID" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+          <Property Name="DocumentName" Type="nvarchar(max)" />
+          <Property Name="AssignmentID" Type="int" />
+          <Property Name="Action" Type="int" Nullable="false" />
+          <Property Name="Description" Type="nvarchar(max)" />
+          <Property Name="CreatedBy" Type="int" />
+          <Property Name="CreatedDate" Type="datetime" />
+        </EntityType>
+        <EntityType Name="tblAssignmentMember">
+          <Key>
+            <PropertyRef Name="Id" />
+          </Key>
+          <Property Name="Id" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+          <Property Name="CanEdit" Type="bit" Nullable="false" />
+          <Property Name="CanApprove" Type="bit" Nullable="false" />
+          <Property Name="AssignmentID" Type="int" />
+          <Property Name="UserID" Type="int" />
+          <Property Name="CanPublish" Type="bit"/>
+        </EntityType>
+        <EntityType Name="tblAssignments">
+          <Key>
+            <PropertyRef Name="AssignmentID" />
+          </Key>
+          <Property Name="AssignmentID" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+          <Property Name="DocumentID" Type="int" />
+          <Property Name="Content" Type="nvarchar(max)" />
+          <Property Name="LockedByUserID" Type="int" />
+          <Property Name="ReplacementCode" Type="nvarchar(max)" />
+          <Property Name="Action" Type="int" Nullable="false" />
+          <Property Name="DocumentType" Type="int" />
+          <Property Name="DueDate" Type="datetime" />
+          <Property Name="Comments" Type="nvarchar(max)" />
+          <Property Name="Remarks" Type="nvarchar(max)" />
+          <Property Name="OrginalSourceFile" Type="nvarchar(max)" />
+          <Property Name="DocumentFile" Type="nvarchar(max)" />
+          <Property Name="ProjectID" Type="int" />
+          <Property Name="CreatedDate" Type="datetime" Nullable="false" />
+          <Property Name="CompletedDate" Type="datetime" />
+          <Property Name="CreatedBy" Type="int" />
+          <Property Name="TaskName" Type="varchar" MaxLength="100" Nullable="false" />
+          <Property Name="Status" Type="int" />
+          <Property Name="MainAssignmentID" Type="int" />
+          <Property Name="IsEntireDocument" Type="bit" />
+        </EntityType>
+        <EntityType Name="tblChatMessage">
+          <Key>
+            <PropertyRef Name="ChatMessageID" />
+          </Key>
+          <Property Name="ChatMessageID" Type="bigint" StoreGeneratedPattern="Identity" Nullable="false" />
+          <Property Name="UserFromId" Type="int" Nullable="false" />
+          <Property Name="UserToId" Type="int" Nullable="false" />
+          <Property Name="Message" Type="varchar(max)" />
+          <Property Name="ClientGuid" Type="varchar" MaxLength="200" Nullable="false" />
+          <Property Name="MessageSentDateTime" Type="datetime" Nullable="false" />
+          <Property Name="IsRead" Type="bit" Nullable="false" />
+          <Property Name="VisibleFrom" Type="bit" />
+          <Property Name="VisibleTo" Type="bit" />
+        </EntityType>
+        <EntityType Name="tblCompany">
+          <Key>
+            <PropertyRef Name="CompanyID" />
+          </Key>
+          <Property Name="CompanyID" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+          <Property Name="CompanyLogo" Type="varchar" MaxLength="250" Nullable="false" />
+          <Property Name="Name" Type="varchar" MaxLength="250" Nullable="false" />
+          <Property Name="Address" Type="varchar" MaxLength="50" />
+          <Property Name="Zip" Type="varchar" MaxLength="25" />
+          <Property Name="City" Type="varchar" MaxLength="50" />
+          <Property Name="State" Type="varchar" MaxLength="50" />
+          <Property Name="Country" Type="varchar" MaxLength="50" />
+          <Property Name="CreatedBy" Type="int" Nullable="false" />
+          <Property Name="CreatedDate" Type="datetime" Nullable="false" />
+          <Property Name="ModifiedBy" Type="int" />
+          <Property Name="ModifiedDate" Type="datetime" />
+          <Property Name="IsSuperAdmin" Type="bit" />
+          <Property Name="IsActive" Type="bit" />
+          <Property Name="IsDeleted" Type="bit" />
+          <Property Name="WebsiteURL" Type="varchar" MaxLength="250" />
+          <Property Name="IsAppointmentEnable" Type="bit" Nullable="false" />
+          <Property Name="ExchangeServerURL" Type="varchar" MaxLength="255" />
+          <Property Name="ExchangeServerUserName" Type="varchar" MaxLength="255" />
+          <Property Name="ExchangeServerPassword" Type="varchar" MaxLength="255" />
+          <Property Name="DateFormatID" Type="int" />
+          <Property Name="IsMessengerServiceEnable" Type="bit" Nullable="false" />
+        </EntityType>
+        <EntityType Name="tblDateFormats">
+          <Key>
+            <PropertyRef Name="DateFormatID" />
+          </Key>
+          <Property Name="DateFormatID" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+          <Property Name="DateFormat" Type="varchar" MaxLength="50" Nullable="false" />
+          <Property Name="IsActive" Type="bit" Nullable="false" />
+        </EntityType>
+        <EntityType Name="tblDocument">
+          <Key>
+            <PropertyRef Name="DocumentID" />
+          </Key>
+          <Property Name="DocumentID" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+          <Property Name="DisplayName" Type="varchar(max)" />
+          <Property Name="DocumentName" Type="varchar(max)" />
+          <Property Name="DocumentType" Type="int" />
+          <Property Name="CompanyID" Type="int" Nullable="false" />
+          <Property Name="CreatedBy" Type="int" />
+          <Property Name="CreatedDate" Type="datetime" />
+        </EntityType>
+        <EntityType Name="tblExcelRowMap">
+          <Key>
+            <PropertyRef Name="Id" />
+          </Key>
+          <Property Name="Id" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+          <Property Name="RowId" Type="uniqueidentifier" Nullable="false" />
+          <Property Name="MasterDocumentName" Type="nvarchar" MaxLength="500" Nullable="false" />
+          <Property Name="AssignmentID" Type="int" Nullable="false" />
+          <Property Name="IsActive" Type="bit" Nullable="false" />
+          <Property Name="DateLastModified" Type="datetime" Nullable="false" />
+          <Property Name="IsRemoved" Type="bit" Nullable="false" />
+        </EntityType>
+        <EntityType Name="tblExcelSheets">
+          <Key>
+            <PropertyRef Name="ExcelSheetID" />
+          </Key>
+          <Property Name="ExcelSheetID" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+          <Property Name="SheetName" Type="varchar" MaxLength="250" Nullable="false" />
+          <Property Name="MasterDocumentName" Type="varchar" MaxLength="500" Nullable="false" />
+          <Property Name="Sequence" Type="int" Nullable="false" />
+          <Property Name="IsOriginal" Type="bit" />
+        </EntityType>
+        <EntityType Name="tblLogActivity">
+          <Key>
+            <PropertyRef Name="LogActivityID" />
+          </Key>
+          <Property Name="LogActivityID" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+          <Property Name="LogActivityTypeID" Type="int" Nullable="false" />
+          <Property Name="ActivityDetails" Type="nvarchar(max)" />
+          <Property Name="IPAddress" Type="nvarchar" MaxLength="50" />
+          <Property Name="ChangedID" Type="int" />
+          <Property Name="CreatedBy" Type="int" Nullable="false" />
+          <Property Name="CreatedDate" Type="datetime" Nullable="false" />
+          <Property Name="MenuItem" Type="nvarchar" MaxLength="50" />
+          <Property Name="CompanyID" Type="int" />
+        </EntityType>
+        <!--Errors Found During Generation:
+warning 6002: The table/view 'triyo-prod9.dbo.tblLogActivityTypes' does not have a primary key defined. The key has been inferred and the definition was created as a read-only table/view.-->
+        <EntityType Name="tblLogActivityTypes">
+          <Key>
+            <PropertyRef Name="LogActivityTypeID" />
+            <PropertyRef Name="LogActivityName" />
+          </Key>
+          <Property Name="LogActivityTypeID" Type="int" Nullable="false" />
+          <Property Name="LogActivityName" Type="nvarchar" MaxLength="50" Nullable="false" />
+        </EntityType>
+        <EntityType Name="tblMenuItem">
+          <Key>
+            <PropertyRef Name="MenuItemID" />
+          </Key>
+          <Property Name="MenuItemID" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+          <Property Name="GUID" Type="uniqueidentifier" />
+          <Property Name="MenuItem" Type="varchar" MaxLength="50" />
+          <Property Name="MenuItemController" Type="varchar" MaxLength="50" />
+          <Property Name="MenuItemView" Type="varchar" MaxLength="50" />
+          <Property Name="SortOrder" Type="int" />
+          <Property Name="ParentID" Type="int" />
+          <Property Name="IsActive" Type="bit" Nullable="false" />
+        </EntityType>
+        <EntityType Name="tblMenuItems">
+          <Key>
+            <PropertyRef Name="MenuItemID" />
+          </Key>
+          <Property Name="MenuItemID" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+          <Property Name="MenuName" Type="nvarchar" MaxLength="50" Nullable="false" />
+          <Property Name="Controller" Type="nvarchar" MaxLength="50" Nullable="false" />
+          <Property Name="Action" Type="nvarchar" MaxLength="50" Nullable="false" />
+          <Property Name="SortOrder" Type="int" />
+          <Property Name="CreatedBy" Type="int" Nullable="false" />
+          <Property Name="CreatedDate" Type="datetime" Nullable="false" />
+        </EntityType>
+        <EntityType Name="tblPPTSlides">
+          <Key>
+            <PropertyRef Name="PPTSlidesID" />
+          </Key>
+          <Property Name="PPTSlidesID" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+          <Property Name="SlideName" Type="nvarchar" MaxLength="50" Nullable="false" />
+          <Property Name="MasterDocumentName" Type="nvarchar(max)" Nullable="false" />
+          <Property Name="Sequence" Type="int" Nullable="false" />
+          <Property Name="IsOriginal" Type="bit" />
+        </EntityType>
+        <EntityType Name="tblProjectDocuments">
+          <Key>
+            <PropertyRef Name="ProjectDocumentID" />
+          </Key>
+          <Property Name="ProjectDocumentID" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+          <Property Name="DocumentID" Type="int" Nullable="false" />
+          <Property Name="ProjectID" Type="int" Nullable="false" />
+          <Property Name="IsActive" Type="bit" Nullable="false" />
+        </EntityType>
+        <EntityType Name="tblProjectMembers">
+          <Key>
+            <PropertyRef Name="ProjectMemberID" />
+          </Key>
+          <Property Name="ProjectMemberID" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+          <Property Name="ProjectID" Type="int" Nullable="false" />
+          <Property Name="UserID" Type="int" Nullable="false" />
+          <Property Name="CreatedDate" Type="datetime" Nullable="false" />
+          <Property Name="CreatedBy" Type="int" Nullable="false" />
+        </EntityType>
+        <EntityType Name="tblProjects">
+          <Key>
+            <PropertyRef Name="ProjectID" />
+          </Key>
+          <Property Name="ProjectID" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+          <Property Name="Name" Type="nvarchar" MaxLength="50" Nullable="false" />
+          <Property Name="StartDate" Type="datetime" Nullable="false" />
+          <Property Name="EndDate" Type="datetime" Nullable="false" />
+          <Property Name="FileName" Type="nvarchar(max)" />
+          <Property Name="Description" Type="nvarchar(max)" />
+          <Property Name="Status" Type="int" Nullable="false" />
+          <Property Name="IsDeleted" Type="bit" Nullable="false" />
+          <Property Name="CreatedDate" Type="datetime" Nullable="false" />
+          <Property Name="CreatedBy" Type="int" Nullable="false" />
+          <Property Name="ModifiedDate" Type="datetime" />
+          <Property Name="ModifiedBy" Type="int" />
+        </EntityType>
+        <EntityType Name="tblRole">
+          <Key>
+            <PropertyRef Name="RoleID" />
+          </Key>
+          <Property Name="RoleID" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+          <Property Name="CompanyID" Type="int" Nullable="false" />
+          <Property Name="Role" Type="varchar" MaxLength="50" />
+          <Property Name="Description" Type="varchar" MaxLength="255" />
+          <Property Name="CreatedBy" Type="int" Nullable="false" />
+          <Property Name="CreatedDate" Type="datetime" Nullable="false" />
+          <Property Name="ModifiedBy" Type="int" />
+          <Property Name="ModifiedDate" Type="datetime" />
+          <Property Name="IsActive" Type="bit" Nullable="false" />
+          <Property Name="IsAdminRole" Type="bit" Nullable="false" />
+        </EntityType>
+        <EntityType Name="tblRolePrivilages">
+          <Key>
+            <PropertyRef Name="RolePrivilageID" />
+          </Key>
+          <Property Name="RolePrivilageID" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+          <Property Name="MenuItemID" Type="int" Nullable="false" />
+          <Property Name="ViewPermission" Type="bit" Nullable="false" />
+          <Property Name="UserID" Type="int" Nullable="false" />
+          <Property Name="CreatedBy" Type="int" Nullable="false" />
+          <Property Name="CreatedDate" Type="datetime" />
+          <Property Name="Add" Type="bit" />
+          <Property Name="Edit" Type="bit" />
+          <Property Name="Delete" Type="bit" />
+          <Property Name="Detail" Type="bit" />
+          <Property Name="ModifiedBy" Type="int" />
+          <Property Name="ModifiedDate" Type="datetime" />
+          <Property Name="IsActive" Type="int" />
+          <Property Name="RoleID" Type="int" />
+        </EntityType>
+        <EntityType Name="tblSectionMaster">
+          <Key>
+            <PropertyRef Name="SectionID" />
+          </Key>
+          <Property Name="SectionID" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+          <Property Name="SectionName" Type="nvarchar" MaxLength="100" Nullable="false" />
+          <Property Name="SectionURL" Type="nvarchar(max)" />
+          <Property Name="Description" Type="nvarchar(max)" />
+          <Property Name="ContentType" Type="int" Nullable="false" />
+          <Property Name="ContentFile" Type="nvarchar" MaxLength="100" />
+          <Property Name="CompanyID" Type="int" />
+          <Property Name="IsDeleted" Type="bit" />
+          <Property Name="Status" Type="bit" />
+          <Property Name="CreatedBy" Type="int" />
+          <Property Name="CreatedDate" Type="datetime" />
+        </EntityType>
+        <EntityType Name="tblTemplateMaster">
+          <Key>
+            <PropertyRef Name="TemplateID" />
+          </Key>
+          <Property Name="TemplateID" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+          <Property Name="TemplateName" Type="varchar" MaxLength="50" Nullable="false" />
+          <Property Name="TemplateType" Type="int" Nullable="false" />
+          <Property Name="Subject" Type="varchar" MaxLength="100" />
+          <Property Name="TemplateContent" Type="varchar(max)" Nullable="false" />
+          <Property Name="IsActive" Type="bit" Nullable="false" />
+          <Property Name="CreatedBy" Type="int" Nullable="false" />
+          <Property Name="CreatedDate" Type="datetime" Nullable="false" />
+          <Property Name="ModifiedBy" Type="int" />
+          <Property Name="ModifiedDate" Type="datetime" />
+        </EntityType>
+        <EntityType Name="tblUserDepartment">
+          <Key>
+            <PropertyRef Name="UserId" />
+          </Key>
+          <Property Name="UserId" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+          <Property Name="FullName" Type="nvarchar" MaxLength="100" Nullable="false" />
+          <Property Name="EmailID" Type="nvarchar" MaxLength="250" />
+          <Property Name="UserName" Type="nvarchar" MaxLength="255" Nullable="false" />
+          <Property Name="Password" Type="varchar" MaxLength="250" />
+          <Property Name="Department" Type="varchar" MaxLength="250" />
+          <Property Name="CompanyID" Type="int" />
+          <Property Name="RoleID" Type="int" />
+          <Property Name="ProfileImage" Type="varchar" MaxLength="250" />
+          <Property Name="CreatedBy" Type="int" />
+          <Property Name="CreatedDate" Type="datetime" />
+          <Property Name="ModifiedBy" Type="int" />
+          <Property Name="ModifiedDate" Type="datetime" />
+          <Property Name="IsActive" Type="bit" />
+          <Property Name="IsAppointmentEnable" Type="bit" Nullable="false" />
+          <Property Name="CanCreateSubtasks" Type="bit" />
+          <Property Name="CanEdit" Type="bit" />
+          <Property Name="CanApprove" Type="bit" />
+        </EntityType>
+        <!--Errors Found During Generation:
+warning 6002: The table/view 'triyo-prod9.dbo.vwRolePrivileges' does not have a primary key defined. The key has been inferred and the definition was created as a read-only table/view.-->
+        <EntityType Name="vwRolePrivileges">
+          <Key>
+            <PropertyRef Name="MenuItemID" />
+          </Key>
+          <Property Name="MenuItemID" Type="int" Nullable="false" />
+          <Property Name="MenuItem" Type="varchar" MaxLength="50" />
+          <Property Name="MenuItemController" Type="varchar" MaxLength="50" />
+          <Property Name="MenuItemView" Type="varchar" MaxLength="50" />
+          <Property Name="ViewPermission" Type="bit" />
+          <Property Name="Add" Type="bit" />
+          <Property Name="Edit" Type="bit" />
+          <Property Name="Delete" Type="bit" />
+          <Property Name="Detail" Type="bit" />
+          <Property Name="OrderID" Type="int" />
+          <Property Name="ParentID" Type="int" />
+          <Property Name="SortOrder" Type="int" />
+          <Property Name="IsActive" Type="int" />
+          <Property Name="RoleID" Type="int" />
+        </EntityType>
+        <Association Name="FK__tblCompan__DateF__27F8EE98">
+          <End Role="tblDateFormats" Type="Self.tblDateFormats" Multiplicity="0..1" />
+          <End Role="tblCompany" Type="Self.tblCompany" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="tblDateFormats">
+              <PropertyRef Name="DateFormatID" />
+            </Principal>
+            <Dependent Role="tblCompany">
+              <PropertyRef Name="DateFormatID" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_AssignmentID">
+          <End Role="tblAssignments" Type="Self.tblAssignments" Multiplicity="0..1" />
+          <End Role="tblAssignmentMember" Type="Self.tblAssignmentMember" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="tblAssignments">
+              <PropertyRef Name="AssignmentID" />
+            </Principal>
+            <Dependent Role="tblAssignmentMember">
+              <PropertyRef Name="AssignmentID" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_tblAssignedDocs_tblAssignments">
+          <End Role="tblAssignments" Type="Self.tblAssignments" Multiplicity="0..1" />
+          <End Role="tblAssignedWordPages" Type="Self.tblAssignedWordPages" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="tblAssignments">
+              <PropertyRef Name="AssignmentID" />
+            </Principal>
+            <Dependent Role="tblAssignedWordPages">
+              <PropertyRef Name="AssignmentID" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_tblAssignedExcelSheets_tblAssignments">
+          <End Role="tblAssignments" Type="Self.tblAssignments" Multiplicity="1" />
+          <End Role="tblAssignedExcelSheets" Type="Self.tblAssignedExcelSheets" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="tblAssignments">
+              <PropertyRef Name="AssignmentID" />
+            </Principal>
+            <Dependent Role="tblAssignedExcelSheets">
+              <PropertyRef Name="AssignmentID" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_tblAssignmentHistory_tblAssignmentLog">
+          <End Role="tblAssignmentLog" Type="Self.tblAssignmentLog" Multiplicity="0..1" />
+          <End Role="tblAssignmentHistory" Type="Self.tblAssignmentHistory" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="tblAssignmentLog">
+              <PropertyRef Name="AssignmentLogID" />
+            </Principal>
+            <Dependent Role="tblAssignmentHistory">
+              <PropertyRef Name="AssignmentLogID" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_tblAssignmentHistory_tblUserDepartment">
+          <End Role="tblUserDepartment" Type="Self.tblUserDepartment" Multiplicity="0..1" />
+          <End Role="tblAssignmentHistory" Type="Self.tblAssignmentHistory" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="tblUserDepartment">
+              <PropertyRef Name="UserId" />
+            </Principal>
+            <Dependent Role="tblAssignmentHistory">
+              <PropertyRef Name="CreatedBy" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_tblAssignmentLog_tblAssignments">
+          <End Role="tblAssignments" Type="Self.tblAssignments" Multiplicity="0..1" />
+          <End Role="tblAssignmentLog" Type="Self.tblAssignmentLog" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="tblAssignments">
+              <PropertyRef Name="AssignmentID" />
+            </Principal>
+            <Dependent Role="tblAssignmentLog">
+              <PropertyRef Name="AssignmentID" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_tblAssignmentLog_tblUserDepartment">
+          <End Role="tblUserDepartment" Type="Self.tblUserDepartment" Multiplicity="0..1" />
+          <End Role="tblAssignmentLog" Type="Self.tblAssignmentLog" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="tblUserDepartment">
+              <PropertyRef Name="UserId" />
+            </Principal>
+            <Dependent Role="tblAssignmentLog">
+              <PropertyRef Name="CreatedBy" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_tblAssignments_tblAssignments">
+          <End Role="tblAssignments" Type="Self.tblAssignments" Multiplicity="1" />
+          <End Role="tblAssignments1" Type="Self.tblAssignments" Multiplicity="0..1" />
+          <ReferentialConstraint>
+            <Principal Role="tblAssignments">
+              <PropertyRef Name="AssignmentID" />
+            </Principal>
+            <Dependent Role="tblAssignments1">
+              <PropertyRef Name="AssignmentID" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_tblAssignments_tblProjects">
+          <End Role="tblProjects" Type="Self.tblProjects" Multiplicity="0..1" />
+          <End Role="tblAssignments" Type="Self.tblAssignments" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="tblProjects">
+              <PropertyRef Name="ProjectID" />
+            </Principal>
+            <Dependent Role="tblAssignments">
+              <PropertyRef Name="ProjectID" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_tblAssignments_tblUserDepartment">
+          <End Role="tblUserDepartment" Type="Self.tblUserDepartment" Multiplicity="0..1" />
+          <End Role="tblAssignments" Type="Self.tblAssignments" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="tblUserDepartment">
+              <PropertyRef Name="UserId" />
+            </Principal>
+            <Dependent Role="tblAssignments">
+              <PropertyRef Name="LockedByUserID" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_tblAssignments_tblUserDepartment1">
+          <End Role="tblDocument" Type="Self.tblDocument" Multiplicity="0..1" />
+          <End Role="tblAssignments" Type="Self.tblAssignments" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="tblDocument">
+              <PropertyRef Name="DocumentID" />
+            </Principal>
+            <Dependent Role="tblAssignments">
+              <PropertyRef Name="DocumentID" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_tblExcelRowMap_tblAssignments">
+          <End Role="tblExcelRowMap" Type="Self.tblExcelRowMap" Multiplicity="*" />
+          <End Role="tblAssignments" Type="Self.tblAssignments" Multiplicity="1" />
+          <ReferentialConstraint>
+            <Principal Role="tblAssignments">
+              <PropertyRef Name="AssignmentID" />
+            </Principal>
+            <Dependent Role="tblExcelRowMap">
+              <PropertyRef Name="AssignmentID" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_tblDocument_tblUserDepartment">
+          <End Role="tblUserDepartment" Type="Self.tblUserDepartment" Multiplicity="0..1" />
+          <End Role="tblDocument" Type="Self.tblDocument" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="tblUserDepartment">
+              <PropertyRef Name="UserId" />
+            </Principal>
+            <Dependent Role="tblDocument">
+              <PropertyRef Name="CreatedBy" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_tblProjectDocuments_tblDocument">
+          <End Role="tblDocument" Type="Self.tblDocument" Multiplicity="1" />
+          <End Role="tblProjectDocuments" Type="Self.tblProjectDocuments" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="tblDocument">
+              <PropertyRef Name="DocumentID" />
+            </Principal>
+            <Dependent Role="tblProjectDocuments">
+              <PropertyRef Name="DocumentID" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_tblProjectDocuments_tblProjects">
+          <End Role="tblProjects" Type="Self.tblProjects" Multiplicity="1" />
+          <End Role="tblProjectDocuments" Type="Self.tblProjectDocuments" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="tblProjects">
+              <PropertyRef Name="ProjectID" />
+            </Principal>
+            <Dependent Role="tblProjectDocuments">
+              <PropertyRef Name="ProjectID" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_tblProjectMembers_tblProjects">
+          <End Role="tblProjects" Type="Self.tblProjects" Multiplicity="1" />
+          <End Role="tblProjectMembers" Type="Self.tblProjectMembers" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="tblProjects">
+              <PropertyRef Name="ProjectID" />
+            </Principal>
+            <Dependent Role="tblProjectMembers">
+              <PropertyRef Name="ProjectID" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_tblProjectMembers_tblUserDepartment">
+          <End Role="tblUserDepartment" Type="Self.tblUserDepartment" Multiplicity="1" />
+          <End Role="tblProjectMembers" Type="Self.tblProjectMembers" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="tblUserDepartment">
+              <PropertyRef Name="UserId" />
+            </Principal>
+            <Dependent Role="tblProjectMembers">
+              <PropertyRef Name="UserID" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_tblProjectMembers_tblUserDepartment1">
+          <End Role="tblUserDepartment" Type="Self.tblUserDepartment" Multiplicity="1" />
+          <End Role="tblProjectMembers" Type="Self.tblProjectMembers" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="tblUserDepartment">
+              <PropertyRef Name="UserId" />
+            </Principal>
+            <Dependent Role="tblProjectMembers">
+              <PropertyRef Name="CreatedBy" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_tblProjects_tblUserDepartment">
+          <End Role="tblUserDepartment" Type="Self.tblUserDepartment" Multiplicity="1" />
+          <End Role="tblProjects" Type="Self.tblProjects" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="tblUserDepartment">
+              <PropertyRef Name="UserId" />
+            </Principal>
+            <Dependent Role="tblProjects">
+              <PropertyRef Name="CreatedBy" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_tblProjects_tblUserDepartment1">
+          <End Role="tblUserDepartment" Type="Self.tblUserDepartment" Multiplicity="0..1" />
+          <End Role="tblProjects" Type="Self.tblProjects" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="tblUserDepartment">
+              <PropertyRef Name="UserId" />
+            </Principal>
+            <Dependent Role="tblProjects">
+              <PropertyRef Name="ModifiedBy" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_tblRole_tblCompany">
+          <End Role="tblCompany" Type="Self.tblCompany" Multiplicity="1" />
+          <End Role="tblRole" Type="Self.tblRole" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="tblCompany">
+              <PropertyRef Name="CompanyID" />
+            </Principal>
+            <Dependent Role="tblRole">
+              <PropertyRef Name="CompanyID" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_tblRolePrivilages_tblUserDepartment">
+          <End Role="tblUserDepartment" Type="Self.tblUserDepartment" Multiplicity="1" />
+          <End Role="tblRolePrivilages" Type="Self.tblRolePrivilages" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="tblUserDepartment">
+              <PropertyRef Name="UserId" />
+            </Principal>
+            <Dependent Role="tblRolePrivilages">
+              <PropertyRef Name="UserID" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_tblSectionMaster_tblCompany">
+          <End Role="tblCompany" Type="Self.tblCompany" Multiplicity="0..1" />
+          <End Role="tblSectionMaster" Type="Self.tblSectionMaster" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="tblCompany">
+              <PropertyRef Name="CompanyID" />
+            </Principal>
+            <Dependent Role="tblSectionMaster">
+              <PropertyRef Name="CompanyID" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_tblSectionMaster_tblUserDepartment">
+          <End Role="tblUserDepartment" Type="Self.tblUserDepartment" Multiplicity="0..1" />
+          <End Role="tblSectionMaster" Type="Self.tblSectionMaster" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="tblUserDepartment">
+              <PropertyRef Name="UserId" />
+            </Principal>
+            <Dependent Role="tblSectionMaster">
+              <PropertyRef Name="CreatedBy" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_tblTemplateMaster_tblUserDepartment">
+          <End Role="tblUserDepartment" Type="Self.tblUserDepartment" Multiplicity="1" />
+          <End Role="tblTemplateMaster" Type="Self.tblTemplateMaster" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="tblUserDepartment">
+              <PropertyRef Name="UserId" />
+            </Principal>
+            <Dependent Role="tblTemplateMaster">
+              <PropertyRef Name="CreatedBy" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_tblTemplateMaster_tblUserDepartment1">
+          <End Role="tblUserDepartment" Type="Self.tblUserDepartment" Multiplicity="0..1" />
+          <End Role="tblTemplateMaster" Type="Self.tblTemplateMaster" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="tblUserDepartment">
+              <PropertyRef Name="UserId" />
+            </Principal>
+            <Dependent Role="tblTemplateMaster">
+              <PropertyRef Name="ModifiedBy" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_tblUserDepartment_tblCompany">
+          <End Role="tblCompany" Type="Self.tblCompany" Multiplicity="0..1" />
+          <End Role="tblUserDepartment" Type="Self.tblUserDepartment" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="tblCompany">
+              <PropertyRef Name="CompanyID" />
+            </Principal>
+            <Dependent Role="tblUserDepartment">
+              <PropertyRef Name="CompanyID" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_tblUserDepartment_tblRole">
+          <End Role="tblRole" Type="Self.tblRole" Multiplicity="0..1" />
+          <End Role="tblUserDepartment" Type="Self.tblUserDepartment" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="tblRole">
+              <PropertyRef Name="RoleID" />
+            </Principal>
+            <Dependent Role="tblUserDepartment">
+              <PropertyRef Name="RoleID" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_UserID">
+          <End Role="tblUserDepartment" Type="Self.tblUserDepartment" Multiplicity="0..1" />
+          <End Role="tblAssignmentMember" Type="Self.tblAssignmentMember" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="tblUserDepartment">
+              <PropertyRef Name="UserId" />
+            </Principal>
+            <Dependent Role="tblAssignmentMember">
+              <PropertyRef Name="UserID" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Function Name="RolePrev" Aggregate="false" BuiltIn="false" NiladicFunction="false" IsComposable="false" ParameterTypeSemantics="AllowImplicitConversion" Schema="dbo">
+          <Parameter Name="RoleID" Type="int" Mode="In" />
+        </Function>
+        <EntityContainer Name="ModelsStoreContainer">
+          <EntitySet Name="tblAssignedWordPages" EntityType="Self.tblAssignedWordPages" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="tblAssignedExcelSheets" EntityType="Self.tblAssignedExcelSheets" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="tblAssignedPPTSlides" EntityType="Self.tblAssignedPPTSlides" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="tblAssignmentHistory" EntityType="Self.tblAssignmentHistory" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="tblAssignmentLog" EntityType="Self.tblAssignmentLog" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="tblAssignmentMembers" EntityType="Self.tblAssignmentMember" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="tblAssignments" EntityType="Self.tblAssignments" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="tblChatMessage" EntityType="Self.tblChatMessage" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="tblCompany" EntityType="Self.tblCompany" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="tblDateFormats" EntityType="Self.tblDateFormats" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="tblDocument" EntityType="Self.tblDocument" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="tblExcelRowMap" EntityType="Self.tblExcelRowMap" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="tblExcelSheets" EntityType="Self.tblExcelSheets" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="tblLogActivity" EntityType="Self.tblLogActivity" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="tblMenuItem" EntityType="Self.tblMenuItem" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="tblMenuItems" EntityType="Self.tblMenuItems" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="tblPPTSlides" EntityType="Self.tblPPTSlides" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="tblProjectDocuments" EntityType="Self.tblProjectDocuments" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="tblProjectMembers" EntityType="Self.tblProjectMembers" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="tblProjects" EntityType="Self.tblProjects" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="tblRole" EntityType="Self.tblRole" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="tblRolePrivilages" EntityType="Self.tblRolePrivilages" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="tblSectionMaster" EntityType="Self.tblSectionMaster" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="tblTemplateMaster" EntityType="Self.tblTemplateMaster" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="tblUserDepartment" EntityType="Self.tblUserDepartment" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="tblLogActivityTypes" EntityType="Self.tblLogActivityTypes" store:Type="Tables" store:Schema="dbo">
+            <DefiningQuery>SELECT 
+    [tblLogActivityTypes].[LogActivityTypeID] AS [LogActivityTypeID], 
+    [tblLogActivityTypes].[LogActivityName] AS [LogActivityName]
+    FROM [dbo].[tblLogActivityTypes] AS [tblLogActivityTypes]</DefiningQuery>
+          </EntitySet>
+          <EntitySet Name="vwRolePrivileges" EntityType="Self.vwRolePrivileges" store:Type="Views" store:Schema="dbo">
+            <DefiningQuery>SELECT 
+    [vwRolePrivileges].[MenuItemID] AS [MenuItemID], 
+    [vwRolePrivileges].[MenuItem] AS [MenuItem], 
+    [vwRolePrivileges].[MenuItemController] AS [MenuItemController], 
+    [vwRolePrivileges].[MenuItemView] AS [MenuItemView], 
+    [vwRolePrivileges].[ViewPermission] AS [ViewPermission], 
+    [vwRolePrivileges].[Add] AS [Add], 
+    [vwRolePrivileges].[Edit] AS [Edit], 
+    [vwRolePrivileges].[Delete] AS [Delete], 
+    [vwRolePrivileges].[Detail] AS [Detail], 
+    [vwRolePrivileges].[OrderID] AS [OrderID], 
+    [vwRolePrivileges].[ParentID] AS [ParentID], 
+    [vwRolePrivileges].[SortOrder] AS [SortOrder], 
+    [vwRolePrivileges].[IsActive] AS [IsActive], 
+    [vwRolePrivileges].[RoleID] AS [RoleID]
+    FROM [dbo].[vwRolePrivileges] AS [vwRolePrivileges]</DefiningQuery>
+          </EntitySet>
+          <AssociationSet Name="FK__tblCompan__DateF__27F8EE98" Association="Self.FK__tblCompan__DateF__27F8EE98">
+            <End Role="tblDateFormats" EntitySet="tblDateFormats" />
+            <End Role="tblCompany" EntitySet="tblCompany" />
+          </AssociationSet>
+          <AssociationSet Name="FK_AssignmentID" Association="Self.FK_AssignmentID">
+            <End Role="tblAssignments" EntitySet="tblAssignments" />
+            <End Role="tblAssignmentMember" EntitySet="tblAssignmentMembers" />
+          </AssociationSet>
+          <AssociationSet Name="FK_tblAssignedDocs_tblAssignments" Association="Self.FK_tblAssignedDocs_tblAssignments">
+            <End Role="tblAssignments" EntitySet="tblAssignments" />
+            <End Role="tblAssignedWordPages" EntitySet="tblAssignedWordPages" />
+          </AssociationSet>
+          <AssociationSet Name="FK_tblAssignedExcelSheets_tblAssignments" Association="Self.FK_tblAssignedExcelSheets_tblAssignments">
+            <End Role="tblAssignments" EntitySet="tblAssignments" />
+            <End Role="tblAssignedExcelSheets" EntitySet="tblAssignedExcelSheets" />
+          </AssociationSet>
+          <AssociationSet Name="FK_tblAssignmentHistory_tblAssignmentLog" Association="Self.FK_tblAssignmentHistory_tblAssignmentLog">
+            <End Role="tblAssignmentLog" EntitySet="tblAssignmentLog" />
+            <End Role="tblAssignmentHistory" EntitySet="tblAssignmentHistory" />
+          </AssociationSet>
+          <AssociationSet Name="FK_tblAssignmentHistory_tblUserDepartment" Association="Self.FK_tblAssignmentHistory_tblUserDepartment">
+            <End Role="tblUserDepartment" EntitySet="tblUserDepartment" />
+            <End Role="tblAssignmentHistory" EntitySet="tblAssignmentHistory" />
+          </AssociationSet>
+          <AssociationSet Name="FK_tblAssignmentLog_tblAssignments" Association="Self.FK_tblAssignmentLog_tblAssignments">
+            <End Role="tblAssignments" EntitySet="tblAssignments" />
+            <End Role="tblAssignmentLog" EntitySet="tblAssignmentLog" />
+          </AssociationSet>
+          <AssociationSet Name="FK_tblAssignmentLog_tblUserDepartment" Association="Self.FK_tblAssignmentLog_tblUserDepartment">
+            <End Role="tblUserDepartment" EntitySet="tblUserDepartment" />
+            <End Role="tblAssignmentLog" EntitySet="tblAssignmentLog" />
+          </AssociationSet>
+          <AssociationSet Name="FK_tblAssignments_tblAssignments" Association="Self.FK_tblAssignments_tblAssignments">
+            <End Role="tblAssignments" EntitySet="tblAssignments" />
+            <End Role="tblAssignments1" EntitySet="tblAssignments" />
+          </AssociationSet>
+          <AssociationSet Name="FK_tblAssignments_tblProjects" Association="Self.FK_tblAssignments_tblProjects">
+            <End Role="tblProjects" EntitySet="tblProjects" />
+            <End Role="tblAssignments" EntitySet="tblAssignments" />
+          </AssociationSet>
+          <AssociationSet Name="FK_tblAssignments_tblUserDepartment" Association="Self.FK_tblAssignments_tblUserDepartment">
+            <End Role="tblUserDepartment" EntitySet="tblUserDepartment" />
+            <End Role="tblAssignments" EntitySet="tblAssignments" />
+          </AssociationSet>
+          <AssociationSet Name="FK_tblAssignments_tblUserDepartment1" Association="Self.FK_tblAssignments_tblUserDepartment1">
+            <End Role="tblDocument" EntitySet="tblDocument" />
+            <End Role="tblAssignments" EntitySet="tblAssignments" />
+          </AssociationSet>
+          <AssociationSet Name="FK_tblDocument_tblUserDepartment" Association="Self.FK_tblDocument_tblUserDepartment">
+            <End Role="tblUserDepartment" EntitySet="tblUserDepartment" />
+            <End Role="tblDocument" EntitySet="tblDocument" />
+          </AssociationSet>
+          <AssociationSet Name="FK_tblExcelRowMap_tblAssignments" Association="Self.FK_tblExcelRowMap_tblAssignments">
+            <End Role="tblAssignments" EntitySet="tblAssignments" />
+            <End Role="tblExcelRowMap" EntitySet="tblExcelRowMap" />
+          </AssociationSet>
+          <AssociationSet Name="FK_tblProjectDocuments_tblDocument" Association="Self.FK_tblProjectDocuments_tblDocument">
+            <End Role="tblDocument" EntitySet="tblDocument" />
+            <End Role="tblProjectDocuments" EntitySet="tblProjectDocuments" />
+          </AssociationSet>
+          <AssociationSet Name="FK_tblProjectDocuments_tblProjects" Association="Self.FK_tblProjectDocuments_tblProjects">
+            <End Role="tblProjects" EntitySet="tblProjects" />
+            <End Role="tblProjectDocuments" EntitySet="tblProjectDocuments" />
+          </AssociationSet>
+          <AssociationSet Name="FK_tblProjectMembers_tblProjects" Association="Self.FK_tblProjectMembers_tblProjects">
+            <End Role="tblProjects" EntitySet="tblProjects" />
+            <End Role="tblProjectMembers" EntitySet="tblProjectMembers" />
+          </AssociationSet>
+          <AssociationSet Name="FK_tblProjectMembers_tblUserDepartment" Association="Self.FK_tblProjectMembers_tblUserDepartment">
+            <End Role="tblUserDepartment" EntitySet="tblUserDepartment" />
+            <End Role="tblProjectMembers" EntitySet="tblProjectMembers" />
+          </AssociationSet>
+          <AssociationSet Name="FK_tblProjectMembers_tblUserDepartment1" Association="Self.FK_tblProjectMembers_tblUserDepartment1">
+            <End Role="tblUserDepartment" EntitySet="tblUserDepartment" />
+            <End Role="tblProjectMembers" EntitySet="tblProjectMembers" />
+          </AssociationSet>
+          <AssociationSet Name="FK_tblProjects_tblUserDepartment" Association="Self.FK_tblProjects_tblUserDepartment">
+            <End Role="tblUserDepartment" EntitySet="tblUserDepartment" />
+            <End Role="tblProjects" EntitySet="tblProjects" />
+          </AssociationSet>
+          <AssociationSet Name="FK_tblProjects_tblUserDepartment1" Association="Self.FK_tblProjects_tblUserDepartment1">
+            <End Role="tblUserDepartment" EntitySet="tblUserDepartment" />
+            <End Role="tblProjects" EntitySet="tblProjects" />
+          </AssociationSet>
+          <AssociationSet Name="FK_tblRole_tblCompany" Association="Self.FK_tblRole_tblCompany">
+            <End Role="tblCompany" EntitySet="tblCompany" />
+            <End Role="tblRole" EntitySet="tblRole" />
+          </AssociationSet>
+          <AssociationSet Name="FK_tblRolePrivilages_tblUserDepartment" Association="Self.FK_tblRolePrivilages_tblUserDepartment">
+            <End Role="tblUserDepartment" EntitySet="tblUserDepartment" />
+            <End Role="tblRolePrivilages" EntitySet="tblRolePrivilages" />
+          </AssociationSet>
+          <AssociationSet Name="FK_tblSectionMaster_tblCompany" Association="Self.FK_tblSectionMaster_tblCompany">
+            <End Role="tblCompany" EntitySet="tblCompany" />
+            <End Role="tblSectionMaster" EntitySet="tblSectionMaster" />
+          </AssociationSet>
+          <AssociationSet Name="FK_tblSectionMaster_tblUserDepartment" Association="Self.FK_tblSectionMaster_tblUserDepartment">
+            <End Role="tblUserDepartment" EntitySet="tblUserDepartment" />
+            <End Role="tblSectionMaster" EntitySet="tblSectionMaster" />
+          </AssociationSet>
+          <AssociationSet Name="FK_tblTemplateMaster_tblUserDepartment" Association="Self.FK_tblTemplateMaster_tblUserDepartment">
+            <End Role="tblUserDepartment" EntitySet="tblUserDepartment" />
+            <End Role="tblTemplateMaster" EntitySet="tblTemplateMaster" />
+          </AssociationSet>
+          <AssociationSet Name="FK_tblTemplateMaster_tblUserDepartment1" Association="Self.FK_tblTemplateMaster_tblUserDepartment1">
+            <End Role="tblUserDepartment" EntitySet="tblUserDepartment" />
+            <End Role="tblTemplateMaster" EntitySet="tblTemplateMaster" />
+          </AssociationSet>
+          <AssociationSet Name="FK_tblUserDepartment_tblCompany" Association="Self.FK_tblUserDepartment_tblCompany">
+            <End Role="tblCompany" EntitySet="tblCompany" />
+            <End Role="tblUserDepartment" EntitySet="tblUserDepartment" />
+          </AssociationSet>
+          <AssociationSet Name="FK_tblUserDepartment_tblRole" Association="Self.FK_tblUserDepartment_tblRole">
+            <End Role="tblRole" EntitySet="tblRole" />
+            <End Role="tblUserDepartment" EntitySet="tblUserDepartment" />
+          </AssociationSet>
+          <AssociationSet Name="FK_UserID" Association="Self.FK_UserID">
+            <End Role="tblUserDepartment" EntitySet="tblUserDepartment" />
+            <End Role="tblAssignmentMember" EntitySet="tblAssignmentMembers" />
+          </AssociationSet>
+        </EntityContainer>
+      </Schema>
+    </edmx:StorageModels>
+    <!-- CSDL content -->
+    <edmx:ConceptualModels>
+      <Schema Namespace="Models" Alias="Self" annotation:UseStrongSpatialTypes="false" xmlns:annotation="http://schemas.microsoft.com/ado/2009/02/edm/annotation" xmlns:customannotation="http://schemas.microsoft.com/ado/2013/11/edm/customannotation" xmlns="http://schemas.microsoft.com/ado/2009/11/edm">
+        <EntityType Name="tblAssignedWordPage">
+          <Key>
+            <PropertyRef Name="AssignedWordPageID" />
+          </Key>
+          <Property Name="AssignedWordPageID" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="AssignmentID" Type="Int32" />
+          <Property Name="DocName" Type="String" MaxLength="100" FixedLength="false" Unicode="false" />
+          <Property Name="Sequence" Type="Int32" />
+          <Property Name="ReviewRequested" Type="Boolean" />
+          <Property Name="IsPublished" Type="Boolean" />
+          <Property Name="PageRemarks" Type="String" MaxLength="500" FixedLength="false" Unicode="false" />
+          <Property Name="Ticks" Type="String" MaxLength="100" />
+          <NavigationProperty Name="tblAssignment" Relationship="Self.FK_tblAssignedDocs_tblAssignments" FromRole="tblAssignedWordPages" ToRole="tblAssignments" />
+        </EntityType>
+        <EntityType Name="tblAssignedExcelSheet">
+          <Key>
+            <PropertyRef Name="AssignedExcelSheetID" />
+          </Key>
+          <Property Name="AssignedExcelSheetID" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="AssignmentID" Type="Int32" Nullable="false" />
+          <Property Name="SheetName" Type="String" MaxLength="250" FixedLength="false" Unicode="false" Nullable="false" />
+          <Property Name="Sequence" Type="Int32" Nullable="false" />
+          <Property Name="SheetRemarks" Type="String" MaxLength="500" FixedLength="false" Unicode="false" />
+          <Property Name="IsSheetApproved" Type="Boolean" Nullable="false" />
+          <Property Name="IsSheetModified" Type="Boolean" Nullable="false" />
+          <Property Name="IsGrayedOut" Type="Boolean" Nullable="false" />
+          <NavigationProperty Name="tblAssignment" Relationship="Self.FK_tblAssignedExcelSheets_tblAssignments" FromRole="tblAssignedExcelSheets" ToRole="tblAssignments" />
+        </EntityType>
+        <EntityType Name="tblAssignedPPTSlide">
+          <Key>
+            <PropertyRef Name="AssignedPPTSildeID" />
+          </Key>
+          <Property Name="AssignedPPTSildeID" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="AssignmentID" Type="Int32" Nullable="false" />
+          <Property Name="SlideName" Type="String" MaxLength="50" FixedLength="false" Unicode="true" Nullable="false" />
+          <Property Name="Sequence" Type="Int32" Nullable="false" />
+          <Property Name="PPTRemarks" Type="String" MaxLength="500" FixedLength="false" Unicode="false" />
+          <Property Name="IsPPTApproved" Type="Boolean" />
+          <Property Name="IsTaskPPT" Type="Boolean" />
+          <Property Name="AssignedDocsID" Type="Int32" />
+          <Property Name="IsPPTModified" Type="Boolean" />
+          <Property Name="IsGrayedOut" Type="Boolean" />
+          <Property Name="ReviewRequested" Type="Boolean" />
+          <Property Name="IsPublished" Type="Boolean" />
+        </EntityType>
+        <EntityType Name="tblAssignmentHistory">
+          <Key>
+            <PropertyRef Name="AssignmentHistoryID" />
+          </Key>
+          <Property Name="AssignmentHistoryID" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="AssignmentLogID" Type="Int32" />
+          <Property Name="DocumentName" Type="String" MaxLength="Max" FixedLength="false" Unicode="false" />
+          <Property Name="Comments" Type="String" MaxLength="Max" FixedLength="false" Unicode="false" />
+          <Property Name="CreatedBy" Type="Int32" />
+          <Property Name="CreatedDate" Type="DateTime" Precision="3" />
+          <NavigationProperty Name="tblAssignmentLog" Relationship="Self.FK_tblAssignmentHistory_tblAssignmentLog" FromRole="tblAssignmentHistory" ToRole="tblAssignmentLog" />
+          <NavigationProperty Name="tblUserDepartment" Relationship="Self.FK_tblAssignmentHistory_tblUserDepartment" FromRole="tblAssignmentHistory" ToRole="tblUserDepartment" />
+        </EntityType>
+        <EntityType Name="tblAssignmentLog">
+          <Key>
+            <PropertyRef Name="AssignmentLogID" />
+          </Key>
+          <Property Name="AssignmentLogID" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="DocumentName" Type="String" MaxLength="Max" FixedLength="false" Unicode="true" />
+          <Property Name="AssignmentID" Type="Int32" />
+          <Property Name="Action" Type="Int32" Nullable="false" />
+          <Property Name="Description" Type="String" MaxLength="Max" FixedLength="false" Unicode="true" />
+          <Property Name="CreatedBy" Type="Int32" />
+          <Property Name="CreatedDate" Type="DateTime" Precision="3" />
+          <NavigationProperty Name="tblAssignmentHistories" Relationship="Self.FK_tblAssignmentHistory_tblAssignmentLog" FromRole="tblAssignmentLog" ToRole="tblAssignmentHistory" />
+          <NavigationProperty Name="tblAssignment" Relationship="Self.FK_tblAssignmentLog_tblAssignments" FromRole="tblAssignmentLog" ToRole="tblAssignments" />
+          <NavigationProperty Name="tblUserDepartment" Relationship="Self.FK_tblAssignmentLog_tblUserDepartment" FromRole="tblAssignmentLog" ToRole="tblUserDepartment" />
+        </EntityType>
+        <EntityType Name="tblAssignmentMember">
+          <Key>
+            <PropertyRef Name="Id" />
+          </Key>
+          <Property Name="Id" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="CanEdit" Type="Boolean" Nullable="false" />
+          <Property Name="CanApprove" Type="Boolean" Nullable="false" />
+          <Property Name="CanPublish" Type="Boolean" />
+          <Property Name="AssignmentID" Type="Int32" />
+          <Property Name="UserID" Type="Int32" />
+          <NavigationProperty Name="tblAssignment" Relationship="Self.FK_AssignmentID" FromRole="tblAssignmentMember" ToRole="tblAssignments" />
+          <NavigationProperty Name="tblUserDepartment" Relationship="Self.FK_UserID" FromRole="tblAssignmentMember" ToRole="tblUserDepartment" />
+        </EntityType>
+        <EntityType Name="tblAssignment">
+          <Key>
+            <PropertyRef Name="AssignmentID" />
+          </Key>
+          <Property Name="AssignmentID" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="DocumentID" Type="Int32" />
+          <Property Name="Content" Type="String" MaxLength="Max" FixedLength="false" Unicode="true" />
+          <Property Name="ReplacementCode" Type="String" MaxLength="Max" FixedLength="false" Unicode="true" />
+          <Property Name="Action" Type="Int32" Nullable="false" />
+          <Property Name="DocumentType" Type="Int32" />
+          <Property Name="DueDate" Type="DateTime" Precision="3" />
+          <Property Name="Comments" Type="String" MaxLength="Max" FixedLength="false" Unicode="true" />
+          <Property Name="Remarks" Type="String" MaxLength="Max" FixedLength="false" Unicode="true" />
+          <Property Name="OrginalSourceFile" Type="String" MaxLength="Max" FixedLength="false" Unicode="true" />
+          <Property Name="DocumentFile" Type="String" MaxLength="Max" FixedLength="false" Unicode="true" />
+          <Property Name="ProjectID" Type="Int32" />
+          <Property Name="CreatedDate" Type="DateTime" Nullable="false" Precision="3" />
+          <Property Name="CompletedDate" Type="DateTime" Precision="3" />
+          <Property Name="CreatedBy" Type="Int32" />
+          <Property Name="TaskName" Type="String" MaxLength="100" FixedLength="false" Unicode="false" Nullable="false" />
+          <Property Name="Status" Type="Int32" />
+          <Property Name="MainAssignmentID" Type="Int32" />
+          <Property Name="LockedByUserID" Type="Int32" Nullable="true" />
+          <Property Name="IsEntireDocument" Type="Boolean" />
+          <NavigationProperty Name="tblAssignedWordPages" Relationship="Self.FK_tblAssignedDocs_tblAssignments" FromRole="tblAssignments" ToRole="tblAssignedWordPages" />
+          <NavigationProperty Name="tblAssignedExcelSheets" Relationship="Self.FK_tblAssignedExcelSheets_tblAssignments" FromRole="tblAssignments" ToRole="tblAssignedExcelSheets" />
+          <NavigationProperty Name="tblAssignmentLogs" Relationship="Self.FK_tblAssignmentLog_tblAssignments" FromRole="tblAssignments" ToRole="tblAssignmentLog" />
+          <NavigationProperty Name="tblAssignmentMembers" Relationship="Self.FK_AssignmentID" FromRole="tblAssignments" ToRole="tblAssignmentMember" />
+          <NavigationProperty Name="tblAssignments1" Relationship="Self.FK_tblAssignments_tblAssignments" FromRole="tblAssignments" ToRole="tblAssignments1" />
+          <NavigationProperty Name="tblAssignment1" Relationship="Self.FK_tblAssignments_tblAssignments" FromRole="tblAssignments1" ToRole="tblAssignments" />
+          <NavigationProperty Name="tblProject" Relationship="Self.FK_tblAssignments_tblProjects" FromRole="tblAssignments" ToRole="tblProjects" />
+          <NavigationProperty Name="tblDocument" Relationship="Self.FK_tblAssignments_tblUserDepartment1" FromRole="tblAssignments" ToRole="tblDocument" />
+          <NavigationProperty Name="tblExcelRowMaps" Relationship="Models.FK_tblExcelRowMap_tblAssignments" FromRole="tblAssignment" ToRole="tblExcelRowMap" />
+          <NavigationProperty Name="LockedBy" Relationship="Self.FK_tblAssignments_tblUserDepartment" FromRole="tblAssignment" ToRole="tblUserDepartment" />
+        </EntityType>
+        <EntityType Name="tblChatMessage">
+          <Key>
+            <PropertyRef Name="ChatMessageID" />
+          </Key>
+          <Property Name="ChatMessageID" Type="Int64" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="UserFromId" Type="Int32" Nullable="false" />
+          <Property Name="UserToId" Type="Int32" Nullable="false" />
+          <Property Name="Message" Type="String" MaxLength="Max" FixedLength="false" Unicode="false" />
+          <Property Name="ClientGuid" Type="String" MaxLength="200" FixedLength="false" Unicode="false" Nullable="false" />
+          <Property Name="MessageSentDateTime" Type="DateTime" Nullable="false" Precision="3" />
+          <Property Name="IsRead" Type="Boolean" Nullable="false" />
+          <Property Name="VisibleFrom" Type="Boolean" />
+          <Property Name="VisibleTo" Type="Boolean" />
+        </EntityType>
+        <EntityType Name="tblCompany">
+          <Key>
+            <PropertyRef Name="CompanyID" />
+          </Key>
+          <Property Name="CompanyID" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="CompanyLogo" Type="String" MaxLength="250" FixedLength="false" Unicode="false" Nullable="false" />
+          <Property Name="Name" Type="String" MaxLength="250" FixedLength="false" Unicode="false" Nullable="false" />
+          <Property Name="Address" Type="String" MaxLength="50" FixedLength="false" Unicode="false" />
+          <Property Name="Zip" Type="String" MaxLength="25" FixedLength="false" Unicode="false" />
+          <Property Name="City" Type="String" MaxLength="50" FixedLength="false" Unicode="false" />
+          <Property Name="State" Type="String" MaxLength="50" FixedLength="false" Unicode="false" />
+          <Property Name="Country" Type="String" MaxLength="50" FixedLength="false" Unicode="false" />
+          <Property Name="CreatedBy" Type="Int32" Nullable="false" />
+          <Property Name="CreatedDate" Type="DateTime" Nullable="false" Precision="3" />
+          <Property Name="ModifiedBy" Type="Int32" />
+          <Property Name="ModifiedDate" Type="DateTime" Precision="3" />
+          <Property Name="IsSuperAdmin" Type="Boolean" />
+          <Property Name="IsActive" Type="Boolean" />
+          <Property Name="IsDeleted" Type="Boolean" />
+          <Property Name="WebsiteURL" Type="String" MaxLength="250" FixedLength="false" Unicode="false" />
+          <Property Name="IsAppointmentEnable" Type="Boolean" Nullable="false" />
+          <Property Name="ExchangeServerURL" Type="String" MaxLength="255" FixedLength="false" Unicode="false" />
+          <Property Name="ExchangeServerUserName" Type="String" MaxLength="255" FixedLength="false" Unicode="false" />
+          <Property Name="ExchangeServerPassword" Type="String" MaxLength="255" FixedLength="false" Unicode="false" />
+          <Property Name="DateFormatID" Type="Int32" />
+          <Property Name="IsMessengerServiceEnable" Type="Boolean" Nullable="false" />
+          <NavigationProperty Name="tblDateFormat" Relationship="Self.FK__tblCompan__DateF__27F8EE98" FromRole="tblCompany" ToRole="tblDateFormats" />
+          <NavigationProperty Name="tblRoles" Relationship="Self.FK_tblRole_tblCompany" FromRole="tblCompany" ToRole="tblRole" />
+          <NavigationProperty Name="tblSectionMasters" Relationship="Self.FK_tblSectionMaster_tblCompany" FromRole="tblCompany" ToRole="tblSectionMaster" />
+          <NavigationProperty Name="tblUserDepartments" Relationship="Self.FK_tblUserDepartment_tblCompany" FromRole="tblCompany" ToRole="tblUserDepartment" />
+        </EntityType>
+        <EntityType Name="tblDateFormat">
+          <Key>
+            <PropertyRef Name="DateFormatID" />
+          </Key>
+          <Property Name="DateFormatID" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="DateFormat" Type="String" MaxLength="50" FixedLength="false" Unicode="false" Nullable="false" />
+          <Property Name="IsActive" Type="Boolean" Nullable="false" />
+          <NavigationProperty Name="tblCompanies" Relationship="Self.FK__tblCompan__DateF__27F8EE98" FromRole="tblDateFormats" ToRole="tblCompany" />
+        </EntityType>
+        <EntityType Name="tblDocument">
+          <Key>
+            <PropertyRef Name="DocumentID" />
+          </Key>
+          <Property Name="DocumentID" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="DisplayName" Type="String" MaxLength="Max" FixedLength="false" Unicode="false" />
+          <Property Name="DocumentName" Type="String" MaxLength="Max" FixedLength="false" Unicode="false" />
+          <Property Name="DocumentType" Type="Int32" />
+          <Property Name="CompanyID" Type="Int32" Nullable="false" />
+          <Property Name="CreatedBy" Type="Int32" />
+          <Property Name="CreatedDate" Type="DateTime" Precision="3" />
+          <NavigationProperty Name="tblAssignments" Relationship="Self.FK_tblAssignments_tblUserDepartment1" FromRole="tblDocument" ToRole="tblAssignments" />
+          <NavigationProperty Name="tblUserDepartment" Relationship="Self.FK_tblDocument_tblUserDepartment" FromRole="tblDocument" ToRole="tblUserDepartment" />
+          <NavigationProperty Name="tblProjectDocuments" Relationship="Self.FK_tblProjectDocuments_tblDocument" FromRole="tblDocument" ToRole="tblProjectDocuments" />
+        </EntityType>
+        <EntityType Name="tblExcelRowMap">
+          <Key>
+            <PropertyRef Name="Id" />
+          </Key>
+          <Property Name="Id" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="RowId" Type="Guid" Nullable="false" />
+          <Property Name="MasterDocumentName" Type="String" MaxLength="500" FixedLength="false" Unicode="true" Nullable="false" />
+          <Property Name="IsActive" Type="Boolean" Nullable="false" />
+          <Property Name="DateLastModified" Type="DateTime" Nullable="false" Precision="3" />
+          <Property Name="IsRemoved" Type="Boolean" Nullable="false" />
+          <NavigationProperty Name="tblAssignment" Relationship="Models.FK_tblExcelRowMap_tblAssignments" FromRole="tblExcelRowMap" ToRole="tblAssignment" />
+          <Property Name="AssignmentID" Type="Int32" Nullable="false" />
+        </EntityType>
+        <EntityType Name="tblExcelSheet">
+          <Key>
+            <PropertyRef Name="ExcelSheetID" />
+          </Key>
+          <Property Name="ExcelSheetID" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="SheetName" Type="String" MaxLength="250" FixedLength="false" Unicode="false" Nullable="false" />
+          <Property Name="MasterDocumentName" Type="String" MaxLength="500" FixedLength="false" Unicode="false" Nullable="false" />
+          <Property Name="Sequence" Type="Int32" Nullable="false" />
+          <Property Name="IsOriginal" Type="Boolean" />
+        </EntityType>
+        <EntityType Name="tblLogActivity">
+          <Key>
+            <PropertyRef Name="LogActivityID" />
+          </Key>
+          <Property Name="LogActivityID" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="LogActivityTypeID" Type="Int32" Nullable="false" />
+          <Property Name="ActivityDetails" Type="String" MaxLength="Max" FixedLength="false" Unicode="true" />
+          <Property Name="IPAddress" Type="String" MaxLength="50" FixedLength="false" Unicode="true" />
+          <Property Name="ChangedID" Type="Int32" />
+          <Property Name="CreatedBy" Type="Int32" Nullable="false" />
+          <Property Name="CreatedDate" Type="DateTime" Nullable="false" Precision="3" />
+          <Property Name="MenuItem" Type="String" MaxLength="50" FixedLength="false" Unicode="true" />
+          <Property Name="CompanyID" Type="Int32" />
+        </EntityType>
+        <EntityType Name="tblMenuItem">
+          <Key>
+            <PropertyRef Name="MenuItemID" />
+          </Key>
+          <Property Name="MenuItemID" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="GUID" Type="Guid" />
+          <Property Name="MenuItem" Type="String" MaxLength="50" FixedLength="false" Unicode="false" />
+          <Property Name="MenuItemController" Type="String" MaxLength="50" FixedLength="false" Unicode="false" />
+          <Property Name="MenuItemView" Type="String" MaxLength="50" FixedLength="false" Unicode="false" />
+          <Property Name="SortOrder" Type="Int32" />
+          <Property Name="ParentID" Type="Int32" />
+          <Property Name="IsActive" Type="Boolean" Nullable="false" />
+        </EntityType>
+        <EntityType Name="tblMenuItem1">
+          <Key>
+            <PropertyRef Name="MenuItemID" />
+          </Key>
+          <Property Name="MenuItemID" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="MenuName" Type="String" MaxLength="50" FixedLength="false" Unicode="true" Nullable="false" />
+          <Property Name="Controller" Type="String" MaxLength="50" FixedLength="false" Unicode="true" Nullable="false" />
+          <Property Name="Action" Type="String" MaxLength="50" FixedLength="false" Unicode="true" Nullable="false" />
+          <Property Name="SortOrder" Type="Int32" />
+          <Property Name="CreatedBy" Type="Int32" Nullable="false" />
+          <Property Name="CreatedDate" Type="DateTime" Nullable="false" Precision="3" />
+        </EntityType>
+        <EntityType Name="tblPPTSlide">
+          <Key>
+            <PropertyRef Name="PPTSlidesID" />
+          </Key>
+          <Property Name="PPTSlidesID" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="SlideName" Type="String" MaxLength="50" FixedLength="false" Unicode="true" Nullable="false" />
+          <Property Name="MasterDocumentName" Type="String" MaxLength="Max" FixedLength="false" Unicode="true" Nullable="false" />
+          <Property Name="Sequence" Type="Int32" Nullable="false" />
+          <Property Name="IsOriginal" Type="Boolean" />
+        </EntityType>
+        <EntityType Name="tblProjectDocument">
+          <Key>
+            <PropertyRef Name="ProjectDocumentID" />
+          </Key>
+          <Property Name="ProjectDocumentID" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="DocumentID" Type="Int32" Nullable="false" />
+          <Property Name="ProjectID" Type="Int32" Nullable="false" />
+          <Property Name="IsActive" Type="Boolean" Nullable="false" />
+          <NavigationProperty Name="tblDocument" Relationship="Self.FK_tblProjectDocuments_tblDocument" FromRole="tblProjectDocuments" ToRole="tblDocument" />
+          <NavigationProperty Name="tblProject" Relationship="Self.FK_tblProjectDocuments_tblProjects" FromRole="tblProjectDocuments" ToRole="tblProjects" />
+        </EntityType>
+        <EntityType Name="tblProjectMember">
+          <Key>
+            <PropertyRef Name="ProjectMemberID" />
+          </Key>
+          <Property Name="ProjectMemberID" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="ProjectID" Type="Int32" Nullable="false" />
+          <Property Name="UserID" Type="Int32" Nullable="false" />
+          <Property Name="CreatedDate" Type="DateTime" Nullable="false" Precision="3" />
+          <Property Name="CreatedBy" Type="Int32" Nullable="false" />
+          <NavigationProperty Name="tblProject" Relationship="Self.FK_tblProjectMembers_tblProjects" FromRole="tblProjectMembers" ToRole="tblProjects" />
+          <NavigationProperty Name="tblUserDepartment" Relationship="Self.FK_tblProjectMembers_tblUserDepartment" FromRole="tblProjectMembers" ToRole="tblUserDepartment" />
+          <NavigationProperty Name="tblUserDepartment1" Relationship="Self.FK_tblProjectMembers_tblUserDepartment1" FromRole="tblProjectMembers" ToRole="tblUserDepartment" />
+        </EntityType>
+        <EntityType Name="tblProject">
+          <Key>
+            <PropertyRef Name="ProjectID" />
+          </Key>
+          <Property Name="ProjectID" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="Name" Type="String" MaxLength="50" FixedLength="false" Unicode="true" Nullable="false" />
+          <Property Name="StartDate" Type="DateTime" Nullable="false" Precision="3" />
+          <Property Name="EndDate" Type="DateTime" Nullable="false" Precision="3" />
+          <Property Name="FileName" Type="String" MaxLength="Max" FixedLength="false" Unicode="true" />
+          <Property Name="Description" Type="String" MaxLength="Max" FixedLength="false" Unicode="true" />
+          <Property Name="Status" Type="Int32" Nullable="false" />
+          <Property Name="IsDeleted" Type="Boolean" Nullable="false" />
+          <Property Name="CreatedDate" Type="DateTime" Nullable="false" Precision="3" />
+          <Property Name="CreatedBy" Type="Int32" Nullable="false" />
+          <Property Name="ModifiedDate" Type="DateTime" Precision="3" />
+          <Property Name="ModifiedBy" Type="Int32" />
+          <NavigationProperty Name="tblAssignments" Relationship="Self.FK_tblAssignments_tblProjects" FromRole="tblProjects" ToRole="tblAssignments" />
+          <NavigationProperty Name="tblProjectDocuments" Relationship="Self.FK_tblProjectDocuments_tblProjects" FromRole="tblProjects" ToRole="tblProjectDocuments" />
+          <NavigationProperty Name="tblProjectMembers" Relationship="Self.FK_tblProjectMembers_tblProjects" FromRole="tblProjects" ToRole="tblProjectMembers" />
+          <NavigationProperty Name="tblUserDepartment" Relationship="Self.FK_tblProjects_tblUserDepartment" FromRole="tblProjects" ToRole="tblUserDepartment" />
+          <NavigationProperty Name="tblUserDepartment1" Relationship="Self.FK_tblProjects_tblUserDepartment1" FromRole="tblProjects" ToRole="tblUserDepartment" />
+        </EntityType>
+        <EntityType Name="tblRole">
+          <Key>
+            <PropertyRef Name="RoleID" />
+          </Key>
+          <Property Name="RoleID" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="CompanyID" Type="Int32" Nullable="false" />
+          <Property Name="Role" Type="String" MaxLength="50" FixedLength="false" Unicode="false" />
+          <Property Name="Description" Type="String" MaxLength="255" FixedLength="false" Unicode="false" />
+          <Property Name="CreatedBy" Type="Int32" Nullable="false" />
+          <Property Name="CreatedDate" Type="DateTime" Nullable="false" Precision="3" />
+          <Property Name="ModifiedBy" Type="Int32" />
+          <Property Name="ModifiedDate" Type="DateTime" Precision="3" />
+          <Property Name="IsActive" Type="Boolean" Nullable="false" />
+          <Property Name="IsAdminRole" Type="Boolean" Nullable="false" />
+          <NavigationProperty Name="tblCompany" Relationship="Self.FK_tblRole_tblCompany" FromRole="tblRole" ToRole="tblCompany" />
+          <NavigationProperty Name="tblUserDepartments" Relationship="Self.FK_tblUserDepartment_tblRole" FromRole="tblRole" ToRole="tblUserDepartment" />
+        </EntityType>
+        <EntityType Name="tblRolePrivilage">
+          <Key>
+            <PropertyRef Name="RolePrivilageID" />
+          </Key>
+          <Property Name="RolePrivilageID" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="MenuItemID" Type="Int32" Nullable="false" />
+          <Property Name="ViewPermission" Type="Boolean" Nullable="false" />
+          <Property Name="UserID" Type="Int32" Nullable="false" />
+          <Property Name="CreatedBy" Type="Int32" Nullable="false" />
+          <Property Name="CreatedDate" Type="DateTime" Precision="3" />
+          <Property Name="Add" Type="Boolean" />
+          <Property Name="Edit" Type="Boolean" />
+          <Property Name="Delete" Type="Boolean" />
+          <Property Name="Detail" Type="Boolean" />
+          <Property Name="ModifiedBy" Type="Int32" />
+          <Property Name="ModifiedDate" Type="DateTime" Precision="3" />
+          <Property Name="IsActive" Type="Int32" />
+          <Property Name="RoleID" Type="Int32" />
+          <NavigationProperty Name="tblUserDepartment" Relationship="Self.FK_tblRolePrivilages_tblUserDepartment" FromRole="tblRolePrivilages" ToRole="tblUserDepartment" />
+        </EntityType>
+        <EntityType Name="tblSectionMaster">
+          <Key>
+            <PropertyRef Name="SectionID" />
+          </Key>
+          <Property Name="SectionID" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="SectionName" Type="String" MaxLength="100" FixedLength="false" Unicode="true" Nullable="false" />
+          <Property Name="SectionURL" Type="String" MaxLength="Max" FixedLength="false" Unicode="true" />
+          <Property Name="Description" Type="String" MaxLength="Max" FixedLength="false" Unicode="true" />
+          <Property Name="ContentType" Type="Int32" Nullable="false" />
+          <Property Name="ContentFile" Type="String" MaxLength="100" FixedLength="false" Unicode="true" />
+          <Property Name="CompanyID" Type="Int32" />
+          <Property Name="IsDeleted" Type="Boolean" />
+          <Property Name="Status" Type="Boolean" />
+          <Property Name="CreatedBy" Type="Int32" />
+          <Property Name="CreatedDate" Type="DateTime" Precision="3" />
+          <NavigationProperty Name="tblCompany" Relationship="Self.FK_tblSectionMaster_tblCompany" FromRole="tblSectionMaster" ToRole="tblCompany" />
+          <NavigationProperty Name="tblUserDepartment" Relationship="Self.FK_tblSectionMaster_tblUserDepartment" FromRole="tblSectionMaster" ToRole="tblUserDepartment" />
+        </EntityType>
+        <EntityType Name="tblTemplateMaster">
+          <Key>
+            <PropertyRef Name="TemplateID" />
+          </Key>
+          <Property Name="TemplateID" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="TemplateName" Type="String" MaxLength="50" FixedLength="false" Unicode="false" Nullable="false" />
+          <Property Name="TemplateType" Type="Int32" Nullable="false" />
+          <Property Name="Subject" Type="String" MaxLength="100" FixedLength="false" Unicode="false" />
+          <Property Name="TemplateContent" Type="String" MaxLength="Max" FixedLength="false" Unicode="false" Nullable="false" />
+          <Property Name="IsActive" Type="Boolean" Nullable="false" />
+          <Property Name="CreatedBy" Type="Int32" Nullable="false" />
+          <Property Name="CreatedDate" Type="DateTime" Nullable="false" Precision="3" />
+          <Property Name="ModifiedBy" Type="Int32" />
+          <Property Name="ModifiedDate" Type="DateTime" Precision="3" />
+          <NavigationProperty Name="tblUserDepartment" Relationship="Self.FK_tblTemplateMaster_tblUserDepartment" FromRole="tblTemplateMaster" ToRole="tblUserDepartment" />
+          <NavigationProperty Name="tblUserDepartment1" Relationship="Self.FK_tblTemplateMaster_tblUserDepartment1" FromRole="tblTemplateMaster" ToRole="tblUserDepartment" />
+        </EntityType>
+        <EntityType Name="tblUserDepartment">
+          <Key>
+            <PropertyRef Name="UserId" />
+          </Key>
+          <Property Name="UserId" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="FullName" Type="String" MaxLength="100" FixedLength="false" Unicode="true" Nullable="false" />
+          <Property Name="EmailID" Type="String" MaxLength="250" FixedLength="false" Unicode="true" />
+          <Property Name="UserName" Type="String" MaxLength="255" FixedLength="false" Unicode="true" Nullable="false" />
+          <Property Name="Password" Type="String" MaxLength="250" FixedLength="false" Unicode="false" />
+          <Property Name="Department" Type="String" MaxLength="250" FixedLength="false" Unicode="false" />
+          <Property Name="CompanyID" Type="Int32" />
+          <Property Name="RoleID" Type="Int32" />
+          <Property Name="ProfileImage" Type="String" MaxLength="250" FixedLength="false" Unicode="false" />
+          <Property Name="CreatedBy" Type="Int32" />
+          <Property Name="CreatedDate" Type="DateTime" Precision="3" />
+          <Property Name="ModifiedBy" Type="Int32" />
+          <Property Name="ModifiedDate" Type="DateTime" Precision="3" />
+          <Property Name="IsActive" Type="Boolean" />
+          <Property Name="IsAppointmentEnable" Type="Boolean" Nullable="false" />
+          <Property Name="CanCreateSubtasks" Type="Boolean" />
+          <Property Name="CanEdit" Type="Boolean" />
+          <Property Name="CanApprove" Type="Boolean" />
+          <NavigationProperty Name="tblAssignmentHistories" Relationship="Self.FK_tblAssignmentHistory_tblUserDepartment" FromRole="tblUserDepartment" ToRole="tblAssignmentHistory" />
+          <NavigationProperty Name="tblAssignmentLogs" Relationship="Self.FK_tblAssignmentLog_tblUserDepartment" FromRole="tblUserDepartment" ToRole="tblAssignmentLog" />
+          <NavigationProperty Name="tblAssignmentMembers" Relationship="Self.FK_UserID" FromRole="tblUserDepartment" ToRole="tblAssignmentMember" />
+          <NavigationProperty Name="tblCompany" Relationship="Self.FK_tblUserDepartment_tblCompany" FromRole="tblUserDepartment" ToRole="tblCompany" />
+          <NavigationProperty Name="tblDocuments" Relationship="Self.FK_tblDocument_tblUserDepartment" FromRole="tblUserDepartment" ToRole="tblDocument" />
+          <NavigationProperty Name="tblProjectMembers" Relationship="Self.FK_tblProjectMembers_tblUserDepartment" FromRole="tblUserDepartment" ToRole="tblProjectMembers" />
+          <NavigationProperty Name="tblProjectMembers1" Relationship="Self.FK_tblProjectMembers_tblUserDepartment1" FromRole="tblUserDepartment" ToRole="tblProjectMembers" />
+          <NavigationProperty Name="tblProjects" Relationship="Self.FK_tblProjects_tblUserDepartment" FromRole="tblUserDepartment" ToRole="tblProjects" />
+          <NavigationProperty Name="tblProjects1" Relationship="Self.FK_tblProjects_tblUserDepartment1" FromRole="tblUserDepartment" ToRole="tblProjects" />
+          <NavigationProperty Name="tblRole" Relationship="Self.FK_tblUserDepartment_tblRole" FromRole="tblUserDepartment" ToRole="tblRole" />
+          <NavigationProperty Name="tblRolePrivilages" Relationship="Self.FK_tblRolePrivilages_tblUserDepartment" FromRole="tblUserDepartment" ToRole="tblRolePrivilages" />
+          <NavigationProperty Name="tblSectionMasters" Relationship="Self.FK_tblSectionMaster_tblUserDepartment" FromRole="tblUserDepartment" ToRole="tblSectionMaster" />
+          <NavigationProperty Name="tblTemplateMasters" Relationship="Self.FK_tblTemplateMaster_tblUserDepartment" FromRole="tblUserDepartment" ToRole="tblTemplateMaster" />
+          <NavigationProperty Name="tblTemplateMasters1" Relationship="Self.FK_tblTemplateMaster_tblUserDepartment1" FromRole="tblUserDepartment" ToRole="tblTemplateMaster" />
+          <NavigationProperty Name="LockedAssignments" Relationship="Self.FK_tblAssignments_tblUserDepartment" FromRole="tblUserDepartment" ToRole="tblAssignment" />
+        </EntityType>
+        <EntityType Name="tblLogActivityType">
+          <Key>
+            <PropertyRef Name="LogActivityTypeID" />
+            <PropertyRef Name="LogActivityName" />
+          </Key>
+          <Property Name="LogActivityTypeID" Type="Int32" Nullable="false" />
+          <Property Name="LogActivityName" Type="String" MaxLength="50" FixedLength="false" Unicode="true" Nullable="false" />
+        </EntityType>
+        <EntityType Name="vwRolePrivilege">
+          <Key>
+            <PropertyRef Name="MenuItemID" />
+          </Key>
+          <Property Name="MenuItemID" Type="Int32" Nullable="false" />
+          <Property Name="MenuItem" Type="String" MaxLength="50" FixedLength="false" Unicode="false" />
+          <Property Name="MenuItemController" Type="String" MaxLength="50" FixedLength="false" Unicode="false" />
+          <Property Name="MenuItemView" Type="String" MaxLength="50" FixedLength="false" Unicode="false" />
+          <Property Name="ViewPermission" Type="Boolean" />
+          <Property Name="Add" Type="Boolean" />
+          <Property Name="Edit" Type="Boolean" />
+          <Property Name="Delete" Type="Boolean" />
+          <Property Name="Detail" Type="Boolean" />
+          <Property Name="OrderID" Type="Int32" />
+          <Property Name="ParentID" Type="Int32" />
+          <Property Name="SortOrder" Type="Int32" />
+          <Property Name="IsActive" Type="Int32" />
+          <Property Name="RoleID" Type="Int32" />
+        </EntityType>
+        <Association Name="FK_tblAssignedDocs_tblAssignments">
+          <End Role="tblAssignments" Type="Self.tblAssignment" Multiplicity="0..1" />
+          <End Role="tblAssignedWordPages" Type="Models.tblAssignedWordPage" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="tblAssignments">
+              <PropertyRef Name="AssignmentID" />
+            </Principal>
+            <Dependent Role="tblAssignedWordPages">
+              <PropertyRef Name="AssignmentID" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_tblAssignedExcelSheets_tblAssignments">
+          <End Role="tblAssignments" Type="Self.tblAssignment" Multiplicity="1" />
+          <End Role="tblAssignedExcelSheets" Type="Self.tblAssignedExcelSheet" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="tblAssignments">
+              <PropertyRef Name="AssignmentID" />
+            </Principal>
+            <Dependent Role="tblAssignedExcelSheets">
+              <PropertyRef Name="AssignmentID" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_tblAssignmentHistory_tblAssignmentLog">
+          <End Role="tblAssignmentLog" Type="Self.tblAssignmentLog" Multiplicity="0..1" />
+          <End Role="tblAssignmentHistory" Type="Self.tblAssignmentHistory" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="tblAssignmentLog">
+              <PropertyRef Name="AssignmentLogID" />
+            </Principal>
+            <Dependent Role="tblAssignmentHistory">
+              <PropertyRef Name="AssignmentLogID" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_tblAssignmentHistory_tblUserDepartment">
+          <End Role="tblUserDepartment" Type="Self.tblUserDepartment" Multiplicity="0..1" />
+          <End Role="tblAssignmentHistory" Type="Self.tblAssignmentHistory" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="tblUserDepartment">
+              <PropertyRef Name="UserId" />
+            </Principal>
+            <Dependent Role="tblAssignmentHistory">
+              <PropertyRef Name="CreatedBy" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_tblAssignmentLog_tblAssignments">
+          <End Role="tblAssignments" Type="Self.tblAssignment" Multiplicity="0..1" />
+          <End Role="tblAssignmentLog" Type="Self.tblAssignmentLog" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="tblAssignments">
+              <PropertyRef Name="AssignmentID" />
+            </Principal>
+            <Dependent Role="tblAssignmentLog">
+              <PropertyRef Name="AssignmentID" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_tblAssignmentLog_tblUserDepartment">
+          <End Role="tblUserDepartment" Type="Self.tblUserDepartment" Multiplicity="0..1" />
+          <End Role="tblAssignmentLog" Type="Self.tblAssignmentLog" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="tblUserDepartment">
+              <PropertyRef Name="UserId" />
+            </Principal>
+            <Dependent Role="tblAssignmentLog">
+              <PropertyRef Name="CreatedBy" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_AssignmentID">
+          <End Role="tblAssignments" Type="Self.tblAssignment" Multiplicity="0..1" />
+          <End Role="tblAssignmentMember" Type="Self.tblAssignmentMember" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="tblAssignments">
+              <PropertyRef Name="AssignmentID" />
+            </Principal>
+            <Dependent Role="tblAssignmentMember">
+              <PropertyRef Name="AssignmentID" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_UserID">
+          <End Role="tblUserDepartment" Type="Self.tblUserDepartment" Multiplicity="0..1" />
+          <End Role="tblAssignmentMember" Type="Self.tblAssignmentMember" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="tblUserDepartment">
+              <PropertyRef Name="UserId" />
+            </Principal>
+            <Dependent Role="tblAssignmentMember">
+              <PropertyRef Name="UserID" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_tblAssignments_tblAssignments">
+          <End Role="tblAssignments" Type="Self.tblAssignment" Multiplicity="1" />
+          <End Role="tblAssignments1" Type="Self.tblAssignment" Multiplicity="0..1" />
+          <ReferentialConstraint>
+            <Principal Role="tblAssignments">
+              <PropertyRef Name="AssignmentID" />
+            </Principal>
+            <Dependent Role="tblAssignments1">
+              <PropertyRef Name="AssignmentID" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_tblAssignments_tblProjects">
+          <End Role="tblProjects" Type="Self.tblProject" Multiplicity="0..1" />
+          <End Role="tblAssignments" Type="Self.tblAssignment" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="tblProjects">
+              <PropertyRef Name="ProjectID" />
+            </Principal>
+            <Dependent Role="tblAssignments">
+              <PropertyRef Name="ProjectID" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_tblAssignments_tblUserDepartment">
+          <End Role="tblUserDepartment" Type="Self.tblUserDepartment" Multiplicity="0..1" />
+          <End Role="tblAssignment" Type="Self.tblAssignment" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="tblUserDepartment">
+              <PropertyRef Name="UserId" />
+            </Principal>
+            <Dependent Role="tblAssignment">
+              <PropertyRef Name="LockedByUserID" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_tblAssignments_tblUserDepartment1">
+          <End Role="tblDocument" Type="Self.tblDocument" Multiplicity="0..1" />
+          <End Role="tblAssignments" Type="Self.tblAssignment" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="tblDocument">
+              <PropertyRef Name="DocumentID" />
+            </Principal>
+            <Dependent Role="tblAssignments">
+              <PropertyRef Name="DocumentID" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK__tblCompan__DateF__27F8EE98">
+          <End Role="tblDateFormats" Type="Self.tblDateFormat" Multiplicity="0..1" />
+          <End Role="tblCompany" Type="Self.tblCompany" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="tblDateFormats">
+              <PropertyRef Name="DateFormatID" />
+            </Principal>
+            <Dependent Role="tblCompany">
+              <PropertyRef Name="DateFormatID" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_tblRole_tblCompany">
+          <End Role="tblCompany" Type="Self.tblCompany" Multiplicity="1" />
+          <End Role="tblRole" Type="Self.tblRole" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="tblCompany">
+              <PropertyRef Name="CompanyID" />
+            </Principal>
+            <Dependent Role="tblRole">
+              <PropertyRef Name="CompanyID" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_tblSectionMaster_tblCompany">
+          <End Role="tblCompany" Type="Self.tblCompany" Multiplicity="0..1" />
+          <End Role="tblSectionMaster" Type="Self.tblSectionMaster" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="tblCompany">
+              <PropertyRef Name="CompanyID" />
+            </Principal>
+            <Dependent Role="tblSectionMaster">
+              <PropertyRef Name="CompanyID" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_tblUserDepartment_tblCompany">
+          <End Role="tblCompany" Type="Self.tblCompany" Multiplicity="0..1" />
+          <End Role="tblUserDepartment" Type="Self.tblUserDepartment" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="tblCompany">
+              <PropertyRef Name="CompanyID" />
+            </Principal>
+            <Dependent Role="tblUserDepartment">
+              <PropertyRef Name="CompanyID" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_tblDocument_tblUserDepartment">
+          <End Role="tblUserDepartment" Type="Self.tblUserDepartment" Multiplicity="0..1" />
+          <End Role="tblDocument" Type="Self.tblDocument" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="tblUserDepartment">
+              <PropertyRef Name="UserId" />
+            </Principal>
+            <Dependent Role="tblDocument">
+              <PropertyRef Name="CreatedBy" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_tblProjectDocuments_tblDocument">
+          <End Role="tblDocument" Type="Self.tblDocument" Multiplicity="1" />
+          <End Role="tblProjectDocuments" Type="Self.tblProjectDocument" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="tblDocument">
+              <PropertyRef Name="DocumentID" />
+            </Principal>
+            <Dependent Role="tblProjectDocuments">
+              <PropertyRef Name="DocumentID" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_tblProjectDocuments_tblProjects">
+          <End Role="tblProjects" Type="Self.tblProject" Multiplicity="1" />
+          <End Role="tblProjectDocuments" Type="Self.tblProjectDocument" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="tblProjects">
+              <PropertyRef Name="ProjectID" />
+            </Principal>
+            <Dependent Role="tblProjectDocuments">
+              <PropertyRef Name="ProjectID" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_tblProjectMembers_tblProjects">
+          <End Role="tblProjects" Type="Self.tblProject" Multiplicity="1" />
+          <End Role="tblProjectMembers" Type="Self.tblProjectMember" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="tblProjects">
+              <PropertyRef Name="ProjectID" />
+            </Principal>
+            <Dependent Role="tblProjectMembers">
+              <PropertyRef Name="ProjectID" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_tblProjectMembers_tblUserDepartment">
+          <End Role="tblUserDepartment" Type="Self.tblUserDepartment" Multiplicity="1" />
+          <End Role="tblProjectMembers" Type="Self.tblProjectMember" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="tblUserDepartment">
+              <PropertyRef Name="UserId" />
+            </Principal>
+            <Dependent Role="tblProjectMembers">
+              <PropertyRef Name="UserID" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_tblProjectMembers_tblUserDepartment1">
+          <End Role="tblUserDepartment" Type="Self.tblUserDepartment" Multiplicity="1" />
+          <End Role="tblProjectMembers" Type="Self.tblProjectMember" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="tblUserDepartment">
+              <PropertyRef Name="UserId" />
+            </Principal>
+            <Dependent Role="tblProjectMembers">
+              <PropertyRef Name="CreatedBy" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_tblProjects_tblUserDepartment">
+          <End Role="tblUserDepartment" Type="Self.tblUserDepartment" Multiplicity="1" />
+          <End Role="tblProjects" Type="Self.tblProject" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="tblUserDepartment">
+              <PropertyRef Name="UserId" />
+            </Principal>
+            <Dependent Role="tblProjects">
+              <PropertyRef Name="CreatedBy" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_tblProjects_tblUserDepartment1">
+          <End Role="tblUserDepartment" Type="Self.tblUserDepartment" Multiplicity="0..1" />
+          <End Role="tblProjects" Type="Self.tblProject" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="tblUserDepartment">
+              <PropertyRef Name="UserId" />
+            </Principal>
+            <Dependent Role="tblProjects">
+              <PropertyRef Name="ModifiedBy" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_tblUserDepartment_tblRole">
+          <End Role="tblRole" Type="Self.tblRole" Multiplicity="0..1" />
+          <End Role="tblUserDepartment" Type="Self.tblUserDepartment" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="tblRole">
+              <PropertyRef Name="RoleID" />
+            </Principal>
+            <Dependent Role="tblUserDepartment">
+              <PropertyRef Name="RoleID" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_tblRolePrivilages_tblUserDepartment">
+          <End Role="tblUserDepartment" Type="Self.tblUserDepartment" Multiplicity="1" />
+          <End Role="tblRolePrivilages" Type="Self.tblRolePrivilage" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="tblUserDepartment">
+              <PropertyRef Name="UserId" />
+            </Principal>
+            <Dependent Role="tblRolePrivilages">
+              <PropertyRef Name="UserID" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_tblSectionMaster_tblUserDepartment">
+          <End Role="tblUserDepartment" Type="Self.tblUserDepartment" Multiplicity="0..1" />
+          <End Role="tblSectionMaster" Type="Self.tblSectionMaster" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="tblUserDepartment">
+              <PropertyRef Name="UserId" />
+            </Principal>
+            <Dependent Role="tblSectionMaster">
+              <PropertyRef Name="CreatedBy" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_tblTemplateMaster_tblUserDepartment">
+          <End Role="tblUserDepartment" Type="Self.tblUserDepartment" Multiplicity="1" />
+          <End Role="tblTemplateMaster" Type="Self.tblTemplateMaster" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="tblUserDepartment">
+              <PropertyRef Name="UserId" />
+            </Principal>
+            <Dependent Role="tblTemplateMaster">
+              <PropertyRef Name="CreatedBy" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_tblTemplateMaster_tblUserDepartment1">
+          <End Role="tblUserDepartment" Type="Self.tblUserDepartment" Multiplicity="0..1" />
+          <End Role="tblTemplateMaster" Type="Self.tblTemplateMaster" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="tblUserDepartment">
+              <PropertyRef Name="UserId" />
+            </Principal>
+            <Dependent Role="tblTemplateMaster">
+              <PropertyRef Name="ModifiedBy" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <EntityContainer Name="ReadyPortalDBEntities" annotation:LazyLoadingEnabled="true">
+          <EntitySet Name="tblAssignedWordPages" EntityType="Models.tblAssignedWordPage" />
+          <EntitySet Name="tblAssignedExcelSheets" EntityType="Self.tblAssignedExcelSheet" />
+          <EntitySet Name="tblAssignedPPTSlides" EntityType="Self.tblAssignedPPTSlide" />
+          <EntitySet Name="tblAssignmentHistories" EntityType="Self.tblAssignmentHistory" />
+          <EntitySet Name="tblAssignmentLogs" EntityType="Self.tblAssignmentLog" />
+          <EntitySet Name="tblAssignmentMembers" EntityType="Self.tblAssignmentMember" />
+          <EntitySet Name="tblAssignments" EntityType="Self.tblAssignment" />
+          <EntitySet Name="tblChatMessages" EntityType="Self.tblChatMessage" />
+          <EntitySet Name="tblCompanies" EntityType="Self.tblCompany" />
+          <EntitySet Name="tblDateFormats" EntityType="Self.tblDateFormat" />
+          <EntitySet Name="tblDocuments" EntityType="Self.tblDocument" />
+          <EntitySet Name="tblExcelRowMaps" EntityType="Self.tblExcelRowMap" />
+          <EntitySet Name="tblExcelSheets" EntityType="Self.tblExcelSheet" />
+          <EntitySet Name="tblLogActivities" EntityType="Self.tblLogActivity" />
+          <EntitySet Name="tblMenuItems" EntityType="Self.tblMenuItem" />
+          <EntitySet Name="tblMenuItems1" EntityType="Self.tblMenuItem1" />
+          <EntitySet Name="tblPPTSlides" EntityType="Self.tblPPTSlide" />
+          <EntitySet Name="tblProjectDocuments" EntityType="Self.tblProjectDocument" />
+          <EntitySet Name="tblProjectMembers" EntityType="Self.tblProjectMember" />
+          <EntitySet Name="tblProjects" EntityType="Self.tblProject" />
+          <EntitySet Name="tblRoles" EntityType="Self.tblRole" />
+          <EntitySet Name="tblRolePrivilages" EntityType="Self.tblRolePrivilage" />
+          <EntitySet Name="tblSectionMasters" EntityType="Self.tblSectionMaster" />
+          <EntitySet Name="tblTemplateMasters" EntityType="Self.tblTemplateMaster" />
+          <EntitySet Name="tblUserDepartments" EntityType="Self.tblUserDepartment" />
+          <EntitySet Name="tblLogActivityTypes" EntityType="Self.tblLogActivityType" />
+          <EntitySet Name="vwRolePrivileges" EntityType="Self.vwRolePrivilege" />
+          <AssociationSet Name="FK_tblAssignedDocs_tblAssignments" Association="Self.FK_tblAssignedDocs_tblAssignments">
+            <End Role="tblAssignments" EntitySet="tblAssignments" />
+            <End Role="tblAssignedWordPages" EntitySet="tblAssignedWordPages" />
+          </AssociationSet>
+          <AssociationSet Name="FK_tblAssignedExcelSheets_tblAssignments" Association="Self.FK_tblAssignedExcelSheets_tblAssignments">
+            <End Role="tblAssignments" EntitySet="tblAssignments" />
+            <End Role="tblAssignedExcelSheets" EntitySet="tblAssignedExcelSheets" />
+          </AssociationSet>
+          <AssociationSet Name="FK_tblAssignmentHistory_tblAssignmentLog" Association="Self.FK_tblAssignmentHistory_tblAssignmentLog">
+            <End Role="tblAssignmentLog" EntitySet="tblAssignmentLogs" />
+            <End Role="tblAssignmentHistory" EntitySet="tblAssignmentHistories" />
+          </AssociationSet>
+          <AssociationSet Name="FK_tblAssignmentHistory_tblUserDepartment" Association="Self.FK_tblAssignmentHistory_tblUserDepartment">
+            <End Role="tblUserDepartment" EntitySet="tblUserDepartments" />
+            <End Role="tblAssignmentHistory" EntitySet="tblAssignmentHistories" />
+          </AssociationSet>
+          <AssociationSet Name="FK_tblAssignmentLog_tblAssignments" Association="Self.FK_tblAssignmentLog_tblAssignments">
+            <End Role="tblAssignments" EntitySet="tblAssignments" />
+            <End Role="tblAssignmentLog" EntitySet="tblAssignmentLogs" />
+          </AssociationSet>
+          <AssociationSet Name="FK_tblAssignmentLog_tblUserDepartment" Association="Self.FK_tblAssignmentLog_tblUserDepartment">
+            <End Role="tblUserDepartment" EntitySet="tblUserDepartments" />
+            <End Role="tblAssignmentLog" EntitySet="tblAssignmentLogs" />
+          </AssociationSet>
+          <AssociationSet Name="FK_AssignmentID" Association="Self.FK_AssignmentID">
+            <End Role="tblAssignments" EntitySet="tblAssignments" />
+            <End Role="tblAssignmentMember" EntitySet="tblAssignmentMembers" />
+          </AssociationSet>
+          <AssociationSet Name="FK_UserID" Association="Self.FK_UserID">
+            <End Role="tblUserDepartment" EntitySet="tblUserDepartments" />
+            <End Role="tblAssignmentMember" EntitySet="tblAssignmentMembers" />
+          </AssociationSet>
+          <AssociationSet Name="FK_tblAssignments_tblAssignments" Association="Self.FK_tblAssignments_tblAssignments">
+            <End Role="tblAssignments" EntitySet="tblAssignments" />
+            <End Role="tblAssignments1" EntitySet="tblAssignments" />
+          </AssociationSet>
+          <AssociationSet Name="FK_tblAssignments_tblProjects" Association="Self.FK_tblAssignments_tblProjects">
+            <End Role="tblProjects" EntitySet="tblProjects" />
+            <End Role="tblAssignments" EntitySet="tblAssignments" />
+          </AssociationSet>
+          <AssociationSet Name="FK_tblAssignments_tblUserDepartment" Association="Self.FK_tblAssignments_tblUserDepartment">
+            <End Role="tblUserDepartment" EntitySet="tblUserDepartments" />
+            <End Role="tblAssignment" EntitySet="tblAssignments" />
+          </AssociationSet>
+          <AssociationSet Name="FK_tblAssignments_tblUserDepartment1" Association="Self.FK_tblAssignments_tblUserDepartment1">
+            <End Role="tblDocument" EntitySet="tblDocuments" />
+            <End Role="tblAssignments" EntitySet="tblAssignments" />
+          </AssociationSet>
+          <AssociationSet Name="FK__tblCompan__DateF__27F8EE98" Association="Self.FK__tblCompan__DateF__27F8EE98">
+            <End Role="tblDateFormats" EntitySet="tblDateFormats" />
+            <End Role="tblCompany" EntitySet="tblCompanies" />
+          </AssociationSet>
+          <AssociationSet Name="FK_tblRole_tblCompany" Association="Self.FK_tblRole_tblCompany">
+            <End Role="tblCompany" EntitySet="tblCompanies" />
+            <End Role="tblRole" EntitySet="tblRoles" />
+          </AssociationSet>
+          <AssociationSet Name="FK_tblSectionMaster_tblCompany" Association="Self.FK_tblSectionMaster_tblCompany">
+            <End Role="tblCompany" EntitySet="tblCompanies" />
+            <End Role="tblSectionMaster" EntitySet="tblSectionMasters" />
+          </AssociationSet>
+          <AssociationSet Name="FK_tblUserDepartment_tblCompany" Association="Self.FK_tblUserDepartment_tblCompany">
+            <End Role="tblCompany" EntitySet="tblCompanies" />
+            <End Role="tblUserDepartment" EntitySet="tblUserDepartments" />
+          </AssociationSet>
+          <AssociationSet Name="FK_tblDocument_tblUserDepartment" Association="Self.FK_tblDocument_tblUserDepartment">
+            <End Role="tblUserDepartment" EntitySet="tblUserDepartments" />
+            <End Role="tblDocument" EntitySet="tblDocuments" />
+          </AssociationSet>
+          <AssociationSet Name="FK_tblProjectDocuments_tblDocument" Association="Self.FK_tblProjectDocuments_tblDocument">
+            <End Role="tblDocument" EntitySet="tblDocuments" />
+            <End Role="tblProjectDocuments" EntitySet="tblProjectDocuments" />
+          </AssociationSet>
+          <AssociationSet Name="FK_tblProjectDocuments_tblProjects" Association="Self.FK_tblProjectDocuments_tblProjects">
+            <End Role="tblProjects" EntitySet="tblProjects" />
+            <End Role="tblProjectDocuments" EntitySet="tblProjectDocuments" />
+          </AssociationSet>
+          <AssociationSet Name="FK_tblProjectMembers_tblProjects" Association="Self.FK_tblProjectMembers_tblProjects">
+            <End Role="tblProjects" EntitySet="tblProjects" />
+            <End Role="tblProjectMembers" EntitySet="tblProjectMembers" />
+          </AssociationSet>
+          <AssociationSet Name="FK_tblProjectMembers_tblUserDepartment" Association="Self.FK_tblProjectMembers_tblUserDepartment">
+            <End Role="tblUserDepartment" EntitySet="tblUserDepartments" />
+            <End Role="tblProjectMembers" EntitySet="tblProjectMembers" />
+          </AssociationSet>
+          <AssociationSet Name="FK_tblProjectMembers_tblUserDepartment1" Association="Self.FK_tblProjectMembers_tblUserDepartment1">
+            <End Role="tblUserDepartment" EntitySet="tblUserDepartments" />
+            <End Role="tblProjectMembers" EntitySet="tblProjectMembers" />
+          </AssociationSet>
+          <AssociationSet Name="FK_tblProjects_tblUserDepartment" Association="Self.FK_tblProjects_tblUserDepartment">
+            <End Role="tblUserDepartment" EntitySet="tblUserDepartments" />
+            <End Role="tblProjects" EntitySet="tblProjects" />
+          </AssociationSet>
+          <AssociationSet Name="FK_tblProjects_tblUserDepartment1" Association="Self.FK_tblProjects_tblUserDepartment1">
+            <End Role="tblUserDepartment" EntitySet="tblUserDepartments" />
+            <End Role="tblProjects" EntitySet="tblProjects" />
+          </AssociationSet>
+          <AssociationSet Name="FK_tblUserDepartment_tblRole" Association="Self.FK_tblUserDepartment_tblRole">
+            <End Role="tblRole" EntitySet="tblRoles" />
+            <End Role="tblUserDepartment" EntitySet="tblUserDepartments" />
+          </AssociationSet>
+          <AssociationSet Name="FK_tblRolePrivilages_tblUserDepartment" Association="Self.FK_tblRolePrivilages_tblUserDepartment">
+            <End Role="tblUserDepartment" EntitySet="tblUserDepartments" />
+            <End Role="tblRolePrivilages" EntitySet="tblRolePrivilages" />
+          </AssociationSet>
+          <AssociationSet Name="FK_tblSectionMaster_tblUserDepartment" Association="Self.FK_tblSectionMaster_tblUserDepartment">
+            <End Role="tblUserDepartment" EntitySet="tblUserDepartments" />
+            <End Role="tblSectionMaster" EntitySet="tblSectionMasters" />
+          </AssociationSet>
+          <AssociationSet Name="FK_tblTemplateMaster_tblUserDepartment" Association="Self.FK_tblTemplateMaster_tblUserDepartment">
+            <End Role="tblUserDepartment" EntitySet="tblUserDepartments" />
+            <End Role="tblTemplateMaster" EntitySet="tblTemplateMasters" />
+          </AssociationSet>
+          <AssociationSet Name="FK_tblTemplateMaster_tblUserDepartment1" Association="Self.FK_tblTemplateMaster_tblUserDepartment1">
+            <End Role="tblUserDepartment" EntitySet="tblUserDepartments" />
+            <End Role="tblTemplateMaster" EntitySet="tblTemplateMasters" />
+          </AssociationSet>
+          <FunctionImport Name="RolePrev">
+            <Parameter Name="RoleID" Mode="In" Type="Int32" />
+          </FunctionImport>
+          <AssociationSet Name="FK_tblExcelRowMap_tblAssignments" Association="Models.FK_tblExcelRowMap_tblAssignments">
+            <End Role="tblExcelRowMap" EntitySet="tblExcelRowMaps" />
+            <End Role="tblAssignment" EntitySet="tblAssignments" />
+          </AssociationSet>
+        </EntityContainer>
+        <Association Name="FK_tblExcelRowMap_tblAssignments">
+          <End Type="Models.tblExcelRowMap" Role="tblExcelRowMap" Multiplicity="*" />
+          <End Type="Models.tblAssignment" Role="tblAssignment" Multiplicity="1" />
+          <ReferentialConstraint>
+            <Principal Role="tblAssignment">
+              <PropertyRef Name="AssignmentID" />
+            </Principal>
+            <Dependent Role="tblExcelRowMap">
+              <PropertyRef Name="AssignmentID" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+      </Schema>
+    </edmx:ConceptualModels>
+    <!-- C-S mapping content -->
+    <edmx:Mappings>
+      <Mapping Space="C-S" xmlns="http://schemas.microsoft.com/ado/2009/11/mapping/cs">
+        <EntityContainerMapping StorageEntityContainer="ModelsStoreContainer" CdmEntityContainer="ReadyPortalDBEntities">
+          <EntitySetMapping Name="tblAssignedWordPages">
+            <EntityTypeMapping TypeName="Models.tblAssignedWordPage">
+              <MappingFragment StoreEntitySet="tblAssignedWordPages">
+                <ScalarProperty Name="AssignedWordPageID" ColumnName="AssignedWordPageID" />
+                <ScalarProperty Name="AssignmentID" ColumnName="AssignmentID" />
+                <ScalarProperty Name="DocName" ColumnName="DocName" />
+                <ScalarProperty Name="Sequence" ColumnName="Sequence" />
+                <ScalarProperty Name="ReviewRequested" ColumnName="ReviewRequested" />
+                <ScalarProperty Name="IsPublished" ColumnName="IsPublished" />
+                <ScalarProperty Name="PageRemarks" ColumnName="PageRemarks" />
+                <ScalarProperty Name="Ticks" ColumnName="Ticks" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="tblAssignedExcelSheets">
+            <EntityTypeMapping TypeName="Models.tblAssignedExcelSheet">
+              <MappingFragment StoreEntitySet="tblAssignedExcelSheets">
+                <ScalarProperty Name="AssignedExcelSheetID" ColumnName="AssignedExcelSheetID" />
+                <ScalarProperty Name="AssignmentID" ColumnName="AssignmentID" />
+                <ScalarProperty Name="SheetName" ColumnName="SheetName" />
+                <ScalarProperty Name="Sequence" ColumnName="Sequence" />
+                <ScalarProperty Name="SheetRemarks" ColumnName="SheetRemarks" />
+                <ScalarProperty Name="IsSheetApproved" ColumnName="IsSheetApproved" />
+                <ScalarProperty Name="IsSheetModified" ColumnName="IsSheetModified" />
+                <ScalarProperty Name="IsGrayedOut" ColumnName="IsGrayedOut" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="tblAssignedPPTSlides">
+            <EntityTypeMapping TypeName="Models.tblAssignedPPTSlide">
+              <MappingFragment StoreEntitySet="tblAssignedPPTSlides">
+                <ScalarProperty Name="AssignedPPTSildeID" ColumnName="AssignedPPTSildeID" />
+                <ScalarProperty Name="AssignmentID" ColumnName="AssignmentID" />
+                <ScalarProperty Name="SlideName" ColumnName="SlideName" />
+                <ScalarProperty Name="Sequence" ColumnName="Sequence" />
+                <ScalarProperty Name="PPTRemarks" ColumnName="PPTRemarks" />
+                <ScalarProperty Name="IsPPTApproved" ColumnName="IsPPTApproved" />
+                <ScalarProperty Name="IsTaskPPT" ColumnName="IsTaskPPT" />
+                <ScalarProperty Name="AssignedDocsID" ColumnName="AssignedDocsID" />
+                <ScalarProperty Name="IsPPTModified" ColumnName="IsPPTModified" />
+                <ScalarProperty Name="IsGrayedOut" ColumnName="IsGrayedOut" />
+                <ScalarProperty Name="ReviewRequested" ColumnName="ReviewRequested" />
+                <ScalarProperty Name="IsPublished" ColumnName="IsPublished" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="tblAssignmentHistories">
+            <EntityTypeMapping TypeName="Models.tblAssignmentHistory">
+              <MappingFragment StoreEntitySet="tblAssignmentHistory">
+                <ScalarProperty Name="AssignmentHistoryID" ColumnName="AssignmentHistoryID" />
+                <ScalarProperty Name="AssignmentLogID" ColumnName="AssignmentLogID" />
+                <ScalarProperty Name="DocumentName" ColumnName="DocumentName" />
+                <ScalarProperty Name="Comments" ColumnName="Comments" />
+                <ScalarProperty Name="CreatedBy" ColumnName="CreatedBy" />
+                <ScalarProperty Name="CreatedDate" ColumnName="CreatedDate" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="tblAssignmentLogs">
+            <EntityTypeMapping TypeName="Models.tblAssignmentLog">
+              <MappingFragment StoreEntitySet="tblAssignmentLog">
+                <ScalarProperty Name="AssignmentLogID" ColumnName="AssignmentLogID" />
+                <ScalarProperty Name="DocumentName" ColumnName="DocumentName" />
+                <ScalarProperty Name="AssignmentID" ColumnName="AssignmentID" />
+                <ScalarProperty Name="Action" ColumnName="Action" />
+                <ScalarProperty Name="Description" ColumnName="Description" />
+                <ScalarProperty Name="CreatedBy" ColumnName="CreatedBy" />
+                <ScalarProperty Name="CreatedDate" ColumnName="CreatedDate" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="tblAssignmentMembers">
+            <EntityTypeMapping TypeName="Models.tblAssignmentMember">
+              <MappingFragment StoreEntitySet="tblAssignmentMembers">
+                <ScalarProperty Name="Id" ColumnName="Id" />
+                <ScalarProperty Name="CanEdit" ColumnName="CanEdit" />
+                <ScalarProperty Name="CanApprove" ColumnName="CanApprove" />
+                <ScalarProperty Name="CanPublish" ColumnName="CanPublish" />
+                <ScalarProperty Name="AssignmentID" ColumnName="AssignmentID" />
+                <ScalarProperty Name="UserID" ColumnName="UserID" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="tblAssignments">
+            <EntityTypeMapping TypeName="Models.tblAssignment">
+              <MappingFragment StoreEntitySet="tblAssignments">
+                <ScalarProperty Name="AssignmentID" ColumnName="AssignmentID" />
+                <ScalarProperty Name="DocumentID" ColumnName="DocumentID" />
+                <ScalarProperty Name="Content" ColumnName="Content" />
+                <ScalarProperty Name="ReplacementCode" ColumnName="ReplacementCode" />
+                <ScalarProperty Name="Action" ColumnName="Action" />
+                <ScalarProperty Name="DocumentType" ColumnName="DocumentType" />
+                <ScalarProperty Name="DueDate" ColumnName="DueDate" />
+                <ScalarProperty Name="Comments" ColumnName="Comments" />
+                <ScalarProperty Name="Remarks" ColumnName="Remarks" />
+                <ScalarProperty Name="OrginalSourceFile" ColumnName="OrginalSourceFile" />
+                <ScalarProperty Name="DocumentFile" ColumnName="DocumentFile" />
+                <ScalarProperty Name="ProjectID" ColumnName="ProjectID" />
+                <ScalarProperty Name="LockedByUserID" ColumnName="LockedByUserID" />
+                <ScalarProperty Name="CreatedDate" ColumnName="CreatedDate" />
+                <ScalarProperty Name="CompletedDate" ColumnName="CompletedDate" />
+                <ScalarProperty Name="CreatedBy" ColumnName="CreatedBy" />
+                <ScalarProperty Name="TaskName" ColumnName="TaskName" />
+                <ScalarProperty Name="Status" ColumnName="Status" />
+                <ScalarProperty Name="MainAssignmentID" ColumnName="MainAssignmentID" />
+                <ScalarProperty Name="IsEntireDocument" ColumnName="IsEntireDocument" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="tblChatMessages">
+            <EntityTypeMapping TypeName="Models.tblChatMessage">
+              <MappingFragment StoreEntitySet="tblChatMessage">
+                <ScalarProperty Name="ChatMessageID" ColumnName="ChatMessageID" />
+                <ScalarProperty Name="UserFromId" ColumnName="UserFromId" />
+                <ScalarProperty Name="UserToId" ColumnName="UserToId" />
+                <ScalarProperty Name="Message" ColumnName="Message" />
+                <ScalarProperty Name="ClientGuid" ColumnName="ClientGuid" />
+                <ScalarProperty Name="MessageSentDateTime" ColumnName="MessageSentDateTime" />
+                <ScalarProperty Name="IsRead" ColumnName="IsRead" />
+                <ScalarProperty Name="VisibleFrom" ColumnName="VisibleFrom" />
+                <ScalarProperty Name="VisibleTo" ColumnName="VisibleTo" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="tblCompanies">
+            <EntityTypeMapping TypeName="Models.tblCompany">
+              <MappingFragment StoreEntitySet="tblCompany">
+                <ScalarProperty Name="CompanyID" ColumnName="CompanyID" />
+                <ScalarProperty Name="CompanyLogo" ColumnName="CompanyLogo" />
+                <ScalarProperty Name="Name" ColumnName="Name" />
+                <ScalarProperty Name="Address" ColumnName="Address" />
+                <ScalarProperty Name="Zip" ColumnName="Zip" />
+                <ScalarProperty Name="City" ColumnName="City" />
+                <ScalarProperty Name="State" ColumnName="State" />
+                <ScalarProperty Name="Country" ColumnName="Country" />
+                <ScalarProperty Name="CreatedBy" ColumnName="CreatedBy" />
+                <ScalarProperty Name="CreatedDate" ColumnName="CreatedDate" />
+                <ScalarProperty Name="ModifiedBy" ColumnName="ModifiedBy" />
+                <ScalarProperty Name="ModifiedDate" ColumnName="ModifiedDate" />
+                <ScalarProperty Name="IsSuperAdmin" ColumnName="IsSuperAdmin" />
+                <ScalarProperty Name="IsActive" ColumnName="IsActive" />
+                <ScalarProperty Name="IsDeleted" ColumnName="IsDeleted" />
+                <ScalarProperty Name="WebsiteURL" ColumnName="WebsiteURL" />
+                <ScalarProperty Name="IsAppointmentEnable" ColumnName="IsAppointmentEnable" />
+                <ScalarProperty Name="ExchangeServerURL" ColumnName="ExchangeServerURL" />
+                <ScalarProperty Name="ExchangeServerUserName" ColumnName="ExchangeServerUserName" />
+                <ScalarProperty Name="ExchangeServerPassword" ColumnName="ExchangeServerPassword" />
+                <ScalarProperty Name="DateFormatID" ColumnName="DateFormatID" />
+                <ScalarProperty Name="IsMessengerServiceEnable" ColumnName="IsMessengerServiceEnable" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="tblDateFormats">
+            <EntityTypeMapping TypeName="Models.tblDateFormat">
+              <MappingFragment StoreEntitySet="tblDateFormats">
+                <ScalarProperty Name="DateFormatID" ColumnName="DateFormatID" />
+                <ScalarProperty Name="DateFormat" ColumnName="DateFormat" />
+                <ScalarProperty Name="IsActive" ColumnName="IsActive" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="tblDocuments">
+            <EntityTypeMapping TypeName="Models.tblDocument">
+              <MappingFragment StoreEntitySet="tblDocument">
+                <ScalarProperty Name="DocumentID" ColumnName="DocumentID" />
+                <ScalarProperty Name="DisplayName" ColumnName="DisplayName" />
+                <ScalarProperty Name="DocumentName" ColumnName="DocumentName" />
+                <ScalarProperty Name="DocumentType" ColumnName="DocumentType" />
+                <ScalarProperty Name="CompanyID" ColumnName="CompanyID" />
+                <ScalarProperty Name="CreatedBy" ColumnName="CreatedBy" />
+                <ScalarProperty Name="CreatedDate" ColumnName="CreatedDate" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="tblExcelRowMaps">
+            <EntityTypeMapping TypeName="Models.tblExcelRowMap">
+              <MappingFragment StoreEntitySet="tblExcelRowMap">
+                <ScalarProperty Name="Id" ColumnName="Id" />
+                <ScalarProperty Name="RowId" ColumnName="RowId" />
+                <ScalarProperty Name="MasterDocumentName" ColumnName="MasterDocumentName" />
+                <ScalarProperty Name="IsActive" ColumnName="IsActive" />
+                <ScalarProperty Name="DateLastModified" ColumnName="DateLastModified" />
+                <ScalarProperty Name="AssignmentID" ColumnName="AssignmentID" />
+                <ScalarProperty Name="IsRemoved" ColumnName="IsRemoved" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="tblExcelSheets">
+            <EntityTypeMapping TypeName="Models.tblExcelSheet">
+              <MappingFragment StoreEntitySet="tblExcelSheets">
+                <ScalarProperty Name="ExcelSheetID" ColumnName="ExcelSheetID" />
+                <ScalarProperty Name="SheetName" ColumnName="SheetName" />
+                <ScalarProperty Name="MasterDocumentName" ColumnName="MasterDocumentName" />
+                <ScalarProperty Name="Sequence" ColumnName="Sequence" />
+                <ScalarProperty Name="IsOriginal" ColumnName="IsOriginal" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="tblLogActivities">
+            <EntityTypeMapping TypeName="Models.tblLogActivity">
+              <MappingFragment StoreEntitySet="tblLogActivity">
+                <ScalarProperty Name="LogActivityID" ColumnName="LogActivityID" />
+                <ScalarProperty Name="LogActivityTypeID" ColumnName="LogActivityTypeID" />
+                <ScalarProperty Name="ActivityDetails" ColumnName="ActivityDetails" />
+                <ScalarProperty Name="IPAddress" ColumnName="IPAddress" />
+                <ScalarProperty Name="ChangedID" ColumnName="ChangedID" />
+                <ScalarProperty Name="CreatedBy" ColumnName="CreatedBy" />
+                <ScalarProperty Name="CreatedDate" ColumnName="CreatedDate" />
+                <ScalarProperty Name="MenuItem" ColumnName="MenuItem" />
+                <ScalarProperty Name="CompanyID" ColumnName="CompanyID" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="tblMenuItems">
+            <EntityTypeMapping TypeName="Models.tblMenuItem">
+              <MappingFragment StoreEntitySet="tblMenuItem">
+                <ScalarProperty Name="MenuItemID" ColumnName="MenuItemID" />
+                <ScalarProperty Name="GUID" ColumnName="GUID" />
+                <ScalarProperty Name="MenuItem" ColumnName="MenuItem" />
+                <ScalarProperty Name="MenuItemController" ColumnName="MenuItemController" />
+                <ScalarProperty Name="MenuItemView" ColumnName="MenuItemView" />
+                <ScalarProperty Name="SortOrder" ColumnName="SortOrder" />
+                <ScalarProperty Name="ParentID" ColumnName="ParentID" />
+                <ScalarProperty Name="IsActive" ColumnName="IsActive" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="tblMenuItems1">
+            <EntityTypeMapping TypeName="Models.tblMenuItem1">
+              <MappingFragment StoreEntitySet="tblMenuItems">
+                <ScalarProperty Name="MenuItemID" ColumnName="MenuItemID" />
+                <ScalarProperty Name="MenuName" ColumnName="MenuName" />
+                <ScalarProperty Name="Controller" ColumnName="Controller" />
+                <ScalarProperty Name="Action" ColumnName="Action" />
+                <ScalarProperty Name="SortOrder" ColumnName="SortOrder" />
+                <ScalarProperty Name="CreatedBy" ColumnName="CreatedBy" />
+                <ScalarProperty Name="CreatedDate" ColumnName="CreatedDate" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="tblPPTSlides">
+            <EntityTypeMapping TypeName="Models.tblPPTSlide">
+              <MappingFragment StoreEntitySet="tblPPTSlides">
+                <ScalarProperty Name="PPTSlidesID" ColumnName="PPTSlidesID" />
+                <ScalarProperty Name="SlideName" ColumnName="SlideName" />
+                <ScalarProperty Name="MasterDocumentName" ColumnName="MasterDocumentName" />
+                <ScalarProperty Name="Sequence" ColumnName="Sequence" />
+                <ScalarProperty Name="IsOriginal" ColumnName="IsOriginal" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="tblProjectDocuments">
+            <EntityTypeMapping TypeName="Models.tblProjectDocument">
+              <MappingFragment StoreEntitySet="tblProjectDocuments">
+                <ScalarProperty Name="ProjectDocumentID" ColumnName="ProjectDocumentID" />
+                <ScalarProperty Name="DocumentID" ColumnName="DocumentID" />
+                <ScalarProperty Name="ProjectID" ColumnName="ProjectID" />
+                <ScalarProperty Name="IsActive" ColumnName="IsActive" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="tblProjectMembers">
+            <EntityTypeMapping TypeName="Models.tblProjectMember">
+              <MappingFragment StoreEntitySet="tblProjectMembers">
+                <ScalarProperty Name="ProjectMemberID" ColumnName="ProjectMemberID" />
+                <ScalarProperty Name="ProjectID" ColumnName="ProjectID" />
+                <ScalarProperty Name="UserID" ColumnName="UserID" />
+                <ScalarProperty Name="CreatedDate" ColumnName="CreatedDate" />
+                <ScalarProperty Name="CreatedBy" ColumnName="CreatedBy" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="tblProjects">
+            <EntityTypeMapping TypeName="Models.tblProject">
+              <MappingFragment StoreEntitySet="tblProjects">
+                <ScalarProperty Name="ProjectID" ColumnName="ProjectID" />
+                <ScalarProperty Name="Name" ColumnName="Name" />
+                <ScalarProperty Name="StartDate" ColumnName="StartDate" />
+                <ScalarProperty Name="EndDate" ColumnName="EndDate" />
+                <ScalarProperty Name="FileName" ColumnName="FileName" />
+                <ScalarProperty Name="Description" ColumnName="Description" />
+                <ScalarProperty Name="Status" ColumnName="Status" />
+                <ScalarProperty Name="IsDeleted" ColumnName="IsDeleted" />
+                <ScalarProperty Name="CreatedDate" ColumnName="CreatedDate" />
+                <ScalarProperty Name="CreatedBy" ColumnName="CreatedBy" />
+                <ScalarProperty Name="ModifiedDate" ColumnName="ModifiedDate" />
+                <ScalarProperty Name="ModifiedBy" ColumnName="ModifiedBy" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="tblRoles">
+            <EntityTypeMapping TypeName="Models.tblRole">
+              <MappingFragment StoreEntitySet="tblRole">
+                <ScalarProperty Name="RoleID" ColumnName="RoleID" />
+                <ScalarProperty Name="CompanyID" ColumnName="CompanyID" />
+                <ScalarProperty Name="Role" ColumnName="Role" />
+                <ScalarProperty Name="Description" ColumnName="Description" />
+                <ScalarProperty Name="CreatedBy" ColumnName="CreatedBy" />
+                <ScalarProperty Name="CreatedDate" ColumnName="CreatedDate" />
+                <ScalarProperty Name="ModifiedBy" ColumnName="ModifiedBy" />
+                <ScalarProperty Name="ModifiedDate" ColumnName="ModifiedDate" />
+                <ScalarProperty Name="IsActive" ColumnName="IsActive" />
+                <ScalarProperty Name="IsAdminRole" ColumnName="IsAdminRole" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="tblRolePrivilages">
+            <EntityTypeMapping TypeName="Models.tblRolePrivilage">
+              <MappingFragment StoreEntitySet="tblRolePrivilages">
+                <ScalarProperty Name="RolePrivilageID" ColumnName="RolePrivilageID" />
+                <ScalarProperty Name="MenuItemID" ColumnName="MenuItemID" />
+                <ScalarProperty Name="ViewPermission" ColumnName="ViewPermission" />
+                <ScalarProperty Name="UserID" ColumnName="UserID" />
+                <ScalarProperty Name="CreatedBy" ColumnName="CreatedBy" />
+                <ScalarProperty Name="CreatedDate" ColumnName="CreatedDate" />
+                <ScalarProperty Name="Add" ColumnName="Add" />
+                <ScalarProperty Name="Edit" ColumnName="Edit" />
+                <ScalarProperty Name="Delete" ColumnName="Delete" />
+                <ScalarProperty Name="Detail" ColumnName="Detail" />
+                <ScalarProperty Name="ModifiedBy" ColumnName="ModifiedBy" />
+                <ScalarProperty Name="ModifiedDate" ColumnName="ModifiedDate" />
+                <ScalarProperty Name="IsActive" ColumnName="IsActive" />
+                <ScalarProperty Name="RoleID" ColumnName="RoleID" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="tblSectionMasters">
+            <EntityTypeMapping TypeName="Models.tblSectionMaster">
+              <MappingFragment StoreEntitySet="tblSectionMaster">
+                <ScalarProperty Name="SectionID" ColumnName="SectionID" />
+                <ScalarProperty Name="SectionName" ColumnName="SectionName" />
+                <ScalarProperty Name="SectionURL" ColumnName="SectionURL" />
+                <ScalarProperty Name="Description" ColumnName="Description" />
+                <ScalarProperty Name="ContentType" ColumnName="ContentType" />
+                <ScalarProperty Name="ContentFile" ColumnName="ContentFile" />
+                <ScalarProperty Name="CompanyID" ColumnName="CompanyID" />
+                <ScalarProperty Name="IsDeleted" ColumnName="IsDeleted" />
+                <ScalarProperty Name="Status" ColumnName="Status" />
+                <ScalarProperty Name="CreatedBy" ColumnName="CreatedBy" />
+                <ScalarProperty Name="CreatedDate" ColumnName="CreatedDate" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="tblTemplateMasters">
+            <EntityTypeMapping TypeName="Models.tblTemplateMaster">
+              <MappingFragment StoreEntitySet="tblTemplateMaster">
+                <ScalarProperty Name="TemplateID" ColumnName="TemplateID" />
+                <ScalarProperty Name="TemplateName" ColumnName="TemplateName" />
+                <ScalarProperty Name="TemplateType" ColumnName="TemplateType" />
+                <ScalarProperty Name="Subject" ColumnName="Subject" />
+                <ScalarProperty Name="TemplateContent" ColumnName="TemplateContent" />
+                <ScalarProperty Name="IsActive" ColumnName="IsActive" />
+                <ScalarProperty Name="CreatedBy" ColumnName="CreatedBy" />
+                <ScalarProperty Name="CreatedDate" ColumnName="CreatedDate" />
+                <ScalarProperty Name="ModifiedBy" ColumnName="ModifiedBy" />
+                <ScalarProperty Name="ModifiedDate" ColumnName="ModifiedDate" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="tblUserDepartments">
+            <EntityTypeMapping TypeName="Models.tblUserDepartment">
+              <MappingFragment StoreEntitySet="tblUserDepartment">
+                <ScalarProperty Name="UserId" ColumnName="UserId" />
+                <ScalarProperty Name="FullName" ColumnName="FullName" />
+                <ScalarProperty Name="EmailID" ColumnName="EmailID" />
+                <ScalarProperty Name="UserName" ColumnName="UserName" />
+                <ScalarProperty Name="Password" ColumnName="Password" />
+                <ScalarProperty Name="Department" ColumnName="Department" />
+                <ScalarProperty Name="CompanyID" ColumnName="CompanyID" />
+                <ScalarProperty Name="RoleID" ColumnName="RoleID" />
+                <ScalarProperty Name="ProfileImage" ColumnName="ProfileImage" />
+                <ScalarProperty Name="CreatedBy" ColumnName="CreatedBy" />
+                <ScalarProperty Name="CreatedDate" ColumnName="CreatedDate" />
+                <ScalarProperty Name="ModifiedBy" ColumnName="ModifiedBy" />
+                <ScalarProperty Name="ModifiedDate" ColumnName="ModifiedDate" />
+                <ScalarProperty Name="IsActive" ColumnName="IsActive" />
+                <ScalarProperty Name="IsAppointmentEnable" ColumnName="IsAppointmentEnable" />
+                <ScalarProperty Name="CanCreateSubtasks" ColumnName="CanCreateSubtasks" />
+                <ScalarProperty Name="CanEdit" ColumnName="CanEdit" />
+                <ScalarProperty Name="CanApprove" ColumnName="CanApprove" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="tblLogActivityTypes">
+            <EntityTypeMapping TypeName="Models.tblLogActivityType">
+              <MappingFragment StoreEntitySet="tblLogActivityTypes">
+                <ScalarProperty Name="LogActivityTypeID" ColumnName="LogActivityTypeID" />
+                <ScalarProperty Name="LogActivityName" ColumnName="LogActivityName" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="vwRolePrivileges">
+            <EntityTypeMapping TypeName="Models.vwRolePrivilege">
+              <MappingFragment StoreEntitySet="vwRolePrivileges">
+                <ScalarProperty Name="MenuItemID" ColumnName="MenuItemID" />
+                <ScalarProperty Name="MenuItem" ColumnName="MenuItem" />
+                <ScalarProperty Name="MenuItemController" ColumnName="MenuItemController" />
+                <ScalarProperty Name="MenuItemView" ColumnName="MenuItemView" />
+                <ScalarProperty Name="ViewPermission" ColumnName="ViewPermission" />
+                <ScalarProperty Name="Add" ColumnName="Add" />
+                <ScalarProperty Name="Edit" ColumnName="Edit" />
+                <ScalarProperty Name="Delete" ColumnName="Delete" />
+                <ScalarProperty Name="Detail" ColumnName="Detail" />
+                <ScalarProperty Name="OrderID" ColumnName="OrderID" />
+                <ScalarProperty Name="ParentID" ColumnName="ParentID" />
+                <ScalarProperty Name="SortOrder" ColumnName="SortOrder" />
+                <ScalarProperty Name="IsActive" ColumnName="IsActive" />
+                <ScalarProperty Name="RoleID" ColumnName="RoleID" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <FunctionImportMapping FunctionImportName="RolePrev" FunctionName="Models.Store.RolePrev" />
+        </EntityContainerMapping>
+      </Mapping>
+    </edmx:Mappings>
+  </edmx:Runtime>
+  <!-- EF Designer content (DO NOT EDIT MANUALLY BELOW HERE) -->
+  <Designer xmlns="http://schemas.microsoft.com/ado/2009/11/edmx">
+    <Connection>
+      <DesignerInfoPropertySet>
+        <DesignerProperty Name="MetadataArtifactProcessing" Value="EmbedInOutputAssembly" />
+      </DesignerInfoPropertySet>
+    </Connection>
+    <Options>
+      <DesignerInfoPropertySet>
+        <DesignerProperty Name="ValidateOnBuild" Value="true" />
+        <DesignerProperty Name="EnablePluralization" Value="true" />
+        <DesignerProperty Name="IncludeForeignKeysInModel" Value="true" />
+        <DesignerProperty Name="UseLegacyProvider" Value="false" />
+        <DesignerProperty Name="CodeGenerationStrategy" Value="None" />
+      </DesignerInfoPropertySet>
+    </Options>
+    <!-- Diagram content (shape and connector positions) -->
+    <Diagrams></Diagrams>
+  </Designer>
+</edmx:Edmx>

@@ -1,0 +1,67 @@
+﻿@using DevExpress.Web.Mvc;
+@using DevExpress.Web.Mvc.UI;
+@model  WordAutomationDemo.Models.AssignmentModel
+
+
+@if (!string.IsNullOrEmpty(Model.DocumentName))
+{
+    @Html.DevExpress().Spreadsheet(settings =>
+                {
+                    settings.Name = "SectionXLS";
+                    settings.CallbackRouteValues = new { Controller = "Section", Action = "LoadSectionXLS" };
+                    settings.WorkDirectory = WordAutomationDemo.Models.DirectoryManagmentUtils.DocumentBrowsingFolderPath;
+                    settings.Width = System.Web.UI.WebControls.Unit.Percentage(100);
+                    settings.Height = System.Web.UI.WebControls.Unit.Pixel(700);
+                    settings.ShowConfirmOnLosingChanges = false;
+                    settings.ReadOnly = Model.IsReadOnly;
+                    settings.ActiveTabIndex = 0;
+                    settings.EnableClientSideAPI = true;
+                    settings.Init = (s, e) =>
+                    {
+                        var spreadsheet = s as MVCxSpreadsheet;
+                        spreadsheet.CreateDefaultRibbonTabs(true);
+                        var fileTab = spreadsheet.RibbonTabs[0];
+                        fileTab.Visible= false;
+                        //fileTab.Groups[0].Items[0].ClientEnabled = false;
+                        //fileTab.Groups[0].Items[1].ClientEnabled = false;
+                        spreadsheet.ShowFormulaBar = false;
+                    };
+                    settings.PreRender = (s, e) =>
+                    {
+                        MVCxSpreadsheet rEdits = (MVCxSpreadsheet)s;
+                        rEdits.Focus();
+                    };
+                }).Open(Path.Combine(WordAutomationDemo.Models.DirectoryManagmentUtils.InitialDemoFilesPathSection, Model.DocumentName)).GetHtml()
+}
+else
+{
+    @Html.DevExpress().Spreadsheet(settings =>
+    {
+        settings.Name = "SectionXLS";
+        settings.CallbackRouteValues = new { Controller = "Section", Action = "LoadSectionXLS" };
+        settings.WorkDirectory = WordAutomationDemo.Models.DirectoryManagmentUtils.DocumentBrowsingFolderPath;
+        settings.Width = System.Web.UI.WebControls.Unit.Percentage(100);
+        settings.Height = System.Web.UI.WebControls.Unit.Pixel(700);
+        //settings.RibbonMode = DevExpress.Web.ASPxSpreadsheet.SpreadsheetRibbonMode.Auto;
+        settings.ShowConfirmOnLosingChanges = false;
+        settings.ReadOnly = Model.IsReadOnly;
+        settings.ActiveTabIndex = 0;
+        //settings.AutoSaveMode = DevExpress.Web.Office.Internal.AutoSaveMode.On;
+        //settings.EnableClientSideAPI = true;
+        settings.Init = (s, e) =>
+        {
+            var spreadsheet = s as MVCxSpreadsheet;
+            spreadsheet.CreateDefaultRibbonTabs(true);
+            var fileTab = spreadsheet.RibbonTabs[0];
+            fileTab.Groups[0].Items[0].ClientEnabled = false;
+            fileTab.Groups[0].Items[1].ClientEnabled = false;
+            spreadsheet.ShowFormulaBar = false;
+        };
+        settings.PreRender = (s, e) =>
+        {
+            MVCxSpreadsheet rEdits = (MVCxSpreadsheet)s;
+            rEdits.Focus();
+        };
+    }).GetHtml()
+}
+

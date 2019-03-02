@@ -1,0 +1,534 @@
+﻿@model IEnumerable<WordAutomationDemo.Models.ProjectModel>
+@using Kendo.Mvc.UI
+@{
+    ViewBag.Title = "Archived Projects";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+<div class="row">
+    @if (Request.QueryString["Msg"] != null && Request.QueryString["Msg"].ToString() == "Created")
+    {
+        <div class="alert alert-success" id="upload">
+            <ul>
+                <li>
+                    @Html.Encode(String.Format(WordAutomationDemo.Common.Messages.ProjectCreated))
+                </li>
+            </ul>
+        </div>
+        <script>
+            $("#upload").show().focus();
+            setTimeout(function () {
+                $("#upload").hide();
+            }, 5000);
+        </script>
+    }
+    @if (Request.QueryString["Msg"] != null && Request.QueryString["Msg"].ToString() == "ProjectEdited")
+    {
+        <div class="alert alert-success" id="upload">
+            <ul>
+                <li>
+                    @Html.Encode(String.Format(WordAutomationDemo.Common.Messages.ProjectEdited))
+                </li>
+            </ul>
+        </div>
+        <script>
+            $("#upload").show().focus();
+            setTimeout(function () {
+                $("#upload").hide();
+            }, 5000);
+        </script>
+
+    }
+    @if (Request.QueryString["Msg"] != null && Request.QueryString["Msg"].ToString() == "deleted")
+    {
+        <div class="alert alert-success" id="upload">
+            <ul>
+                <li>
+                    @Html.Encode(String.Format(WordAutomationDemo.Common.Messages.ProjectDeleted))
+                </li>
+            </ul>
+        </div>
+        <script>
+            $("#upload").show().focus();
+            setTimeout(function () {
+                $("#upload").hide();
+            }, 5000);
+        </script>
+
+    }
+    @if (Request.QueryString["Msg"] != null && Request.QueryString["Msg"].ToString() == "ProjectNotFound")
+    {
+        <div class="alert alert-danger" id="upload">
+            <ul>
+                <li>
+                    @Html.Encode(String.Format(WordAutomationDemo.Common.Messages.ProjectNotFound))
+                </li>
+            </ul>
+        </div>
+    }
+
+    @if (Request.QueryString["Msg"] != null && Request.QueryString["Msg"].ToString() == "Added")
+    {
+        <div class="alert alert-success" id="upload">
+            <ul>
+                <li>
+                    @Html.Encode(String.Format(WordAutomationDemo.Common.Messages.DocumentAdded))
+                </li>
+            </ul>
+        </div>
+        <script>
+            $("#upload").show().focus();
+            setTimeout(function () {
+                $("#upload").hide();
+            }, 5000);
+        </script>
+
+    }
+
+    @if (Request.QueryString["Msg"] != null && Request.QueryString["Msg"].ToString() == "Error")
+    {
+        <div class="alert alert-success" id="upload">
+            <ul>
+                <li>
+                    @Html.Encode(String.Format(WordAutomationDemo.Common.Messages.Error))
+                </li>
+            </ul>
+        </div>
+        <script>
+            $("#upload").show().focus();
+            setTimeout(function () {
+                $("#upload").hide();
+            }, 5000);
+        </script>
+
+    }
+
+    @{
+        string DocPathTemp = @Url.Content("~/ApplicationDocuments/ProjectDocuments/");
+    }
+    @using (Html.BeginForm("Delete", "Projects", FormMethod.Post, new { @onkeypress = "return event.keyCode != 13;" }))
+    {
+        <input type="hidden" name="MasterDocName" id="MasterDocName" value="" />
+        <input type="hidden" name="ProjectID" id="ProjectID" value="" />
+        <input type="hidden" name="DocName" value="" id="DocName" />
+
+        <div class="col-sm-12">
+            <div class="main-heading title-row mbp15">
+                <div class="row">
+                    <div class="col-xs-4">
+                        <h1 class="heading01">Archived Projects</h1>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+
+        <div class="col-sm-12">
+            <div class="row">
+                <div class="col-sm-4 col-sm-push-8 text-lr-xs">
+                    <a href="@Url.Action("Create", "Projects")" class="lightblue-btn btnspace"><i class="fa fa-plus" aria-hidden="true"></i> Create New Project</a>
+                </div>
+                <div class="col-sm-8 col-sm-pull-4">
+                    <button type="submit" class="darkred-btn btnspace" id="btnDelete" onclick="return Check_CheckBox_Count_Project('ProjectID');"><i class="fa fa-trash-o" aria-hidden="true"></i> Delete</button>
+                    <button type="button" class="lightblue-btn btnspace" id="btnBulkStatusChange" name="btnBulkStatusChange" onclick="openStatusChangePopUp()"><i class="fa fa-file-archive-o" aria-hidden="true"></i>Un-Archive</button>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-sm-12 mtp20">
+        <div class="table-responsive">
+
+
+            @(Html.Kendo().Grid<WordAutomationDemo.Models.ProjectModel>
+                        ()
+                        .Name("projectGrid")
+                        .Events(e => e.DataBound("onGridDataBound"))
+                        .Columns(columns =>
+                        {
+                            columns.Template(@<text>
+                                <input id="chkDelete" name="chkDelete" type="checkbox" class="singleCheckBox" value="@item.ProjectID" onclick="return initializeSingleCheckBox(this.id);" />}
+                            </text>)
+                        .ClientTemplate("<input type='checkbox' id='chkDelete' name='chkDelete' class='singleCheckBox' value='#= ProjectID #' onclick='return initializeSingleCheckBox(this);' />")
+                        .HeaderTemplate(@<input id="allCheckBox" name="allCheckBox" type="checkbox" title="check all records" onclick="return initializeAllCheckBox();" />)
+                        .HtmlAttributes(new { @class = "textalign" })
+                        .HeaderHtmlAttributes(new { @class = "textalign" }).Width("2%");
+
+                            columns.Template(@<text>
+                            <a href="@Url.Action(" Edit", "Projects" , new { UID = item.EncryptedProjectID})" class="tableicon bluebg" data-original-title="Edit Project" data-toggle="tooltip" data-placement="top"><i class="fa fa-pencil" aria-hidden="true"></i></a>
+                            </text>)
+                        .ClientTemplate("<a href='" + Url.Action("Edit", "Projects", new { UID = "#= EncryptedProjectID #" }) + "' " + " class='tableicon bluebg' data-original-title='Edit Project' data-toggle='tooltip' data-placement='top'><i class='fa fa-pencil' aria-hidden='true'></i></a>")
+                        .HtmlAttributes(new { style = "text-align:center" })
+                        .HeaderHtmlAttributes(new { style = "text-align:center;width:4%" })
+                        .Title("Edit");
+
+                            columns.Template(@<text>
+                            <a href="@Url.Action(" Details", "Projects" , new { UID = item.EncryptedProjectID})" class="grid-btn-edit" title="Project Details "><i class="fa fa-pencil-square-o"></i></a>
+                            </text>)
+                        .ClientTemplate("<a href='" + Url.Action("Details", "Projects", new { UID = "#= EncryptedProjectID #" }) + "' " + " class='grid-btn-edit' title='Project Details'>#= Name #</a>")
+                        .HtmlAttributes(new { style = "text-align:center" })
+                        .HeaderHtmlAttributes(new { style = "text-align:center;" })
+                        .Title("Name");
+
+                            columns.Template(@<text>
+                            <a href="#" class="grid-btn-edit" title="Project Details "><i class="fa fa-pencil-square-o"></i></a>
+                            </text>)
+                        .ClientTemplate("<a onClick='UploadDocuments(#= ProjectID #)' class='grid-btn-edit' title='Upload Doc' style='cursor:pointer;'><span class='glyphicon glyphicon-open' aria-hidden='true'></span></a>")
+                        .HtmlAttributes(new { style = "text-align:center" })
+                        .HeaderHtmlAttributes(new { style = "text-align:center;" })
+                        .Title("Upload Doc");
+
+                            columns.Bound(x => x.Description);
+
+                            columns.Bound(x => x.StartDate).Format("{0:" + WordAutomationDemo.Helpers.CurrentUserSession.User.DTFormatGrid + "}");
+
+                            columns.Bound(x => x.EndDate).Format("{0:" + WordAutomationDemo.Helpers.CurrentUserSession.User.DTFormatGrid + "}");
+
+                            columns.Template(@<text><a title="Member List">View</a></text>)
+                        .ClientTemplate("<a title='View' class='onlyicon' href='' data-toggle='modal' onClick='OpenMemberListPopup(this)' id='#=ProjectID#'><i class='fa fa-users' aria-hidden='true'></i></a>")
+                        .Title("Members")
+                        .HtmlAttributes(new { style = "text-align:center" })
+                        .Width("7%");
+
+                            columns.Bound(x => x.CreatedDate).Format("{0:" + WordAutomationDemo.Helpers.CurrentUserSession.User.DTFormatGrid + " hh:mm tt}");
+
+                            columns.Bound(x => x.strStatus)
+                            .Width("5%")
+                            .Title("Status")
+                            .Groupable(false)
+                            .Sortable(false)
+                            .Filterable(false);
+                        }).Pageable(pageable => pageable.Refresh(true).PageSizes(WordAutomationDemo.Common.Global.recordPerPageList).ButtonCount(5).Input(true).Numeric(true)).DataSource(dataSource => dataSource.Ajax().PageSize(WordAutomationDemo.Common.Global.PageSize).Read(read => read.Action("GetArchiveProjects", "Projects"))).Sortable().Filterable(f=>f.Extra(false)).Groupable().EnableCustomBinding(false).AutoBind(true))
+
+        </div>
+    </div>
+    }
+    
+</div>
+<!-- Modal -->
+
+<div class="modal fade bs-example-modal-lg" id="ReportsModal" tabindex="1000" role="dialog" aria-labelledby="myLargeModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg" style="overflow:auto;">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+                <h4 class="modal-title" id="myModalLabel">  <span id="contentType">View Members </span></h4>
+            </div>
+            <div class="modal-body" id="partialContent" style="line-height:25px;">
+                <div>
+
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-primary" data-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade bs-example-modal-lg" id="DocumentModal" tabindex="1000" role="dialog" aria-labelledby="myLargeModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg" style="overflow:auto;">
+        <div class="modal-content">
+            <div class="modal-header">
+                <div class="pull-right">
+                    <a id="DocdownloadLink" href="#"><i class="glyphicon glyphicon-download-alt " title="Click to Download "></i></a>
+                    &nbsp;&nbsp;
+                    <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+                </div>
+                <h4 class="modal-title" id="myModalLabel">  <span id="contentType">View Document </span></h4>
+            </div>
+            <div class="modal-body" id="partialContentDoc" style="line-height:25px;">
+                <div>
+
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-primary" data-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade bs-example-modal-lg" id="StatusModal" tabindex="1000" role="dialog" aria-labelledby="myLargeModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg" style="overflow:auto;">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+                <h4 class="modal-title" id="myModalLabel">  <span id="contentType">Un-Archive Projects</span></h4>
+            </div>
+            <div class="modal-body" id="partialContentDoc" style="line-height:25px;">
+                <div>
+
+                    <input type="radio" name="status" value="Un-Archive" checked="checked" id="statusActive" />
+                    <label title="Un-Archive" for="statusActive">Un-Archive</label><br />
+                    @*<input type="radio" name="status" value="InActive" id="statusInActive" />
+                        <label for="statusInActive" title="InActive">InActive</label>*@
+                </div>
+            </div>
+            <div class="modal-footer">
+                <input type="button" name="btnChange" class="btn btn-primary pull-right" style="width:150px" value="Save" id="btnChangeStatus" onclick="Check_Status_CheckBox_Count()" />
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade bs-example-modal-lg" id="AllSlidesModel" tabindex="1000" role="dialog" aria-labelledby="myLargeModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg" style="overflow:auto;">
+
+        <div class="modal-content">
+            <div class="modal-header">
+                <div class="pull-right">
+                    <a id="downloadLink" href="#"><i class="glyphicon glyphicon-download-alt " title="Download Original File"></i></a>
+                    &nbsp;&nbsp;
+                    <button type="button" title="Close" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+                </div>
+                <h4 class="modal-title" id="myModalLabel">  <span id="contentType">View Document </span></h4>
+            </div>
+            <div class="modal-body" id="partialContent" style="line-height:25px;">
+                <div class="demo-section k-content wide">
+                    @(Html.Kendo().ListView<WordAutomationDemo.Models.ProjectModel>
+                                ()
+                                .Name("listView2")
+                                .TagName("div")
+                                .ClientTemplateId("template")
+
+                                .DataSource(dataSource =>
+                                {
+                                    dataSource.Read(read => read.Action("GetAllSlidesForProjectDoc", "Projects").Data("AllSlidesParamas"));
+                                }).HtmlAttributes(new { style = "max-height:250px;overflow-y:auto" }))
+                    <div class="clearfix"></div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-primary" data-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade bs-example-modal-lg" id="UploadDocModel" tabindex="1000" role="dialog" aria-labelledby="myLargeModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg" style="overflow:auto;">
+
+        <div class="modal-content">
+            <div class="modal-header">
+                <div class="pull-right">
+                    <button type="button" title="Close" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+                </div>
+                <h4 class="modal-title" id="myModalLabel">  <span id="contentType">Upload Documents</span></h4>
+            </div>
+            @using (Html.BeginForm("UploadDocuments", "Projects", FormMethod.Post, new { enctype = "multipart/form-data", id = "frmUploadDocument" }))
+            {
+                <input type="hidden" name="hdnProjectID" id="hdnProjectID" value="" />
+                <div class="modal-body" id="partialContent" style="line-height:25px;">
+                    <div class="demo-section k-content wide">
+                        <input type="file" name="docFile" onchange="ValidateType(this)" value="" class="form-control col-md-3" id="docFile" multiple="multiple" accept=".docx,.doc,.ppt,.pptx" style="width: 35%; margin-right: 10px;" />
+                        <input type="submit" class="btn btn-primary" name="Upload" value="Upload" onclick="return ValidateFile()" title="Upload Document" style="width:10%;" />
+                        <div class="clearfix"></div>
+                    </div>
+                </div>
+            }
+            <div class="modal-footer">
+                <button type="button" class="btn btn-primary" data-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="popup" data-backdrop="static" style="border:1px solid gray;z-index:99999;display:none;">Popup</div>
+
+<script type="text/x-kendo-tmpl" id="template">
+    <div class="pull-left" style="padding:10px;overflow:auto;max-height:250px"> #=ThumbnailLink#</div>
+</script>
+
+<script>
+    $(document).ready(function () {
+        $(".k-grouping-header").remove();
+    });
+
+    function ShowImg(obj) {
+        $('.popup').hide();
+        $('.popup').html('<img style="border:1px solid" src="' + $(obj).data('id') + '" />');
+        var offset = $(obj).offset();
+        $('.popup').css('left', 300);
+        $('.popup').css('top', offset.top);
+        $('.popup').show();
+    }
+
+    function HideImg(obj) {
+        $('.popup').hide();
+    }
+
+
+    $("#DocumentModal").on('shown.bs.modal', function () {
+        $('#ProjectDoc_R_TC_TPTCL_MinBtn').click();
+        $('#ProjectDoc_R_TC_TPTCL_MinBtn').click();
+    });
+
+    //databound column
+    function onGridDataBound(e) {
+        $(".k-grouping-header").remove();
+        var grid = $("#" + e.sender.element[0].id).data("kendoGrid");
+        var dataSource = grid.dataSource;
+        //total records
+        var totalRecords = dataSource.total();
+        if (totalRecords <= 0) {
+            var colCount = grid.columns.length;
+            $("#" + e.sender.element[0].id).find('tbody').html('');
+            $("#" + e.sender.element[0].id).find('tbody').append('<tr class="kendo-data-row"><td colspan="' + colCount + '" class="no-data" style="text-align: center;">No records found.</td></tr>');
+        }
+    }
+
+    function OpenMemberListPopup(e) {
+        var projectId = e.id;
+
+        if (projectId != null && projectId > 0) {
+            $.get('@Url.Action("GetMembers", "Projects")', { ProjectID: projectId }, function (result) {
+
+                var strhtml = '<table class="table table-bordered" style="word-break:break-all" id="MembersTable"><tbody>';
+                if (result.length > 0) {
+                    $.each(result, function (key, value) {
+                        strhtml += '<tr>';
+                        strhtml += '<td><p style="padding:0;margin:0">' + value["FullName"] + '</p></td>';
+                        strhtml += '</tr>';
+                    });
+                }
+                else {
+                    strhtml += '<tr class="center"><td colspan="2">No members found</td></tr>';
+                }
+                strhtml += '</tbody></table>';
+                $("#partialContent").html(strhtml);
+                $('#ReportsModal').modal('show');
+            });
+        }
+    }
+
+
+    function GetPPTSlides(id, name) {
+        var id = id;
+        var name = name;
+        $("#downloadLink").attr("href", '@Url.Content("~/ApplicationDocuments/ProjectDocuments/")' + id + "/" + name)
+        $("#MasterDocName").val(name);
+        $("#ProjectID").val(id);
+        $("#listView2").data("kendoListView").dataSource.read();
+        $('#AllSlidesModel').modal('show');
+
+    }
+
+    function UploadDocuments(id) {
+        var id = id;
+        $("#hdnProjectID").val(id);
+        $('#UploadDocModel').modal('show');
+    }
+
+    function AllSlidesParamas() {
+        return {
+            FileName: $("#MasterDocName").val(),
+            ProjectID: $("#ProjectID").val(),
+        };
+    }
+
+
+
+    function OpenProjectDoc(id, name) {
+        if (name != "") {
+            $("#DocdownloadLink").attr("href", '@DocPathTemp' + id + '/' + name)
+            $.get('@Url.Action("LoadProjectDoc", "Projects")', { ProjectID: id, FileName: name }, function (partialView) {
+                $("#partialContentDoc").html(partialView);
+                $('#DocumentModal').modal('show');
+            });
+        }
+    }
+
+
+
+    function openStatusChangePopUp() {
+        var n = $("input[name=chkDelete]"), t = n.filter(":checked").length;
+        if (t > 0) {
+            $("#StatusModal").modal('show');
+        }
+        else {
+            return (alert("Please select at least one checkbox to un-archive projects."), !1);
+        }
+    }
+
+    function Check_Status_CheckBox_Count() {
+        var n = $("input[name=chkDelete]"), t = n.filter(":checked").length;
+
+        if (t > 0) {
+            $("#StatusModal").modal('hide');
+            //$("#btnBulkStatusChange").attr("value", "Status Changing...");
+            //$("#btnChangeStatus").attr("value", "Saving...");
+            var Status = BulkStatusChange();
+            //$("#btnBulkStatusChange").attr("value", "Status Change");
+            $("#btnChangeStatus").attr("value", "Save");
+            if (Status == 1) {
+                $("#Message").html("<ul><li>Selected projects(s) has been un-archived successfully</li></ul>")
+                $("#Message").show().focus();
+                setTimeout(function () {
+                    $("#Message").hide();
+                }, 5000);
+                $("#allCheckBox").removeAttr("checked", "checked");
+            }
+            else if (Status == 2) {
+                alert("Please select at least one checkbox to un-archive.");
+            }
+            else if (Status == 0) {
+                alert("Something went wrong, Please try later.");
+            }
+
+            $("#projectGrid").data("kendoGrid").dataSource.read();
+        }
+        else {
+            return false;
+        }
+    }
+
+    function BulkStatusChange() {
+        var response = 0;
+        var $b = $('input[name=chkDelete]');
+        var active = $("input[id='statusActive']").is(":checked");
+        var allVals = [];
+
+        $b.filter(':checked').each(function () {
+            allVals.push($(this).val());
+        });
+
+        $.ajax({
+            type: "GET",
+            url: SiteUrl + "Projects/BulkStausChange",
+            data: { ProjectIDs: allVals.toString(), IsActive: 1 },
+            cache: false,
+            async: false,
+            success: function (data) {
+                response = data;
+            }
+        });
+
+        return response;
+    }
+    function Check_CheckBox_Count_Project() {
+        var n = $("input[name=chkDelete]"), t = n.filter(":checked").length; return t > 0 ? confirm("Are you sure? Do you want to delete selected projects and relevant tasks?") : (alert("Please select at least one checkbox to delete."), !1)
+    }
+
+    function ValidateType(e) {
+        if ($(e).val() != "") {
+            var ext = $(e).val().split('.').pop().toLowerCase();
+            if ($.inArray(ext, ['docx', 'doc', 'ppt', 'pptx']) == -1) {
+                alert("Only documents files can be uploaded!")
+                $(e).val('');
+            }
+            //if (input.size / 1024 / 1024 > 5) {
+            //    alert("Max 5Mb file size is allowed!")
+            //    $(input).val('');
+            //}
+        }
+    }
+
+    function ValidateFile() {
+        if ($("#docFile").val() != "") {
+            return true
+        }
+        else {
+            alert("Please select document files to upload")
+            return false
+        }
+    }
+</script>

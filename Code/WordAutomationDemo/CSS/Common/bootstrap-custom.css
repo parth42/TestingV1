@@ -1,0 +1,50 @@
+﻿@charset "utf-8";
+/* CSS Document */
+
+/* ==========================================================================
+   Bootstrap Overwrite
+   ========================================================================== */
+
+.navbar-brand { height: auto; padding: 10px 0 0px 15px; }
+.navbar-brand > img { height: 35px; }
+.navbar-default { border-color: #fff; background-color: #fff; }
+.navbar-default .navbar-nav > li > a { color: #505461; padding: 5px 15px; }
+.navbar-default .navbar-nav > li > a:hover, .navbar-default .navbar-nav > li > a:focus { color: #505461; }
+.navbar-form { margin-top: 0; border-top: none; }
+.navbar-right { border-top: 1px solid #eee; }
+.modal-backdrop.in { opacity: 0.8; }
+.pagination { margin: 0 0 20px; }
+.label { border-radius: 0; }
+
+.btn:focus, .btn:active { outline: none; }
+
+
+/* Small devices (tablets, 768px and up) */
+@media (min-width: 768px) {
+	
+.dropdown:hover .dropdown-menu { display: block; }
+.navbar-brand { padding-top: 5px; padding-bottom: 20px; }
+.navbar-brand > img { height: auto; }
+.navbar-default .navbar-nav > li > a { padding: 5px 10px; }
+.navbar-default .navbar-nav > .open > a,
+.navbar-default .navbar-nav > .open > a:focus,
+.navbar-default .navbar-nav > .open > a:hover { background-color: transparent; color: #196db6 !important; }
+.navbar-right { margin-right: -10px; border-top: none; }
+.form-inline .form-group + .form-group { margin-left: 4px; }
+	
+}
+
+
+/* Medium devices (desktops, 992px and up) */
+@media (min-width: 992px) { 
+    .navbar-brand { padding-bottom: 15px; }
+    .navbar-default .navbar-nav > li > a { padding: 7px 10px; }	
+}
+
+
+/* Large devices (large desktops, 1200px and up) */
+@media (min-width: 1200px) { 
+
+.container { width: 1200px; padding-left: 0; padding-right: 0; }
+	
+}

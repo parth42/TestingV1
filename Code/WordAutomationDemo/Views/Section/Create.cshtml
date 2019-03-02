@@ -1,0 +1,176 @@
+﻿@using DevExpress.Web.Mvc;
+@using DevExpress.Web.Mvc.UI;
+@model WordAutomationDemo.Models.SectionModel
+
+@{
+    ViewBag.Title = "Create Section";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+<script src="~/Scripts/Custom/Section.js"></script>
+<div class="row">
+    <div class="col-sm-12">
+        <div class="main-heading title-row mbp15">
+            <div class="row">
+                <div class="col-xs-12">
+                    <h1 class="heading01">Create Section</h1>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-sm-12 mtp10">
+        @using (Html.BeginForm("Create", "Section", FormMethod.Post, new { id = "frmCreateSection", enctype = "multipart/form-data" }))
+        {
+            <div class="row">
+                @Html.AntiForgeryToken()
+                <div class="col-sm-4">
+                    <div class="form-group">
+                        <label>@Html.LabelFor(model => model.SectionName) <span class="mandatory">*</span></label>
+                        @Html.TextBoxFor(model => model.SectionName, new { @class = "form-control", @maxlength = "50" })
+                        <p class="errormessage">@Html.ValidationMessageFor(model => model.SectionName)</p>
+                    </div>
+                </div>
+                <div class="col-sm-4">
+                    <div class="form-group multiselectbox">
+                        <label for="ProjectDocuments">@Html.LabelFor(model => model.Description) </label>
+                        @Html.TextAreaFor(model => model.Description, new { @class = "form-control", @rows = "2" })
+                    </div>
+                </div>
+                <div class="col-sm-4">
+                    <div class="form-group">
+                        <label for="name">@Html.LabelFor(model => model.ContentType) </label>
+                        <div class="clearfix">
+                            <label class="radio-inline">
+                                @Html.RadioButtonFor(model => model.ContentType, true, new { Checked = "checked", id = "ContentType1", value = "Edit" }) Rich Editor
+                            </label>
+                            <label class="radio-inline">
+                                @Html.RadioButtonFor(model => model.ContentType, false, new { id = "ContentType2" }) Upload document
+                            </label>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-sm-12">
+                    <div class="row">
+                        <div class="col-sm-4" id="divUpload">
+                            <div class="form-group multiselectbox">
+                                <label>Content File</label>
+                                <div class="input-group">
+                                    <input type="text" class="form-control" readonly>
+                                    <label class="input-group-btn">
+                                        <span class="btn btn-primary">
+                                            Browse&hellip; <input type="file" name="ContentFile" id="FileValidation paddingTop7" onchange="ValidateType(this)" style="display: none;" accept=".docx,.xls,.xlsx" multiple>
+                                        </span>
+                                    </label>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-sm-4">
+                            <div class="form-group">
+                                <label>Status <span class="mandatory">*</span></label>
+                                <div class="clearfix">
+                                    <label class="radio-inline">
+                                        @Html.RadioButtonFor(model => model.Status, true, new { id = "active", value = "Doc", @checked = "checked" }) Active
+                                    </label>
+                                    <label class="radio-inline">
+                                        @Html.RadioButtonFor(model => model.Status, false, new { id = "inActive" }) InActive
+                                    </label>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-sm-12">
+                    <div class="form-group multiselectbox" id="divEditor">
+                        <label for="ProjectDocuments">Editor</label>
+                        <div class="clearfix">
+                            @Html.DevExpress().RichEdit(settings =>
+                           {
+                               settings.Name = "BlankDoc";
+                               //settings.CallbackRouteValues = new { Controller = "Section", Action = "BlankDoc" };
+                               settings.WorkDirectory = WordAutomationDemo.Models.DirectoryManagmentUtils.InitialDemoFilesPathSection;
+                               settings.Width = System.Web.UI.WebControls.Unit.Percentage(100);
+                               settings.Height = System.Web.UI.WebControls.Unit.Pixel(700);
+                               settings.ShowConfirmOnLosingChanges = false;
+                               settings.ActiveTabIndex = 0;
+                               settings.Settings.Behavior.Save = DevExpress.XtraRichEdit.DocumentCapability.Disabled;
+                               settings.EnableClientSideAPI = true;
+                               settings.Init = (s, e) =>
+                               {
+                                   var rich = s as MVCxRichEdit;
+                                   rich.CreateDefaultRibbonTabs(true);
+                                   rich.RibbonTabs[0].Visible = false;
+                                   rich.RibbonTabs.Find(c => c.Text.Contains("Merge")).Visible = false;
+                               };
+                               settings.PreRender = (s, e) =>
+                               {
+                                   MVCxRichEdit richEdit = (MVCxRichEdit)s;
+                                   richEdit.Focus();
+                               };
+                           }).GetHtml()
+
+                        </div>
+                    </div>
+                </div>
+                <div class="col-sm-12">
+                    <button type="submit" class="lightblue-btn btnspace"><i class="fa fa-floppy-o" aria-hidden="true"></i> Save</button>
+                    <button class="darkblue-btn btnspace" type="button" onclick="location.href = '@Url.Action("Index","Section")';"><i class="fa fa-angle-left" aria-hidden="true"></i> Back</button>
+                </div>
+            </div>
+        }
+    </div>
+</div>
+
+<script>
+
+    $(document).ready(function () {
+        if ($("#ContentType2").is(":checked") == true) {
+            $("#divEditor").hide();
+            $("#divUpload").show();
+        } else {
+            $("#divEditor").show();
+            $("#divUpload").hide();
+        }
+
+    });
+
+    $('#frmCreateSection').submit(function () {
+        //var RichEditorContentLength = RichEdit.core.model.sections.length;
+        //if ($("#ContentType2").is(":checked") == true && !$('#ContentFile').val()) {
+        //    //return false;
+        //}
+
+        if ($("#ContentType1").is(":checked") == true) {
+            $("#ContentFile").rules('remove', 'required');
+        }
+        else {
+            $("#ContentFile").rules('add', 'required');
+        }
+
+
+    });
+    $('input:radio[name="ContentType"]').on('click', function () {
+        if ($('input[name=ContentType]:checked').val() == 'True') {
+            $("#divEditor").show();
+            $("#divUpload").hide();
+        } else {
+            $("#divEditor").hide();
+            $("#divUpload").show();
+        }
+    });
+
+
+    function ValidateType(e) {
+
+        if ($(e).val() != "") {
+            var ext = $(e).val().split('.').pop().toLowerCase();
+            if ($.inArray(ext, ['docx', 'xlsx', 'xls']) == -1) {
+                alert("Only documents files can be uploaded!")
+                $(e).val('');
+            }
+            //if (input.size / 1024 / 1024 > 5) {
+            //    alert("Max 5Mb file size is allowed!")
+            //    $(input).val('');
+            //}
+        }
+    }
+
+</script>

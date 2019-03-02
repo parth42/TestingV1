@@ -1,0 +1,67 @@
+﻿@using DevExpress.Web.Mvc;
+@using DevExpress.Web.Mvc.UI;
+@using Kendo.Mvc.UI
+
+@model WordAutomationDemo.Models.AssignmentModel
+
+@Html.HiddenFor(x => x.start)
+@Html.HiddenFor(x => x.length)
+@Html.HiddenFor(x => x.selectedText)
+@Html.HiddenFor(x => x.DocumentName)
+@Html.HiddenFor(x => x.DocumentType)
+@Html.HiddenFor(x => x.SelectedRows)
+@Html.HiddenFor(x => x.ProjectID)
+@Html.HiddenFor(x => x.SelectedSlides)
+@Html.HiddenFor(x => x.SelectedSheets)
+@Html.HiddenFor(x => x.DocumentID)
+@Html.HiddenFor(x => x.Comments)
+@Html.HiddenFor(x => x.AssignmentMemberList)
+
+<!-- Column 1: Fields -->
+<div class="col-sm-6">
+    <div class="form-group input-height row">
+        <label for="Project" class="col-md-6 col-sm-3">Project<span class="mandatory">*</span></label>
+        <div class="input-group col-md-6 col-sm-9">
+            @Html.DropDownListFor(x => x.ProjectID, (Model.myProjectList != null) ? Model.myProjectList : new List<SelectListItem>(), " - Select Project - ", new { @class = "form-control", onchange = "changeProject(this)" })
+            <span class="input-group-btn">
+                <button class="btn-primary btn" type="button" data-toggle="modal" data-target="#addnewproject" onclick="openAddNewPopup()"><i class="fa fa-plus" aria-hidden="true"></i></button>
+            </span>
+        </div>
+        <p class="errormessage col-sm-6 offset-sm-6" style="display:none;" id="reqProjectID">
+            <span class="field-validation-error" data-valmsg-for="ProjectID" data-valmsg-replace="true"><span for="ProjectID" class="">Project is required.</span></span>
+        </p>
+    </div>
+    <div class="form-group input-height row">
+        <label for="TaskName" class="col-md-6 col-sm-3">Task Name<span class="mandatory">*</span></label>
+        <div class="input-group col-md-6 col-sm-9">@Html.TextBoxFor(x => x.TaskName, new { @class = "form-control required" })</div>
+        <p class="errormessage col-sm-6 offset-sm-6" style="display:none;" id="reqTaskName">
+            <span class="field-validation-error" data-valmsg-for="TaskName" data-valmsg-replace="true"><span for="TaskName" class="">Task Name is required.</span></span>
+        </p>
+    </div>
+    <div class="form-group input-height row">
+        <label for="name" class="col-md-6 col-sm-3">Due Date<span class="mandatory">*</span></label>
+        <div class="input-group data col-md-6 col-sm-9" id="dtDuedate">
+            @Html.TextBoxFor(x => x.DueDate, new { @class = "form-control", id = "DueDate" })
+            <span class="input-group-addon btn-primary"> <i class="fa fa-calendar" aria-hidden="true"></i> </span>
+        </div>
+        <p class="errormessage col-sm-6 offset-sm-6" style="display:none;" id="reqDueDate">
+            <span class="field-validation-error" data-valmsg-for="DueDate" data-valmsg-replace="true"><span for="DueDate" class="">Due Date is required.</span></span>
+        </p>
+    </div>
+    <div class="form-group input-height row">
+        <label for="name" class="col-md-6 col-sm-3">Comments</label>
+        <div class="input-group data col-md-6 col-sm-9">
+            @Html.TextAreaFor(x => x.Comments, new { @placeholder = "Comments (Optional)", @id = "taskComments", @class = "form-control", @row = 3 })
+        </div>
+    </div>
+
+    @if (!string.IsNullOrEmpty(Model.Content))
+    {
+        <div class="form-group input-height row">
+            <div class="clearfix col-sm-12">
+                @Html.TextAreaFor(m => m.Content, new { @style = "border:none;width:100%;", @cols = "50" })
+            </div>
+        </div>
+    }
+    @Html.HiddenFor(x => x.DocumentName)
+</div>

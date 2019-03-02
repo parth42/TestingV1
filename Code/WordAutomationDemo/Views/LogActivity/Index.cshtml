@@ -1,0 +1,49 @@
+﻿@model WordAutomationDemo.Models.LogActivityModel
+@using Kendo.Mvc.UI
+@using WordAutomationDemo.Helpers
+@using WordAutomationDemo.Common
+@{
+    ViewBag.Title = "Log Activities";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+<div class="row">
+
+    <div class="col-sm-12 mtp20">
+        <div class="table-responsive nospacetd">
+            <table class="table">
+                <tr>
+                    <td>
+                        @(Html.Kendo().Grid(Model.IListLogActivity)
+      .Name("grid")
+      .Events(e => e.DataBound("onGridDataBound"))
+      .Columns(columns =>
+      {
+
+
+          columns.Bound(la => la.LogActivityID).Title("Event ID").Filterable(false);
+          columns.Bound(la => la.LogActivityTypeName).Title("Event Type");
+          columns.Bound(la => la.ActivityDetails).Title("Event Detail");
+          columns.Bound(la => la.IPAddress);
+          //columns.Bound(la => la.ChangedRoleNameOrID);
+          columns.Bound(la => la.CreatedByName).Title("Created By");
+          columns.Bound(la => la.CreatedDate).Format("{0:MM/dd/yyyy  hh:mm tt}").Title("Created Date");
+
+      }).Pageable(pageable => pageable.Refresh(true).PageSizes(Global.recordPerPageList).ButtonCount(Global.buttonCount).Input(true).Numeric(true))
+                                          .DataSource(dataSource => dataSource
+                                              .Ajax()
+                                              .PageSize(Global.PageSize)
+                                              .Read(read => read.Action("LogActivity_Read", "LogActivity")))
+                                              .Sortable(f => f.Enabled(true))
+                                              .Filterable(f => f.Enabled(true))
+                                              .Groupable(g => g.Enabled(false))
+                                              .EnableCustomBinding(true)
+                        )
+
+                    </td>
+                </tr>
+            </table>
+        </div>
+
+    </div>
+
+</div>

@@ -1,0 +1,347 @@
+﻿@using DevExpress.Web.Mvc;
+@using DevExpress.Web.Mvc.UI;
+@model WordAutomationDemo.Models.AssignmentModel
+@using Kendo.Mvc.UI
+
+@{
+    ViewBag.Title = "Create Task";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+@section scripts {
+    <script src="@Url.Content("~/Scripts/Common/moment.min.js")"></script>
+    <script src="@Url.Content("~/Scripts/Common/bootstrap-datetimepicker.js")"></script>
+    <script src="@Url.Content("~/Scripts/Common/bootstrap-multiselect.js")"></script>
+    <script src="@Url.Content("~/Scripts/jquery.steps.js")"></script>
+    @Html.Partial("CreateAssignmentJS", Model)
+
+    <link href="@Url.Content("~/CSS/Common/bootstrap-multiselect.css")" rel="stylesheet" />
+    <link href="@Url.Content("~/CSS/Common/bootstrap-datetimepicker.css")" rel="stylesheet" />
+    <link href="@Url.Content("~/CSS/Common/jquery.steps.css")" rel="stylesheet" />
+    <link href="@Url.Content("~/CSS/Custom/CreateAssignment.css")" rel="stylesheet" />
+    <link href="@Url.Content("~/CSS/Custom/CreateTask.css")" rel="stylesheet" />
+    <link href="@Url.Content("~/CSS/Custom/StepsSidebar.css")" rel="stylesheet" />
+}
+
+<div class="row">
+    <div class="col-sm-12"><div class="main-heading title-row mbp15"><h1 class="heading01">Create Task</h1></div></div>
+</div>
+
+@Html.Partial("_ErrorMessages", Model)
+
+<div id="wizard">
+    <!-- Step 1 -->
+    <h3>Project Selection</h3>
+    <section>
+        <div class="form-group input-height row">
+            <label for="Project" class="col-md-6 col-sm-3">Project<span class="mandatory">*</span></label>
+            <div class="input-group col-md-6 col-sm-9">
+                @Html.DropDownListFor(x => x.ProjectID, (Model.myProjectList != null) ? Model.myProjectList : new List<SelectListItem>(), " - Select Project - ", new { @class = "form-control", onchange = "changeProject(this)" })
+                <span class="input-group-btn">
+                    <button class="btn-primary btn" type="button" data-toggle="modal" data-target="#addnewproject" onclick="openAddNewPopup()"><i class="fa fa-plus" aria-hidden="true"></i></button>
+                </span>
+            </div>
+            <p class="errormessage col-sm-6 offset-sm-6" style="display:none;" id="reqProjectID">
+                <span class="field-validation-error" data-valmsg-for="ProjectID" data-valmsg-replace="true"><span for="ProjectID" class="">Project is required.</span></span>
+            </p>
+        </div>
+
+        <div class="form-group input-height row">
+            <label for="" class="col-md-6 col-sm-3">Choose a project file<span class="mandatory">*</span></label>
+            <div id="divProjectTaskID" class="col-md-6 col-sm-9 input-group">
+                @(Html.Kendo().DropDownList()
+                                  .Name("ProjectTaskID")
+                                  .HtmlAttributes(new { style = "width: 100%", @class = "form-control" })
+                                  .DataTextField("ProjectName")
+                                  .DataValueField("ProjectID")
+                                  .OptionLabel(" - Select Project Document - ")
+                                  .DataSource(source => source
+                                      .Custom()
+                                      .Transport(transport => transport
+                                          .Read(read =>
+                                          {
+                                              read.Action("GetProjectDocumentList", "Home").Data("filterDocuments"); ;
+                                          })))
+                                  .Events(e =>
+                                  {
+                                      e.Change("changeProjectDoc");
+                                  }).Template("<span class=\"k-state-default\" ><b style='font-size:14px;'>#: ProjectName #</b><p style='font-size:10px;'>#: DocName #</p></span>")
+                                  .ValueTemplate("<span class=\"selected-value\" ></span>" + "<span>#:DocName#</span>")
+                )
+                @*<span class="input-group-btn">
+                    <button class="btn-primary btn" type="button"><i class="fa fa-plus" aria-hidden="true"></i></button>
+                </span>*@
+            </div>
+            <p class="errormessage col-sm-6 offset-sm-6" style="display:none;" id="reqProjectDocuments">
+                <span class="field-validation-error" data-valmsg-for="ProjectDocuments" data-valmsg-replace="true"><span for="ProjectDocuments" class="">Project Document is required.</span></span>
+            </p>
+        </div>
+
+
+        <div class="form-group multiselectbox input-height row">
+            @using (Html.BeginForm("UploadDoc", "Home", FormMethod.Post, new { enctype = "multipart/form-data", id = "CreateUpload" }))
+            {
+                <input type="hidden" name="hdnDocTaskType" value="" id="hdnDocTaskType" />
+                <input type="hidden" name="hdnDocProjectID" value="" id="hdnDocProjectID" />
+                <input type="hidden" name="hdnDocTaskName" value="" id="hdnDocTaskName" />
+                <input type="hidden" name="hdnDocDueDate" value="" id="hdnDocDueDate" />
+                <input type="hidden" name="hdnDocAssignTo" value="" id="hdnDocAssignTo" />
+                //<input type="hidden" name="hdnDocComments" value="" id="hdnDocComments" />
+                <input type="hidden" name="hdnDocName" value="" id="hdnDocName" />
+                <input type="hidden" name="hdnDocumentID" value="" id="hdnDocumentID" />
+                <input type="hidden" name="hdnFileName" id="hdnFileName" />
+
+                <label for="UploadNewFile" class="col-md-6 col-sm-3">Or upload a new file</label>
+                <div class="col-md-6 col-sm-9 input-group" style="padding-right:15px;">
+
+                    <input type="text" class="form-control" readonly="">
+                    <label class="input-group-btn">
+                        <span class="btn btn-primary">
+                            Browse… <input type="file" style="display:none;" multiple="multiple" name="docFile" onchange="ValidateType(this)" class="form-control" id="docFile" accept=".docx,.doc,.ppt,.pptx,.xls,.xlsx" />
+                        </span>
+                        @*<div class="col-lg-6">
+                                <input type="file" multiple="multiple" name="docFile" onchange="ValidateType(this)" value="" class="form-control col-md-5" id="docFile" accept=".docx,.doc,.ppt,.pptx" />
+                            </div>*@
+                        <button class="btn-primary btn ml5" type="submit" name="Upload" onclick="return SetDocData()" title="Upload Document"><i class="fa fa-upload" aria-hidden="true"></i></button>
+                    </label>
+                </div>
+            }
+        </div>
+        <div class="col-sm-12 form-group">
+            <form action="@Url.Action("UploadDocDropzone","Home")" method="post"
+                  enctype="multipart/form-data" class="dropzone"
+                  id="dropzoneForm">
+                <div class="upload-drop-zone data-hint" id="dropzone">
+                    You can drag and drop a new file here
+                </div>
+            </form>
+        </div>
+
+    </section>
+
+    <!-- Step 2 -->
+    <h3>Document Preview</h3>
+    <section>
+        <div class="col-sm-8">
+            <div id="divPPT" style="display:none;">
+                <div class="table-responsive bluetheme mtp15 popover-hide-xs" id="Slides">
+                </div>
+            </div>
+        </div>
+        <div class="col-sm-8 ExcelDiv">
+            <div id="divExcel" style="display:none">
+                <div class="table-responsive bluetheme mtp15 popover-hide-xs" style="">
+                    <div id="rowsTab" class="tab-pane fade in active">
+                        <ul class="legend">
+                            <li><span class="assignedRows"></span> Rows already assigned.</li>
+                        </ul>
+                        <br /><br />
+                        @{
+                            if (Model.AssignedMembers != null && Model.AssignedMembers.Count() > 0)
+                            {
+
+                                <div class="alert alert-warning">
+                                    <strong>Assigned Members:</strong>
+                                    @foreach (var member in Model.AssignedMembers)
+                                    {
+                                        <li>@member</li>
+                                    }
+                                </div>
+                            }
+                        }
+
+                        <div class="alert alert-warning">
+                            <strong>Note:</strong> <span id="sheetRowsText">You have not selected any rows, the entire workbook will be shared.</span>
+                        </div>
+                        <div id="RowsPartialContainer"></div>
+                        <a id="RowsDownloadLink" href="#"><i class="glyphicon glyphicon-download-alt " title="Click to Download "></i></a>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-sm-8">
+            <div id="AssignDiv" style="display: block">
+                <div class="table-responsive bluetheme mtp15 popover-hide-xs" id="divFile" style="display:none;">
+
+                </div>
+
+                <div id="divWord" style="display:none">
+                </div>
+            </div>
+        </div>
+        <div class="col-sm-8">
+            <div id="generateDiv" style="display:none">
+                @using (Html.BeginForm("GenerateTemplate", "Home", FormMethod.Post, new { enctype = "multipart/form-data", id = "generateTemplate" }))
+                {
+                    <div class="col-lg-3 pull-left " style="padding-left:0">
+                        <input type="hidden" name="OriginalDocumentName" value=" " id="OriginalDocumentName" />
+                        <input type="submit" class="btn btn-primary pull-left" name="Generate" value="Generate Document" id="btnGenerate" />
+                    </div>
+                }
+            </div>
+        </div>
+        <div class="col-sm-9 wordDiv">
+            <div id="wordTextTabButtons">
+                <div class="btn btn-primary wordTextTabButton" id="selectEntireDoc" onclick="SelectEntireDocument()">Select entire document</div>
+                <div class="btn btn-primary wordTextTabButton" id="openFullscreen" onclick="OpenFullscreen()">Fullscreen</div>
+            </div>
+            <div id="wordTab">
+                <ul class="nav nav-tabs" style="list-style: none;">
+                    <li id="wordPageTab" @*class="hidden"*@>
+                        <a href="#1" data-toggle="tab">Page Selection</a>
+                    </li>
+                    <li class="active" id="wordTextTab">
+                        <a href="#2" data-toggle="tab">Text Selection</a>
+                    </li>
+                </ul>
+
+                <div class="tab-content">
+                    <div class="tab-pane" id="1">
+                        <div>
+                            @*<div class="table-responsive bluetheme mtp15 popover-hide-xs" id="WordPages">
+                        </div>*@
+                            <div class="row">
+                                <div class="col-lg-2" id="WordPages" style="height: 550px; overflow: auto;"></div>
+                                <div class="col-lg-10" id="WordPagesDoc"></div>
+                            </div>
+                        </div>
+
+                    </div>
+                    <div class="tab-pane active" id="2">
+                        <div id="divDoc" style="display: block">
+                            @if (Model.DocumentType == (int) WordAutomationDemo.Common.Global.DocumentType.Word && !string.IsNullOrEmpty(Model.DocumentName))
+                            {
+                                @Html.Partial("_LoadAndSavePartial", Model)
+                            }
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+
+        <div class="col-sm-4" id="taskDetails">
+            @using (Html.BeginForm("CreateAssignment", "Home", FormMethod.Post, new { id = "frmCreate" }))
+            {
+                @Html.HiddenFor(x => x.start)
+                @Html.HiddenFor(x => x.length)
+                @Html.HiddenFor(x => x.selectedText)
+                @Html.HiddenFor(x => x.selectedPages)
+                @Html.HiddenFor(x => x.selectedRanges)
+                @Html.HiddenFor(x => x.DocumentName)
+                @Html.HiddenFor(x => x.DocumentType)
+                @Html.HiddenFor(x => x.SelectedRows)
+                @Html.HiddenFor(x => x.IsEntireDocument)
+                @Html.HiddenFor(x => x.ProjectID)
+                @Html.HiddenFor(x => x.IsFullscreen)
+                @Html.HiddenFor(x => x.SelectedSlides)
+                @Html.HiddenFor(x => x.SelectedSheets)
+                @Html.HiddenFor(x => x.DocumentID)
+                @Html.HiddenFor(x => x.Comments)
+                @Html.HiddenFor(x => x.AssignmentMemberList)
+
+                <div class="form-group input-height row">
+                    <label for="TaskName" class="col-md-6">Task Name<span class="mandatory">*</span></label>
+                    <div class="input-group col-md-6 col-sm-9">@Html.TextBoxFor(x => x.TaskName, new { @class = "form-control required" })</div>
+                    <p class="errormessage col-sm-6 offset-sm-6" style="display:none;" id="reqTaskName">
+                        <span class="field-validation-error" data-valmsg-for="TaskName" data-valmsg-replace="true"><span for="TaskName" class="">Task Name is required.</span></span>
+                    </p>
+                </div>
+                <div class="form-group input-height row">
+                    <label for="name" class="col-md-6">Due Date<span class="mandatory">*</span></label>
+                    <div class="input-group data col-md-6" id="dtDuedate">
+                        @Html.TextBoxFor(x => x.DueDate, new { @class = "form-control", id = "DueDate" })
+                        <span class="input-group-addon btn-primary"> <i class="fa fa-calendar" aria-hidden="true"></i> </span>
+                    </div>
+                    <p class="errormessage col-sm-6 offset-sm-6" style="display:none;" id="reqDueDate">
+                        <span class="field-validation-error" data-valmsg-for="DueDate" data-valmsg-replace="true"><span for="DueDate" class="">Due Date is required.</span></span>
+                    </p>
+                </div>
+                <div class="form-group input-height row">
+                    <label for="name" class="col-md-6">Comments</label>
+                    <div class="input-group data col-md-6">
+                        @Html.TextAreaFor(x => x.Comments, new { @placeholder = "Comments (Optional)", @id = "taskComments", @class = "form-control" })
+                    </div>
+                </div>
+                <br />
+                <div class="row">
+                    <div class="col-sm-12">
+                        <div id="grid"></div>
+                        <p class="errormessage" style="display:none;" id="reqAssignTo">
+                            <span class="field-validation-error" data-valmsg-for="AssignTo" data-valmsg-replace="true"><span for="AssignTo" class="">Assign To is required.</span></span>
+                        </p>
+                    </div>
+                </div>
+            }
+        </div>
+
+    </section>
+
+</div>
+
+<div id="spinner" style="display:none;">
+    <img src=@Url.Content("~/CSS/images/bx_loader.gif") class="ajax-loader loading-spinner">
+</div>
+
+<!-- Modals -->
+@Html.Partial("_AddMembersModal", Model)
+@Html.Partial("_CreateProjectModal", Model)
+
+<!-- Floating task details -->
+@Html.Partial("_FullscreenTaskDetails",Model)
+
+<!-- JQuery Steps plugin script -->
+<script>
+   
+    var wizard = $("#wizard").steps({
+        headerTag: "h3",
+        bodyTag: "section",
+        transitionEffect: "slideLeft",
+        stepsOrientation: "horizontal",
+        onFinished: function (event, currentIndex) {
+            PostData(false);
+        },
+
+        //onStepChanging: function(event, currentIndex, newIndex) {
+        //    if (currentIndex < newIndex) {
+        //        var projectId = $("#ProjectID").val();
+        //        var documentId = $("#DocumentID").val();
+        //        //console.log(projectId, documentId);
+        //        var isValid = true;
+        //        if (projectId == "" || parseInt(projectId) <= 0) {
+        //            $("#reqProjectID").show();
+        //            isValid = false;
+        //        }
+        //        if (documentId == "" || parseInt(documentId) <= 0) {
+        //            $("#reqProjectDocuments").show();
+        //            isValid = false;
+        //        }
+        //        //console.log(isValid);
+        //        return isValid;
+        //    } else {
+        //        return true;
+        //    }
+        //},
+    
+        onStepChanged: function (event, currentIndex, priorIndex) {
+            //Load inline view when clicking on "next"
+            if (currentIndex > priorIndex) {
+                var selectedDoctype = $('input:hidden[name=DocumentType]').val();
+                var docName = $('input:hidden[name=DocumentName]').val();
+
+                if (selectedDoctype == '@((int)WordAutomationDemo.Common.Global.DocumentType.Xls)') {
+                    GetRows(docName);
+                }
+                if (selectedDoctype == '@((int)WordAutomationDemo.Common.Global.DocumentType.Word)') {
+                    GetDocument(docName);
+                }
+            }
+
+        }
+    });
+
+//Go to next step if a doc is already selected (on redirect after creating new task)
+    if (('@TempData["hdnDocName"]' != null && '@TempData["hdnDocName"]' != '') || $("#DocumentName").val() != '') {
+        unlockEntireDoc();
+        wizard.steps("next");
+    }
+</script> @*JQuery Steps - Custom*@
